@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_margin="16dp"
-        android:background="@drawable/ic_launcher_background"
+        android:src="@drawable/air_conditioner"
         android:contentDescription="家具图片"
         android:scaleType="centerInside"/>
 
@@ -137,14 +137,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_11"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="灯光"
+                        android:text="设置项11"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_light"
+                        android:id="@+id/switch_11"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
@@ -158,14 +159,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_12"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="加热"
+                        android:text="设置项12"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_heat"
+                        android:id="@+id/switch_12"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
@@ -179,14 +181,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_13"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="震动"
+                        android:text="设置项13"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_vibrate"
+                        android:id="@+id/switch_13"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
@@ -200,14 +203,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="锁定"
+                        android:text="设置项14"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_lock"
+                        android:id="@+id/switch_14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
@@ -230,14 +234,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_21"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="节能"
+                        android:text="设置项21"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_energy"
+                        android:id="@+id/switch_21"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -252,14 +257,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_22"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="节能"
+                        android:text="设置项22"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_energy2"
+                        android:id="@+id/switch_22"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -274,14 +280,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_23"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="节能"
+                        android:text="设置项23"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_energy3"
+                        android:id="@+id/switch_23"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -296,14 +303,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/switch_label_24"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="节能"
+                        android:text="设置项24"
                         android:textSize="14sp" />
 
                     <Switch
-                        android:id="@+id/switch_energy4"
+                        android:id="@+id/switch_24"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -322,14 +330,15 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/seekbar_label_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:text="亮度"
+                    android:text="滑块1"
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/seekbar_brightness"
+                    android:id="@+id/seekbar_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
@@ -345,14 +354,15 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/seekbar_label_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:text="温度"
+                    android:text="滑块2"
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/seekbar_temperature"
+                    android:id="@+id/seekbar_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
@@ -368,14 +378,15 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/seekbar_label_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:text="音量"
+                    android:text="滑块3"
                     android:textSize="14sp" />
 
                 <SeekBar
-                    android:id="@+id/seekbar_volume"
+                    android:id="@+id/seekbar_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
