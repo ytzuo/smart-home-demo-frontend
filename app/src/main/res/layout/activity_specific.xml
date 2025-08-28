@@ -20,7 +20,7 @@
             android:layout_width="53dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
-            android:text="<返回"
+            android:text="返回"
             android:textColor="@color/black"
             android:textSize="14sp" />
 

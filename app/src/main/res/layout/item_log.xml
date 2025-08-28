@@ -9,28 +9,57 @@
     android:paddingLeft="20dp">
 
     <com.google.android.material.button.MaterialButton
-        android:layout_width="100dp"
+        android:id="@+id/log_type"
+        android:layout_width="110dp"
         android:layout_height="68dp"
         android:text="@string/INFO"
-        android:textSize="22sp"
+        android:textSize="18sp"
         app:cornerRadius="12dp"
         app:backgroundTint="@color/INFO_background"
         android:textColor="@color/INFO_text"/>
-    <View
-        android:layout_width="20dp"
-        android:layout_height="0dp"/>
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:text="@string/log_time"/>
-    <View
-        android:layout_width="20dp"
-        android:layout_height="0dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:text="@string/log_des"/>
+        android:layout_height="match_parent"
+        android:paddingTop="18dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View
+                android:layout_width="18dp"
+                android:layout_height="0dp"/>
+            <TextView
+                android:id="@+id/log_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/log_time"/>
+            <View
+                android:layout_width="20dp"
+                android:layout_height="0dp"/>
+            <TextView
+                android:id="@+id/log_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/log_des"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View
+                android:layout_width="14dp"
+                android:layout_height="0dp"/>
+            <TextView
+                android:id="@+id/log_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/logID"/>
+        </LinearLayout>
+    </LinearLayout>
+
 
 </LinearLayout>

@@ -14,4 +14,5 @@
     <string name="enginOn">发动机状态</string>
     <string name="fuel">剩余油量</string>
     <string name="mile">剩余里程</string>
+    <string name="logID">日志ID</string>
 </resources>

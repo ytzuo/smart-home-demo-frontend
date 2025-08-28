@@ -14,9 +14,7 @@
         android:layout_height="240dp"
         android:layout_margin="10dp"
         android:background="@drawable/ic_launcher_background"
-        app:layout_constraintTop_toTopOf=""
-        android:contentDescription="汽车图片"
-        android:scaleType="centerInside"/>
+        android:contentDescription="汽车图片" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -87,7 +85,7 @@
                     app:cornerRadius="0dp"
                     android:layout_weight="1"
                     app:iconSize="80dp"
-                    app:iconTint="@color/gray_btn_bg_color"
+                    app:iconTint="#FF9E9E9E"
                     app:iconGravity="textTop"
                     android:text="车灯"
                     android:textColor="@color/black"/>
@@ -100,7 +98,7 @@
                     app:cornerRadius="0dp"
                     android:layout_weight="1"
                     app:iconSize="80dp"
-                    app:iconTint="@color/gray_btn_bg_color"
+                    app:iconTint="#FF9E9E9E"
                     app:iconGravity="textTop"
                     android:text="发动机"
                     android:textColor="@color/black"/>
@@ -112,7 +110,7 @@
                     app:backgroundTint="@android:color/transparent"
                     app:cornerRadius="0dp"
                     android:layout_weight="1"
-                    app:iconTint="@color/gray_btn_bg_color"
+                    app:iconTint="#FF9E9E9E"
                     app:iconSize="80dp"
                     app:iconGravity="textTop"
                     android:text="空调"
