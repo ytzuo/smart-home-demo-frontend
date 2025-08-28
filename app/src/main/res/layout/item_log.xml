@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:gravity="center_vertical"
+    android:paddingLeft="20dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="100dp"
+        android:layout_height="68dp"
+        android:text="@string/INFO"
+        android:textSize="22sp"
+        app:cornerRadius="12dp"
+        app:backgroundTint="@color/INFO_background"
+        android:textColor="@color/INFO_text"/>
+    <View
+        android:layout_width="20dp"
+        android:layout_height="0dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:text="@string/log_time"/>
+    <View
+        android:layout_width="20dp"
+        android:layout_height="0dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:text="@string/log_des"/>
+
+</LinearLayout>

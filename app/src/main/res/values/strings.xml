@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">SmartHomeDemo</string>
+    <string name="type">家具图片</string>
+    <string name="furniture">设备名称</string>
+    <string name="working">工作状态</string>
+    <string name="status1">其他状态1</string>
+    <string name="status2">其他状态2</string>
+    <string name="INFO">INFO</string>
+    <string name="WARN">WARN</string>
+    <string name="ALERT">ALERT</string>
+    <string name="log_time">日志时间</string>
+    <string name="log_des">日志信息</string>
+    <string name="name_car">汽车名</string>
+    <string name="enginOn">发动机状态</string>
+    <string name="fuel">剩余油量</string>
+    <string name="mile">剩余里程</string>
 </resources>
