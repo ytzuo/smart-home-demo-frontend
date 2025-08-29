@@ -12,7 +12,4 @@ public class SpecificFurnitureActivity extends AppCompatActivity {
 
 
     }
-
-
-
 }

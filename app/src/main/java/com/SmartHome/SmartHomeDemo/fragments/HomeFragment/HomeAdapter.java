@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
+
 import java.util.List;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
@@ -82,5 +84,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 }
             });
         }
+    }
+    public void updateData(List<FurnitureItem> newFurnitureList) {
+        this.furnitureList = newFurnitureList;
+        notifyDataSetChanged();
     }
 }

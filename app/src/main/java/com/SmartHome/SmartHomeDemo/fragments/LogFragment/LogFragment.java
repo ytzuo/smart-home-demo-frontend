@@ -7,12 +7,15 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
-import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
-import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeAdapter;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogAdapter;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +24,31 @@ public class LogFragment extends Fragment {
     public LogFragment(){}
     private RecyclerView recyclerView;
     private LogAdapter adapter;
-    private List<LogItem> logList;
+    private LogViewModel logViewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
+        // 初始化ViewModel
+        logViewModel = new ViewModelProvider(this).get(LogViewModel.class);
+
         // 初始化RecyclerView
         recyclerView = view.findViewById(R.id.log_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 初始化数据
-        initData();
-
         // 设置适配器
-        adapter = new LogAdapter(logList);
+        adapter = new LogAdapter(new ArrayList<LogItem>());
         recyclerView.setAdapter(adapter);
+
+        // 观察日志数据变化
+        logViewModel.getLogListLiveData().observe(getViewLifecycleOwner(), new Observer<List<LogItem>>() {
+            @Override
+            public void onChanged(List<LogItem> logItems) {
+                adapter.updateData(logItems);
+            }
+        });
 
         // 设置点击事件
         adapter.setOnItemClickListener(new LogAdapter.OnItemClickListener() {
@@ -50,10 +62,13 @@ public class LogFragment extends Fragment {
 
     }
 
-    private void initData() { //这里是测试数据, 正式版删去
-        logList = new ArrayList<>();
-        logList.add(new LogItem("INFO", "2025-8-28 19:53", "log01", "测试日志1"));
-        logList.add(new LogItem("WARN", "2025-8-28 19:53", "log02", "测试日志2"));
-        logList.add(new LogItem("ALERT", "2025-8-28 19:53", "log03", "测试日志3"));
+    // 提供一个方法用于外部添加日志
+    public void addLogItem(LogItem logItem) {
+        logViewModel.addLogItem(logItem);
+    }
+
+    // 提供一个方法用于更新整个日志列表
+    public void updateLogList(List<LogItem> newLogList) {
+        logViewModel.updateLogList(newLogList);
     }
 }

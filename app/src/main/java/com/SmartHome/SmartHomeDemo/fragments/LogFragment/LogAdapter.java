@@ -97,4 +97,9 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
             });
         }
     }
+
+    public void updateData(List<LogItem> newLogList) {
+        this.logList = newLogList;
+        notifyDataSetChanged();
+    }
 }

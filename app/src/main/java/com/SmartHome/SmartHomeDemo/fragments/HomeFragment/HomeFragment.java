@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,22 +21,30 @@ public class HomeFragment extends Fragment {
     public HomeFragment(){}
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
-    private List<FurnitureItem> furnitureList;
+    private HomeViewModel homeViewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_furniture, container, false);
 
+        // 初始化ViewModel
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         // 初始化RecyclerView
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 初始化数据
-        initData();
-
         // 设置适配器
-        adapter = new HomeAdapter(furnitureList);
+        adapter = new HomeAdapter(new ArrayList<FurnitureItem>());
         recyclerView.setAdapter(adapter);
+
+        // 观察家具数据变化
+        homeViewModel.getFurnitureLiveData().observe(getViewLifecycleOwner(), new Observer<List<FurnitureItem>>() {
+            @Override
+            public void onChanged(List<FurnitureItem> furnitureItems) {
+                adapter.updateData(furnitureItems);
+            }
+        });
 
         // 设置点击事件
         adapter.setOnItemClickListener(new HomeAdapter.OnItemClickListener() {
@@ -45,14 +55,6 @@ public class HomeFragment extends Fragment {
         });
 
         return view;
-    }
 
-    private void initData() { //这里是测试数据, 正式版删去
-        furnitureList = new ArrayList<>();
-        furnitureList.add(new FurnitureItem("智能灯具", "工作中", "开启", "今天 14:30", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能空调", "工作中", "制冷 24℃", "今天 10:15", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能窗帘", "待机中", "关闭", "昨天 18:20", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能音响", "工作中", "播放中", "今天 09:45", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能电视", "待机中", "关闭", "昨天 22:30", R.drawable.ic_launcher_foreground));
     }
 }
