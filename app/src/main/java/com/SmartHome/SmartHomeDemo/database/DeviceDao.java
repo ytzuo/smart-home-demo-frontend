@@ -11,6 +11,9 @@ public interface DeviceDao {
     @Query("SELECT * FROM devices")
     List<Device> getAllDevices();
 
+    @Query("SELECT * FROM devices WHERE id = :id")
+    Device getDeviceById(int id);
+
     @Query("SELECT * FROM devices WHERE device_id = :deviceId")
     List<Device> getDevicesByDeviceId(String deviceId);
 

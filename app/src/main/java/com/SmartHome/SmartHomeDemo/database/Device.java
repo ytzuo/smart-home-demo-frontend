@@ -2,9 +2,12 @@ package com.SmartHome.SmartHomeDemo.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity(tableName = "devices")
 public class Device {
+        @PrimaryKey(autoGenerate = true)
+        private int id;
         @ColumnInfo(name = "device_id")
         private String deviceId;
         @ColumnInfo(name = "device_type")
@@ -32,4 +35,9 @@ public class Device {
         public void setDeviceType(String deviceType) {
                 this.deviceType = deviceType;
         }
+
+        public int getId() {
+                return id;
+        }
+
 }

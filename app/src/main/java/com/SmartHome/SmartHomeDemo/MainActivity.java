@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
@@ -20,11 +21,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AppDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        // 初始化数据库
+        database = AppDatabase.getDatabase(this);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         loadFragment(new CarFragment());
@@ -54,5 +59,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    // 提供获取数据库实例的方法
+    public AppDatabase getDatabase() {
+        return database;
     }
 }
