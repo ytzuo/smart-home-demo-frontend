@@ -19,11 +19,21 @@ public class HomeViewModel extends ViewModel {
         furnitureListLiveData = new MutableLiveData<>(furnitureList);
 
         //初始化测试数据
-        furnitureList.add(new FurnitureItem("智能灯具", "工作中", "开启", "今天 14:30", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能空调", "工作中", "制冷 24℃", "今天 10:15", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能窗帘", "待机中", "关闭", "昨天 18:20", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能音响", "工作中", "播放中", "今天 09:45", R.drawable.ic_launcher_foreground));
-        furnitureList.add(new FurnitureItem("智能电视", "待机中", "关闭", "昨天 22:30", R.drawable.ic_launcher_foreground));
+        furnitureList.add(new FurnitureItem(
+                "智能灯具1", "light", "工作中", "开启", "今天 14:30", R.drawable.light,
+                0, "0000", true, 80));
+        furnitureList.add(new FurnitureItem(
+                "智能空调1", "air_conditioner", "工作中", "制冷 24℃", "今天 10:15", R.drawable.air_conditioner,
+                27, "1001", false, 0));
+        furnitureList.add(new FurnitureItem(
+                "智能灯具2", "light", "待机中", "关闭", "昨天 18:20", R.drawable.light,
+                0, "0000", false, 70));
+        furnitureList.add(new FurnitureItem(
+                "智能空调2", "air_conditioner", "工作中", "播放中", "今天 09:45", R.drawable.air_conditioner,
+                25, "1011", false, 0));
+        furnitureList.add(new FurnitureItem(
+                "智能灯具2", "light", "待机中", "关闭", "昨天 22:30", R.drawable.light,
+                0, "0000", false, 0));
         furnitureListLiveData.setValue(furnitureList);
     }
 

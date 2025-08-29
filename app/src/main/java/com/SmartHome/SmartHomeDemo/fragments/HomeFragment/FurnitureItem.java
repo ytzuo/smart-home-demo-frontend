@@ -1,7 +1,8 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 public class FurnitureItem {
-    private String name;
+    private String deviceId;
+    private String deviceType;
     private String workingStatus;
     private String status;
     private String time;
@@ -44,20 +45,26 @@ public class FurnitureItem {
         this.lightPercent = lightPercent;
     }
 
-    public FurnitureItem(String name, String workingStatus, String status, String time, int imageResource) {
-        this.name = name;
+    public FurnitureItem(String name, String deviceType, String workingStatus, String status, String time, int imageResource,
+                         float acTemp, String acStatus, boolean lightOn, float lightPercent) {
+        this.deviceId = name;
+        this.deviceType = deviceType;
         this.workingStatus = workingStatus;
         this.status = status;
         this.time = time;
         this.imageResource = imageResource;
+        this.acTemp = acTemp;
+        this.acStatus = acStatus;
+        this.lightOn = lightOn;
+        this.lightPercent = lightPercent;
     }
 
-    public String getName() {
-        return name;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getWorkingStatus() {
@@ -91,4 +98,13 @@ public class FurnitureItem {
     public void setImageResource(int imageResource) {
         this.imageResource = imageResource;
     }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+    }
+
 }

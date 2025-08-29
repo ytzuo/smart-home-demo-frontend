@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.SmartHome.SmartHomeDemo.R;
-import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         public void bind(final FurnitureItem item, final OnItemClickListener listener, final int position) {
             itemImage.setImageResource(item.getImageResource());
-            nameText.setText(item.getName());
+            nameText.setText(item.getDeviceId());
             workingText.setText(item.getWorkingStatus());
             statusText.setText(item.getStatus());
             timeText.setText(item.getTime());

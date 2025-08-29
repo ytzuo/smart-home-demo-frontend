@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment {
         adapter.setOnItemClickListener(new HomeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(FurnitureItem item, int position) {
-                Toast.makeText(getContext(), "点击了: " + item.getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT).show();
             }
         });
 
