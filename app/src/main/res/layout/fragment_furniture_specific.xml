@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_margin="16dp"
-        android:src="@drawable/air_conditioner"
+        android:src="@drawable/param_background"
         android:contentDescription="家具图片"
         android:scaleType="centerInside"/>
 
@@ -79,33 +79,37 @@
 
                 <!-- 参数项1 -->
                 <TextView
+                    android:id="@+id/arg1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="尺寸: 120cm × 60cm × 80cm"
+                    android:text="参数项1"
                     android:textSize="14sp" />
 
                 <!-- 参数项2 -->
                 <TextView
+                    android:id="@+id/arg2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="材质: 实木"
+                    android:text="参数项2"
                     android:textSize="14sp" />
 
                 <!-- 参数项3 -->
                 <TextView
+                    android:id="@+id/arg3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="颜色: 原木色"
+                    android:text="参数项3"
                     android:textSize="14sp" />
 
                 <!-- 参数项4 -->
                 <TextView
+                    android:id="@+id/arg4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="重量: 25kg"
+                    android:text="参数项4"
                     android:textSize="14sp" />
             </LinearLayout>
 
