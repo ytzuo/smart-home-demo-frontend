@@ -15,4 +15,10 @@
     <string name="fuel">剩余油量</string>
     <string name="mile">剩余里程</string>
     <string name="logID">日志ID</string>
+    <string name="match_device">发现新设备</string>
+    <string name="new_device">是否进行配对？</string>
+    <string name="device_id">设备ID</string>
+    <string name="device_type">设备类型</string>
+    <string name="match_cancel">取消</string>
+    <string name="match_done">确定配对</string>
 </resources>
