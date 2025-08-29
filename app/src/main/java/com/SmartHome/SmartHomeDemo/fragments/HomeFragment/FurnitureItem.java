@@ -1,14 +1,16 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
-public class FurnitureItem {
+import java.io.Serializable;
+public class FurnitureItem implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String deviceId;
-    private String deviceType;
+    private String deviceType; //"air_conditioner" 或 "light"
     private String workingStatus;
     private String status;
     private String time;
     private int imageResource;
-    private float acTemp;
-    private String acStatus; //四位长的字符串, 类似1001, 代表开关
+    private float acTemp; //空调温度
+    private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
     private boolean lightOn;
     private float lightPercent;
 
@@ -21,12 +23,12 @@ public class FurnitureItem {
         this.acTemp = acTemp;
     }
 
-    public String getAcStatus() {
-        return acStatus;
+    public String getSwitchStatus() {
+        return switchStatus;
     }
 
-    public void setAcStatus(String acStatus) {
-        this.acStatus = acStatus;
+    public void setSwitchStatus(String acStatus) {
+        this.switchStatus = acStatus;
     }
 
     public boolean isLightOn() {
@@ -46,7 +48,7 @@ public class FurnitureItem {
     }
 
     public FurnitureItem(String name, String deviceType, String workingStatus, String status, String time, int imageResource,
-                         float acTemp, String acStatus, boolean lightOn, float lightPercent) {
+                         float acTemp, String switchStatus, boolean lightOn, float lightPercent) {
         this.deviceId = name;
         this.deviceType = deviceType;
         this.workingStatus = workingStatus;
@@ -54,7 +56,7 @@ public class FurnitureItem {
         this.time = time;
         this.imageResource = imageResource;
         this.acTemp = acTemp;
-        this.acStatus = acStatus;
+        this.switchStatus = switchStatus;
         this.lightOn = lightOn;
         this.lightPercent = lightPercent;
     }
