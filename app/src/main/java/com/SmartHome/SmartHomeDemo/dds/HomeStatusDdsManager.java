@@ -66,15 +66,15 @@ public class HomeStatusDdsManager {
             );
 
             if (topic == null) {
-                Log.e(TAG, "创建Alert主题失败");
+                Log.e(TAG, "创建HomeStatus主题失败");
                 return;
             }
 
-            Log.i(TAG, "✓ Alert主题创建成功: " + TOPIC_NAME);
+            Log.i(TAG, "✓ HomeStatus主题创建成功: " + TOPIC_NAME);
 
             createSubscriber(baseManager);
 
-            Log.i(TAG, "✓ Alert DDS组件初始化完成");
+            Log.i(TAG, "✓ HomeStatus DDS组件初始化完成");
         } catch (Exception e) {
             Log.e(TAG, "HomeStatus DDS组件初始化失败", e);
         }

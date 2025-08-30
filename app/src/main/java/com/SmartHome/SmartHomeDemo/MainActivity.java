@@ -6,12 +6,11 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.DeviceDao;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
@@ -28,8 +27,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // 初始化数据库
-        database = AppDatabase.getDatabase(this);
+        // 获取数据库实例
+        SmartHomeApplication app = (SmartHomeApplication) getApplication();
+        database = app.getDatabase();
+        // 使用数据库
+        DeviceDao deviceDao = database.deviceDao();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         loadFragment(new CarFragment());

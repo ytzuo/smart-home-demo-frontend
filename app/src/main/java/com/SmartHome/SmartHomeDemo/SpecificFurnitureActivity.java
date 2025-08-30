@@ -23,7 +23,7 @@ public class SpecificFurnitureActivity extends AppCompatActivity {
             case "air_conditioner":
                 //设置图标
                 ImageView tempImage = findViewById(R.id.iv_furniture);
-                tempImage.setImageResource(R.drawable.air_conditioner);
+                tempImage.setImageResource(R.drawable.icon_air_conditioner);
 
                 //设置参数项文本
                 temp = findViewById(R.id.arg1);
@@ -54,7 +54,7 @@ public class SpecificFurnitureActivity extends AppCompatActivity {
             case "light":
                 //设置图标
                 tempImage = findViewById(R.id.iv_furniture);
-                tempImage.setImageResource(R.drawable.light);
+                tempImage.setImageResource(R.drawable.icon_light);
 
                 //设置参数项文本
                 temp = findViewById(R.id.arg1);

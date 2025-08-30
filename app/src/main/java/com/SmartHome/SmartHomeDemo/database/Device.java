@@ -15,10 +15,10 @@ public class Device {
         // 无参构造函数
         public Device() {}
 
-        public Device(String deviceId, String deviceType) {
-                this.deviceId = deviceId;
-                this.deviceType = deviceType;
-        }
+//        public Device(String deviceId, String deviceType) {
+//                this.deviceId = deviceId;
+//                this.deviceType = deviceType;
+//        }
 
         public String getDeviceId() {
                 return deviceId;
@@ -38,6 +38,10 @@ public class Device {
 
         public int getId() {
                 return id;
+        }
+
+        public void setId(int id) {
+                this.id = id;
         }
 
 }

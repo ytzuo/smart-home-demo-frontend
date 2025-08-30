@@ -23,7 +23,7 @@ public class CommandDdsManager {
     private DataWriter dataWriter;
 
     private static final String TOPIC_NAME = "CommandTopic";
-    private void initialize(BaseDdsManager baseManager) {
+    public void initialize(BaseDdsManager baseManager) {
         try{
             Log.i(TAG, "开始初始化Command DDS组件...");
 
@@ -55,9 +55,9 @@ public class CommandDdsManager {
 
             createPublisher(baseManager);
 
-            Log.i(TAG, "✓ Alert DDS组件初始化完成");
+            Log.i(TAG, "✓ Command DDS组件初始化完成");
         } catch(Exception e) {
-            Log.e(TAG, "HomeStatus DDS组件初始化失败", e);
+            Log.e(TAG, "Command DDS组件初始化失败", e);
         }
     }
 
