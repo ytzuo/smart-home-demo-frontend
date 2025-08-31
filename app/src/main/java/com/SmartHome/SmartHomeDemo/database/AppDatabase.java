@@ -7,7 +7,7 @@ import android.content.Context;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Device.class}, version = 1, exportSchema = false)
+@Database(entities = {Device.class, Log.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     //
@@ -20,6 +20,7 @@ public abstract class AppDatabase extends RoomDatabase {
             Executors.newFixedThreadPool(4);
 
     public abstract DeviceDao deviceDao();
+    public abstract LogDao logDao();
 
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
@@ -29,7 +30,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class, "smart_home_database")
                             .build();
 //                            .allowMainThreadQueries() // 仅用于测试，实际应用中应避免在主线程执行数据库操作
-                            //.build();
+                    //.build();
                 }
             }
         }

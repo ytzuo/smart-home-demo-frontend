@@ -1,20 +1,29 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class HomeViewModel extends ViewModel {
+public class HomeViewModel extends AndroidViewModel {
     private MutableLiveData<List<FurnitureItem>> furnitureListLiveData;
     private List<FurnitureItem> furnitureList;
+    private AppDatabase database;
 
-    public HomeViewModel() {
+    public HomeViewModel(Application application) {
+        super(application);
         furnitureList = new ArrayList<>();
         furnitureListLiveData = new MutableLiveData<>(furnitureList);
 
@@ -35,6 +44,12 @@ public class HomeViewModel extends ViewModel {
                 "智能灯具2", "light", "待机中", "关闭", "昨天 22:30", R.drawable.icon_light,
                 0, "0000", false, 0));
         furnitureListLiveData.setValue(furnitureList);
+
+//        //实测数据库时再启用
+//        database = ((SmartHomeApplication) application).getDatabase();
+//
+//         //从数据库加载日志
+//        loadFurnitureFromDatabase();
     }
 
     public LiveData<List<FurnitureItem>> getFurnitureLiveData() {
@@ -59,4 +74,32 @@ public class HomeViewModel extends ViewModel {
         }
     }
 
+    private void loadFurnitureFromDatabase() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Device> devices = database.deviceDao().getAllDevices();
+            List<FurnitureItem> FurnitureItems = new ArrayList<>();
+
+            for(Device device : devices) {
+                int icon = R.drawable.icon_air_conditioner;
+                if(Objects.equals(device.getDeviceType(), "light"))
+                    icon = R.drawable.icon_light;
+                else if (Objects.equals(device.getDeviceType(), "air_conditioner"))
+                    icon = R.drawable.icon_air_conditioner;
+                FurnitureItem item = new FurnitureItem(
+                        device.getDeviceId(),
+                        device.getDeviceType(),
+                        "未连接",
+                        "未连接",
+                        "默认时间",
+                        icon,
+                        0,
+                        "0000",
+                        false,
+                        0
+                );
+                FurnitureItems.add(item);
+            }
+            furnitureListLiveData.postValue(FurnitureItems);
+        });
+    }
 }

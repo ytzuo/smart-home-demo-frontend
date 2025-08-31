@@ -24,6 +24,9 @@ public class SmartHomeApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // 加载ZRDDS库
+        System.loadLibrary("ZRDDS_JAVA");
+
         // 初始化数据库
         database = AppDatabase.getDatabase(this);
 
