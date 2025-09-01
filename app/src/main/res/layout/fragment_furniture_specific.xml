@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="25dp"
+    android:orientation="vertical">
 
     <!-- 导航栏 -->
     <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:elevation="4dp">
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- 返回按钮 -->
         <TextView
@@ -46,13 +51,20 @@
         android:layout_margin="16dp"
         android:src="@drawable/param_background"
         android:contentDescription="家具图片"
-        android:scaleType="centerInside"/>
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- 可扩展的参数和设置项框架 -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp">
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/iv_furniture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,6 +73,7 @@
 
             <!-- 参数区域 -->
             <TextView
+                android:id="@+id/param_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -71,6 +84,7 @@
                 android:textSize="18sp" />
 
             <LinearLayout
+                android:id="@+id/param_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/param_background"
@@ -78,43 +92,102 @@
                 android:padding="16dp">
 
                 <!-- 参数项1 -->
-                <TextView
-                    android:id="@+id/arg1"
+                <LinearLayout
+                    android:id="@+id/param_container_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="参数项1"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项1："
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/arg1_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="项1"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
 
                 <!-- 参数项2 -->
-                <TextView
-                    android:id="@+id/arg2"
+                <LinearLayout
+                    android:id="@+id/param_container_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="参数项2"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项2："
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/arg2_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="项2"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
                 <!-- 参数项3 -->
-                <TextView
-                    android:id="@+id/arg3"
+                <LinearLayout
+                    android:id="@+id/param_container_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="参数项3"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项3："
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/arg3_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="项3"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
                 <!-- 参数项4 -->
-                <TextView
-                    android:id="@+id/arg4"
+                <LinearLayout
+                    android:id="@+id/param_container_4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="参数项4"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项4："
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/arg4_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="项4"
+                        android:textSize="14sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- 设置项标题 -->
             <TextView
+                android:id="@+id/settings_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -126,6 +199,7 @@
 
             <!-- 开关设置项区域 (一行最多4个) -->
             <LinearLayout
+                android:id="@+id/switch_row_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -223,6 +297,7 @@
 
             <!-- 第二行开关 (如果需要更多开关) -->
             <LinearLayout
+                android:id="@+id/switch_row_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -327,6 +402,7 @@
 
             <!-- 滑块设置项1 (占一整行) -->
             <LinearLayout
+                android:id="@+id/seekbar_container_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -351,6 +427,7 @@
 
             <!-- 滑块设置项2 -->
             <LinearLayout
+                android:id="@+id/seekbar_container_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -375,6 +452,7 @@
 
             <!-- 滑块设置项3 -->
             <LinearLayout
+                android:id="@+id/seekbar_container_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
@@ -397,7 +475,16 @@
                     android:max="100" />
             </LinearLayout>
 
+
+            <Button
+                android:id="@+id/unbind_device"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="解绑设备"
+                android:backgroundTint="@color/ALERT_background"
+                android:onClick="unbind"/>
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

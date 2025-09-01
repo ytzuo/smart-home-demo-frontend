@@ -21,4 +21,7 @@
     <string name="device_type">设备类型</string>
     <string name="match_cancel">取消</string>
     <string name="match_done">确定配对</string>
+    <string name="unbind_confirm_label">解绑确认</string>
+    <string name="unbind_confirm_content">是否解绑该设备？</string>
+    <string name="unbind_done">确定解绑</string>
 </resources>

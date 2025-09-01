@@ -1,13 +1,20 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import static java.security.AccessController.getContext;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
+
+import idl.SmartDemo03.Presence;
 
 public class HomeFurnitureSpecific extends AppCompatActivity {
 
@@ -17,15 +24,16 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_furniture_specific);
-//        Intent intent = getIntent();
-//        furnitureItem = (FurnitureItem) intent.getSerializableExtra("furniture_item");
+        Intent intent = getIntent();
+        furnitureItem = (FurnitureItem) intent.getSerializableExtra("furniture_item");
 
-        furnitureItem = new FurnitureItem("智能空调1", "air_conditioner", "工作中",
-                "制冷 24℃", "今天 10:15", R.drawable.icon_air_conditioner,24,"10100000",false,50);
+//        furnitureItem = new FurnitureItem("智能空调1", "air_conditioner", "工作中",
+//                "制冷 24℃", "今天 10:15", R.drawable.icon_air_conditioner,24,"10100000",false,50);
 
         initialization();
         setupEventListeners();
         refreshUI();
+
     }
 
     private void initialization(){
@@ -40,9 +48,9 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
 
                 //设置参数项文本
                 temp = findViewById(R.id.arg1);
-                temp.setText("状态");
+                temp.setText("状态：");
                 temp = findViewById(R.id.arg2);
-                temp.setText("当前温度");
+                temp.setText("当前温度：");
 
                 //设置开关项文本
                 temp = findViewById(R.id.switch_label_11);
@@ -71,9 +79,9 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
 
                 //设置参数项文本
                 temp = findViewById(R.id.arg1);
-                temp.setText("状态");
+                temp.setText("状态：");
                 temp = findViewById(R.id.arg2);
-                temp.setText("亮度");
+                temp.setText("亮度：");
 
                 //设置开关项文本
                 temp = findViewById(R.id.switch_label_11);
@@ -144,7 +152,8 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
                 if(label != null) {
                     // 如果标签文本包含"滑块"，则隐藏该项
                     if(label.getText().toString().contains("参数项")) {
-                        label.setVisibility(View.GONE);
+                        LinearLayout parentLayout = (LinearLayout) label.getParent();
+                        parentLayout.setVisibility(View.GONE);
                     }
                 }
             }
@@ -198,6 +207,33 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
                 });
             }
         }
+
+        //为返回按钮添加监听器
+        TextView backButton = findViewById(R.id.btn_back);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(this,"返回按钮被点击", Toast.LENGTH_SHORT).show();
+                Log.i("HomeFurnitureSpecific", "返回按钮被点击");
+                finish(); // 关闭当前Activity，返回上一个界面
+            }
+        });
+
+        //为解绑按钮添加监听器
+        Button unbindButton = findViewById(R.id.unbind_device);
+        if (unbindButton != null) {
+            unbindButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 创建一个临时的Presence对象用于演示
+                    // 在实际应用中，您需要从furnitureItem获取真实数据
+                    Presence presence = new Presence();
+                    presence.deviceId = furnitureItem.getDeviceId();
+                    presence.deviceType = furnitureItem.getDeviceType();
+                    showUnbindDialog(presence);
+                }
+            });
+        }
     }
 
     private void handleSwitchChange(CompoundButton switchView, boolean isChecked) {
@@ -214,6 +250,17 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
         Toast.makeText(this, seekBarName + " 值: " + progress, Toast.LENGTH_SHORT).show();
     }
     private void refreshUI(){
+        TextView arg1TextView = findViewById(R.id.arg1_item);
+        Switch switch11 = findViewById(R.id.switch_11);
+
+        if (switch11 != null && arg1TextView != null) {
+            if (switch11.isChecked()) {
+                arg1TextView.setText("正常运行");
+            } else {
+                arg1TextView.setText("停止工作");
+            }
+        }
+
         // 根据FurnitureItem中的switchStatus更新开关状态
         if (furnitureItem != null && furnitureItem.getSwitchStatus() != null) {
             String switchStatus = furnitureItem.getSwitchStatus();
@@ -251,6 +298,12 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
 
         switch (furnitureItem.getDeviceType()) {
             case "air_conditioner":
+                // 设置参数项2显示空调当前温度
+                TextView arg2TextView = findViewById(R.id.arg2_item);
+                if (arg2TextView != null) {
+                    arg2TextView.setText(furnitureItem.getAcTemp() + "℃");
+                }
+
                 // 根据acTemp调整滑块位置，acTemp范围为15-30
                 SeekBar tempSeekBar = findViewById(R.id.seekbar_1);
                 if (tempSeekBar != null) {
@@ -285,6 +338,12 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
                 break;
 
             case "light":
+                // 设置参数项2显示灯光亮度
+                TextView lightArg2TextView = findViewById(R.id.arg2);
+                if (lightArg2TextView != null) {
+                    lightArg2TextView.setText("亮度：" + (int)furnitureItem.getLightPercent() + "%");
+                }
+
                 // 根据lightPercent调整滑块位置，lightPercent范围为10-100
                 SeekBar brightnessSeekBar = findViewById(R.id.seekbar_1);
                 if (brightnessSeekBar != null) {
@@ -320,6 +379,15 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
         }
     }
 
+    public void triggerAlarm() {
+        TextView arg1TextView = findViewById(R.id.arg1);
+        if (arg1TextView != null) {
+            arg1TextView.setText("状态：报警");
+        }
+
+        // 可以在这里添加其他报警相关的UI更新
+        Toast.makeText(this, "设备报警！", Toast.LENGTH_SHORT).show();
+    }
     private void sendRequestSwitch(){
 
     }
@@ -327,4 +395,45 @@ public class HomeFurnitureSpecific extends AppCompatActivity {
     private void sendRequestSeekbar(){
 
     }
+
+    private void showUnbindDialog(Presence presence) {
+        // 加载对话框布局
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.window_unbind_confirm, null);
+
+        // 更新对话框中的文本
+        TextView deviceIdText = dialogView.findViewById(R.id.unbind_device_id);
+        TextView deviceTypeText = dialogView.findViewById(R.id.unbind_device_type);
+
+        if (deviceIdText != null) {
+            deviceIdText.setText(getString(R.string.device_id) + ": " + presence.deviceId);
+        }
+
+        if (deviceTypeText != null) {
+            deviceTypeText.setText(getString(R.string.device_type) + ": " + presence.deviceType);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // 设置按钮点击事件
+        if (dialogView.findViewById(R.id.unbind_done) != null) {
+            dialogView.findViewById(R.id.unbind_done).setOnClickListener(v -> {
+                //TODO 用户点击确认，将设备从数据库删除
+                dialog.dismiss();
+            });
+        }
+
+        if (dialogView.findViewById(R.id.unbind_cancel) != null) {
+            dialogView.findViewById(R.id.unbind_cancel).setOnClickListener(v -> {
+                // 用户点击取消
+                dialog.dismiss();
+            });
+        }
+
+        dialog.show();
+    }
+
 }
