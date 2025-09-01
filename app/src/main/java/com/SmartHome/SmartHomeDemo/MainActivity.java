@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         if (dialogView.findViewById(R.id.add_new_done) != null) {
             dialogView.findViewById(R.id.add_new_done).setOnClickListener(v -> {
                 // 用户点击确认，将设备插入数据库
-                addDeviceToDatabase(presence);
+                //addDeviceToDatabase(presence);
                 dialog.dismiss();
             });
         }

@@ -27,4 +27,7 @@
     <string name="car_light_off">关闭车灯</string>
     <string name="car_engine_off">汽车熄火</string>
     <string name="car_ac_pff">关闭空调</string>
+    <string name="unbind_confirm_label">解绑确认</string>
+    <string name="unbind_confirm_content">是否解绑该设备？</string>
+    <string name="unbind_done">确定解绑</string>
 </resources>

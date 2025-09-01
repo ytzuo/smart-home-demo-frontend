@@ -1,5 +1,6 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +52,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemClick(FurnitureItem item, int position) {
                 Toast.makeText(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), HomeFurnitureSpecific.class);
+                intent.putExtra("furniture_item", item);
+                startActivity(intent);
             }
         });
 
