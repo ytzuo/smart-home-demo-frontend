@@ -21,4 +21,10 @@
     <string name="device_type">设备类型</string>
     <string name="match_cancel">取消</string>
     <string name="match_done">确定配对</string>
+    <string name="car_light_on">开启车灯</string>
+    <string name="car_engine_on">启动汽车</string>
+    <string name="car_ac_on">开启空调</string>
+    <string name="car_light_off">关闭车灯</string>
+    <string name="car_engine_off">汽车熄火</string>
+    <string name="car_ac_pff">关闭空调</string>
 </resources>

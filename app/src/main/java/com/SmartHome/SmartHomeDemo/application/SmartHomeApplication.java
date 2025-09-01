@@ -15,10 +15,15 @@ import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.PresenceDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
+import com.zrdds.infrastructure.FloatSeq;
+import com.zrdds.infrastructure.StringSeq;
 
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.function.ToDoubleBiFunction;
 
+import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
 
 /*
@@ -35,6 +40,7 @@ public class SmartHomeApplication extends Application {
     private AlertDdsManager alertDdsManager;
     private HomeStatusDdsManager homeStatusDdsManager;
     private PresenceDdsManager presenceDdsManager;
+    private VehicleStatusDdsManager vehicleStatusDdsManager;
 
     private ConnectivityManager.NetworkCallback networkCallback;
     private String deviceId;
@@ -97,6 +103,9 @@ public class SmartHomeApplication extends Application {
 
         presenceDdsManager = new PresenceDdsManager();
         presenceDdsManager.initialize(baseDdsManager);
+
+        vehicleStatusDdsManager = new VehicleStatusDdsManager();
+        vehicleStatusDdsManager.initialize(baseDdsManager);
     }
 
     private void startNetworkMonitoring() {
@@ -226,6 +235,30 @@ public class SmartHomeApplication extends Application {
         return "device_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
+
+
+    private void setupHomeStatusListener() {
+        homeStatusDdsManager.setOnHomeStatusReceivedListener(new HomeStatusDdsManager.OnHomeStatusReceivedListener() {
+            @Override
+            public void onHomeStatusReceived(idl.SmartDemo03.HomeStatus homeStatus) {
+                Log.d(TAG, "收到HomeStatus消息: deviceId=" + homeStatus.deviceIds.toString() +
+                        ", status=" + homeStatus.deviceTypes.toString());
+
+                // 处理HomeStatus消息
+                handleHomeStatus(homeStatus);
+            }
+        });
+    }
+
+    private void handleHomeStatus(idl.SmartDemo03.HomeStatus homeStatus) {
+        // 在这里处理收到的HomeStatus消息
+        Log.i(TAG, "处理HomeStatus消息: " + homeStatus.toString());
+        // 可以添加更多处理逻辑，例如更新UI或存储数据等
+        //TODO 逻辑待完善, 可能需要修改HomeStatus
+    }
+
+
+
     /*
         // 在Activity或Fragment中获取DDS管理器
         SmartHomeApplication app = (SmartHomeApplication) getApplication();
@@ -253,6 +286,10 @@ public class SmartHomeApplication extends Application {
         return presenceDdsManager;
     }
 
+    public VehicleStatusDdsManager getVehicleStatusDdsManager() {
+        return vehicleStatusDdsManager;
+    }
+
     public String getId() {
         return deviceId;
     }
@@ -278,6 +315,11 @@ public class SmartHomeApplication extends Application {
         // 清理DDS资源
         if (baseDdsManager != null) {
             baseDdsManager.cleanup();
+        }
+
+        //仅供测试时使用!!!
+        if(database != null) {
+            database.deviceDao().deleteAll();
         }
 
         super.onTerminate();

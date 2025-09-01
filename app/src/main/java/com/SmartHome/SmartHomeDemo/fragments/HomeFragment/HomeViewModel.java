@@ -1,6 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class HomeViewModel extends AndroidViewModel {
+    String TAG = "HomeViewModel";
     private MutableLiveData<List<FurnitureItem>> furnitureListLiveData;
     private List<FurnitureItem> furnitureList;
     private AppDatabase database;
@@ -27,29 +29,40 @@ public class HomeViewModel extends AndroidViewModel {
         furnitureList = new ArrayList<>();
         furnitureListLiveData = new MutableLiveData<>(furnitureList);
 
-        //初始化测试数据
-        furnitureList.add(new FurnitureItem(
-                "智能灯具1", "light", "工作中", "开启", "今天 14:30", R.drawable.icon_light,
-                0, "0000", true, 80));
-        furnitureList.add(new FurnitureItem(
-                "智能空调1", "air_conditioner", "工作中", "制冷 24℃", "今天 10:15", R.drawable.icon_air_conditioner,
-                27, "1001", false, 0));
-        furnitureList.add(new FurnitureItem(
-                "智能灯具2", "light", "待机中", "关闭", "昨天 18:20", R.drawable.icon_light,
-                0, "0000", false, 70));
-        furnitureList.add(new FurnitureItem(
-                "智能空调2", "air_conditioner", "工作中", "播放中", "今天 09:45", R.drawable.icon_air_conditioner,
-                25, "1011", false, 0));
-        furnitureList.add(new FurnitureItem(
-                "智能灯具2", "light", "待机中", "关闭", "昨天 22:30", R.drawable.icon_light,
-                0, "0000", false, 0));
-        furnitureListLiveData.setValue(furnitureList);
+//        //初始化测试数据
+//        furnitureList.add(new FurnitureItem(
+//                "智能灯具1", "light", "工作中", "开启", "今天 14:30", R.drawable.icon_light,
+//                0, "0000", true, 80));
+//        furnitureList.add(new FurnitureItem(
+//                "智能空调1", "air_conditioner", "工作中", "制冷 24℃", "今天 10:15", R.drawable.icon_air_conditioner,
+//                27, "1001", false, 0));
+//        furnitureList.add(new FurnitureItem(
+//                "智能灯具2", "light", "待机中", "关闭", "昨天 18:20", R.drawable.icon_light,
+//                0, "0000", false, 70));
+//        furnitureList.add(new FurnitureItem(
+//                "智能空调2", "air_conditioner", "工作中", "播放中", "今天 09:45", R.drawable.icon_air_conditioner,
+//                25, "1011", false, 0));
+//        furnitureList.add(new FurnitureItem(
+//                "智能灯具3", "light", "待机中", "关闭", "昨天 22:30", R.drawable.icon_light,
+//                0, "0000", false, 0));
+//        furnitureListLiveData.setValue(furnitureList);
 
-//        //实测数据库时再启用
-//        database = ((SmartHomeApplication) application).getDatabase();
-//
-//         //从数据库加载日志
-//        loadFurnitureFromDatabase();
+        //实测数据库时再启用
+        database = ((SmartHomeApplication) application).getDatabase();
+
+        //这一段仅供测试数据使用
+        String[] ids = {"智能灯具1", "智能空调1", "智能灯具2", "智能空调2", "智能灯具3"};
+        String[] types = {"light", "air_conditioner", "light", "air_conditioner", "light"};
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            for(int i = 0 ; i < 5; i++) {
+                Device newDevice = new Device();
+                newDevice.setDeviceId(ids[i]);
+                newDevice.setDeviceType(types[i]);
+                database.deviceDao().insertDevice(newDevice);
+            }
+        });
+         //从数据库加载日志
+        loadFurnitureFromDatabase();
     }
 
     public LiveData<List<FurnitureItem>> getFurnitureLiveData() {
@@ -78,6 +91,7 @@ public class HomeViewModel extends AndroidViewModel {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             List<Device> devices = database.deviceDao().getAllDevices();
             List<FurnitureItem> FurnitureItems = new ArrayList<>();
+            Log.i(TAG, devices.toString());
 
             for(Device device : devices) {
                 int icon = R.drawable.icon_air_conditioner;

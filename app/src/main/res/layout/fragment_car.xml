@@ -42,6 +42,7 @@
             android:padding="8dp">
             <!-- 参数区域 -->
             <TextView
+                android:id="@+id/car_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -52,6 +53,7 @@
                 android:textSize="18sp" />
             <!-- 参数项1 -->
             <TextView
+                android:id="@+id/car_engine_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -60,12 +62,14 @@
 
             <!-- 参数项2 -->
             <TextView
+                android:id="@+id/car_fuel_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="@string/fuel"
                 android:textSize="16sp" />
             <TextView
+                android:id="@+id/car_mile_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -81,12 +85,16 @@
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/control_car_light"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -97,9 +105,10 @@
                     app:iconSize="80dp"
                     app:iconTint="#FF9E9E9E"
                     app:iconGravity="textTop"
-                    android:text="车灯"
+                    android:text="@string/car_light_on"
                     android:textColor="@color/black"/>
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/control_car_engine"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -110,9 +119,10 @@
                     app:iconSize="80dp"
                     app:iconTint="#FF9E9E9E"
                     app:iconGravity="textTop"
-                    android:text="发动机"
+                    android:text="@string/car_engine_on"
                     android:textColor="@color/black"/>
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/control_car_ac"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -123,7 +133,7 @@
                     app:iconTint="#FF9E9E9E"
                     app:iconSize="80dp"
                     app:iconGravity="textTop"
-                    android:text="空调"
+                    android:text="@string/car_ac_on"
                     android:textColor="@color/black"/>
             </LinearLayout>
         </LinearLayout>

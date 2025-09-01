@@ -1,6 +1,7 @@
 package com.SmartHome.SmartHomeDemo.database;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -22,5 +23,8 @@ public interface DeviceDao {
 
     @Insert
     void insertDevices(List<Device> devices);
+
+    @Query("DELETE FROM devices")
+    void deleteAll();
 
 }

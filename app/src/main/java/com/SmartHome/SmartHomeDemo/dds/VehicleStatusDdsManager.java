@@ -21,67 +21,72 @@ import com.zrdds.subscription.DataReaderListener;
 import com.zrdds.subscription.Subscriber;
 import com.zrdds.topic.Topic;
 
-import idl.SmartDemo03.HomeStatus;
-import idl.SmartDemo03.HomeStatusDataReader;
-import idl.SmartDemo03.HomeStatusSeq;
-import idl.SmartDemo03.HomeStatusTypeSupport;
+import idl.SmartDemo03.Alert;
+import idl.SmartDemo03.AlertDataReader;
+import idl.SmartDemo03.AlertSeq;
+import idl.SmartDemo03.AlertTypeSupport;
+import idl.SmartDemo03.VehicleStatus;
+import idl.SmartDemo03.VehicleStatusDataReader;
+import idl.SmartDemo03.VehicleStatusSeq;
+import idl.SmartDemo03.VehicleStatusTypeSupport;
 
-
-public class HomeStatusDdsManager {
-    private static final String TAG = "HomeStatusDdsManager";
+public class VehicleStatusDdsManager {
+    private static final String TAG = "VehicleStatusDdsManager";
 
     private Topic topic;
     private Subscriber subscriber;
     private DataReader dataReader;
 
-    private OnHomeStatusReceivedListener homeStatusListener;
+    private OnVehicleStatusReceivedListener vehicleStatusListener;
 
-    public interface OnHomeStatusReceivedListener {
-        void onHomeStatusReceived(HomeStatus homeStatus);
+    public interface OnVehicleStatusReceivedListener {
+        void onVehicleStatusReceived(VehicleStatus status);
     }
 
-    private static final String TOPIC_NAME = "HomeStatusTopic";
+    private static final String TOPIC_NAME = "VehicleStatusTopic";
 
     public void initialize(BaseDdsManager baseManager) {
         try {
-            Log.i(TAG, "开始初始化HomeStatus DDS组件...");
+            Log.i(TAG, "开始初始化VehicleStatus DDS组件...");
 
-            ReturnCode_t result = HomeStatusTypeSupport.get_instance().register_type(
+            // 注册VehicleStatus类型
+            ReturnCode_t result = VehicleStatusTypeSupport.get_instance().register_type(
                     baseManager.getParticipant(),
                     null
             );
 
             if (result != ReturnCode_t.RETCODE_OK) {
-                Log.e(TAG, "注册HomeStatus类型失败，错误码: " + result);
+                Log.e(TAG, "注册VehicleStatus类型失败，错误码: " + result);
                 return;
             }
 
             // 创建主题
             topic = baseManager.getParticipant().create_topic(
                     TOPIC_NAME,
-                    HomeStatusTypeSupport.get_instance().get_type_name(),
+                    VehicleStatusTypeSupport.get_instance().get_type_name(),
                     DomainParticipant.TOPIC_QOS_DEFAULT,
                     null,
                     StatusKind.STATUS_MASK_NONE
             );
 
             if (topic == null) {
-                Log.e(TAG, "创建HomeStatus主题失败");
+                Log.e(TAG, "创建VehicleStatus主题失败");
                 return;
             }
 
-            Log.i(TAG, "✓ HomeStatus主题创建成功: " + TOPIC_NAME);
+            Log.i(TAG, "✓ VehicleStatus主题创建成功: " + TOPIC_NAME);
 
             createSubscriber(baseManager);
 
-            Log.i(TAG, "✓ HomeStatus DDS组件初始化完成");
+            Log.i(TAG, "✓ VehicleStatus DDS组件初始化完成");
+
         } catch (Exception e) {
-            Log.e(TAG, "HomeStatus DDS组件初始化失败", e);
+            Log.e(TAG, "VehicleStatus DDS组件初始化失败", e);
         }
     }
 
     private void createSubscriber(BaseDdsManager baseManager) {
-        try{
+        try {
             // 创建订阅者
             subscriber = baseManager.getParticipant().create_subscriber(
                     DomainParticipant.SUBSCRIBER_QOS_DEFAULT,
@@ -90,7 +95,7 @@ public class HomeStatusDdsManager {
             );
 
             if (subscriber == null) {
-                Log.e(TAG, "创建HomeStatus Subscriber失败");
+                Log.e(TAG, "创建VehicleStatus Subscriber失败");
                 return;
             }
 
@@ -98,14 +103,14 @@ public class HomeStatusDdsManager {
             DataReaderListener readerListener = new DataReaderListener() {
                 @Override
                 public void on_data_available(DataReader reader) {
-                    Log.i(TAG, "📨 收到新的HomeStatus数据！");
-                    readHomeStatusData(reader);
+                    Log.i(TAG, "📨 收到新的VehicleStatus数据！");
+                    readVehicleStatusData(reader);
                 }
 
                 @Override
                 public void on_data_arrived(DataReader reader, Object obj, SampleInfo sampleInfo) {
-                    Log.i(TAG, "📨 收到新的HomeStatus数据！");
-                    readHomeStatusData(reader);
+                    Log.i(TAG, "📨 收到新的VehicleStatus数据！");
+                    readVehicleStatusData(reader);
                 }
 
                 // 实现其他必要的回调方法
@@ -136,24 +141,25 @@ public class HomeStatusDdsManager {
             );
 
             if (dataReader == null) {
-                Log.e(TAG, "创建HomeStatus DataReader失败");
+                Log.e(TAG, "创建VehicleStatus DataReader失败");
                 return;
             }
 
-            Log.i(TAG, "✓ HomeStatus Subscriber和DataReader创建成功");
-        } catch(Exception e) {
-            Log.e(TAG, "创建HomeStatus Subscriber失败", e);
-        }
+            Log.i(TAG, "✓ VehicleStatus Subscriber和DataReader创建成功");
 
+        } catch (Exception e) {
+            Log.e(TAG, "创建VehicleStatus Subscriber失败", e);
+        }
     }
-    private void readHomeStatusData(DataReader reader) {
+
+    private void readVehicleStatusData(DataReader reader) {
         try {
-            HomeStatusSeq homeStatuses = new HomeStatusSeq();
+            VehicleStatusSeq vehicleStatuses = new VehicleStatusSeq();
             SampleInfoSeq sampleInfos = new SampleInfoSeq();
 
-            HomeStatusDataReader homeStatusDataReader = (HomeStatusDataReader) reader;
+            VehicleStatusDataReader vehicleStatusDataReader = (VehicleStatusDataReader) reader;
 
-            ReturnCode_t result = homeStatusDataReader.take(homeStatuses, sampleInfos, 10,
+            ReturnCode_t result = vehicleStatusDataReader.take(vehicleStatuses, sampleInfos, 10,
                     SampleStateKind.ANY_SAMPLE_STATE,
                     ViewStateKind.ANY_VIEW_STATE,
                     InstanceStateKind.ANY_INSTANCE_STATE);
@@ -161,15 +167,15 @@ public class HomeStatusDdsManager {
             if (result == ReturnCode_t.RETCODE_OK) {
                 for (int i = 0; i < sampleInfos.length(); i++) {
                     if (sampleInfos.get_at(i).valid_data) {
-                        HomeStatus receivedHomeStatus = homeStatuses.get_at(i);
+                        VehicleStatus receivedVehicleStatus = vehicleStatuses.get_at(i);
 
                         // 通知监听器
-                        if (homeStatusListener != null) {
-                            final HomeStatus finalHomeStatus = new HomeStatus(receivedHomeStatus); // 复制数据
+                        if (vehicleStatusListener != null) {
+                            final VehicleStatus finalVehicleStatus = new VehicleStatus(receivedVehicleStatus); // 复制数据
                             new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    homeStatusListener.onHomeStatusReceived(finalHomeStatus);
+                                    vehicleStatusListener.onVehicleStatusReceived(finalVehicleStatus);
                                 }
                             });
                         }
@@ -177,15 +183,15 @@ public class HomeStatusDdsManager {
                 }
 
                 // 返还数据
-                homeStatusDataReader.return_loan(homeStatuses, sampleInfos);
+                vehicleStatusDataReader.return_loan(vehicleStatuses, sampleInfos);
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "读取HomeStatus数据时发生异常", e);
+            Log.e(TAG, "读取VehicleStatus数据时发生异常", e);
         }
     }
 
-    public void setOnHomeStatusReceivedListener(OnHomeStatusReceivedListener listener) {
-        this.homeStatusListener = listener;
+    public void setOnVehicleStatusReceivedListener(OnVehicleStatusReceivedListener listener) {
+        this.vehicleStatusListener = listener;
     }
 }
