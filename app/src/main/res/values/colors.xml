@@ -8,4 +8,8 @@
     <color name="INFO_text">#FF388E3C</color>
     <color name="WARN_text">#FFFBC02D</color>
     <color name="ALERT_text">#FFD32F2F</color>
+    <color name="green">#4CAF50</color>
+    <color name="gray">#9E9E9E</color>
+    <color name="orange">#FF9800</color>
+    <color name="blue">#2196F3</color>
 </resources>

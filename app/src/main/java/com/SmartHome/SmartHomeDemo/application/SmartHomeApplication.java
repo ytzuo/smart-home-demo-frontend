@@ -86,6 +86,12 @@ public class SmartHomeApplication extends Application {
 
         // 设置Presence消息监听器
         setupPresenceListener();
+
+        // 设置HomeStatus消息监听器
+        setupHomeStatusListener();
+
+        // 设置VehicleStatus消息监听器
+        setupVehicleStatusListener();
     }
 
     private void initializeDDS() {
@@ -254,10 +260,28 @@ public class SmartHomeApplication extends Application {
         // 在这里处理收到的HomeStatus消息
         Log.i(TAG, "处理HomeStatus消息: " + homeStatus.toString());
         // 可以添加更多处理逻辑，例如更新UI或存储数据等
-        //TODO 逻辑待完善, 可能需要修改HomeStatus
+        //TODO 将采用JSON格式进行家具属性的传输和解析
     }
 
+    private void setupVehicleStatusListener() {
+        vehicleStatusDdsManager.setOnVehicleStatusReceivedListener(new VehicleStatusDdsManager.OnVehicleStatusReceivedListener() {
+            @Override
+            public void onVehicleStatusReceived(idl.SmartDemo03.VehicleStatus vehicleStatus) {
+                Log.d(TAG, "收到VehicleStatus消息: engineOn=" + vehicleStatus.engineOn +
+                        ", fuelPercent=" + vehicleStatus.fuelPercent);
 
+                // 处理VehicleStatus消息
+                handleVehicleStatus(vehicleStatus);
+            }
+        });
+    }
+
+    private void handleVehicleStatus(idl.SmartDemo03.VehicleStatus vehicleStatus) {
+        // 在这里处理收到的VehicleStatus消息
+        Log.i(TAG, "处理VehicleStatus消息: " + vehicleStatus.toString());
+        // 可以添加更多处理逻辑，例如更新UI或存储数据等
+        // TODO: 可能需要通知CarFragment更新UI
+    }
 
     /*
         // 在Activity或Fragment中获取DDS管理器

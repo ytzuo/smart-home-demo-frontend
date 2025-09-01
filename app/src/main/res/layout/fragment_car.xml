@@ -49,8 +49,9 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/name_car"
+                android:textStyle="bold"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
             <!-- 参数项1 -->
             <TextView
                 android:id="@+id/car_engine_status"
@@ -73,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/mile"
+                android:text="@string/location"
                 android:textSize="16sp" />
             <View
                 android:layout_width="match_parent"
@@ -94,18 +95,18 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/control_car_light"
+                    android:id="@+id/control_car_lock"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/icon_car_light"
+                    app:icon="@drawable/icon_lock"
                     app:backgroundTint="@android:color/transparent"
                     app:cornerRadius="0dp"
                     android:layout_weight="1"
                     app:iconSize="80dp"
                     app:iconTint="#FF9E9E9E"
                     app:iconGravity="textTop"
-                    android:text="@string/car_light_on"
+                    android:text="@string/car_lock"
                     android:textColor="@color/black"/>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/control_car_engine"

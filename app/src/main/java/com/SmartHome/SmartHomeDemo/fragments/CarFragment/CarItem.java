@@ -4,17 +4,17 @@ public class CarItem {
     private String carName;
     private String engineStatus;
     private String fuel;
-    private String mile;
-    private boolean lightOn;
+    private String location;
+    private boolean lock;
     private boolean engineOn;
     private boolean acOn;
 
-    public CarItem(String carName, String engineStatus, String fuel, String mile, boolean lightOn, boolean engineOn, boolean acOn) {
+    public CarItem(String carName, String engineStatus, String fuel, String location, boolean lock, boolean engineOn, boolean acOn) {
         this.carName = carName;
         this.engineStatus = engineStatus;
         this.fuel = fuel;
-        this.mile = mile;
-        this.lightOn = lightOn;
+        this.location = location;
+        this.lock = lock;
         this.engineOn = engineOn;
         this.acOn = acOn;
     }
@@ -35,12 +35,12 @@ public class CarItem {
         this.engineStatus = engineStatus;
     }
 
-    public String getMile() {
-        return mile;
+    public String getLocation() {
+        return location;
     }
 
-    public void setMile(String mile) {
-        this.mile = mile;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getFuel() {
@@ -51,12 +51,12 @@ public class CarItem {
         this.fuel = fuel;
     }
 
-    public boolean isLightOn() {
-        return lightOn;
+    public boolean isLock() {
+        return lock;
     }
 
-    public void setLightOn(boolean lightOn) {
-        this.lightOn = lightOn;
+    public void setLock(boolean lock) {
+        this.lock = lock;
     }
 
     public boolean isEngineOn() {

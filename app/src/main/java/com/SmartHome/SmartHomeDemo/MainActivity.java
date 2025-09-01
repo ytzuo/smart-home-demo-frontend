@@ -19,6 +19,8 @@ import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.database.DeviceDao;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
@@ -32,13 +34,17 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 
 import idl.SmartDemo03.Alert;
+import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
+import idl.SmartDemo03.VehicleStatus;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private AppDatabase database;
     private SmartHomeApplication app;
+    private CarFragment currentCarFragment;
+    private HomeFragment currentHomeFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +74,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 设置VehicleStatus监听器
+        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
+        vehicleStatusDdsManager.setOnVehicleStatusReceivedListener(new VehicleStatusDdsManager.OnVehicleStatusReceivedListener() {
+            @Override
+            public void onVehicleStatusReceived(VehicleStatus vehicleStatus) {
+                updateCarFragmentUI(vehicleStatus);
+            }
+        });
+
+        // 设置HomeStatus监听器
+        HomeStatusDdsManager homeStatusDdsManager = app.getHomeStatusDdsManager();
+        homeStatusDdsManager.setOnHomeStatusReceivedListener(new HomeStatusDdsManager.OnHomeStatusReceivedListener() {
+            @Override
+            public void onHomeStatusReceived(HomeStatus homeStatus) {
+                updateHomeFragmentUI(homeStatus);
+            }
+        });
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
         // 只有在savedInstanceState为null时才加载初始Fragment
@@ -94,6 +118,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void updateCarFragmentUI(VehicleStatus newStatus) {
+        // 更新CarFragment UI
+        if (currentCarFragment != null) {
+            // 在主线程中更新UI
+            runOnUiThread(() -> {
+                // 可以通过接口或ViewModel等方式通知CarFragment更新UI
+                // 这里使用广播方式通知CarFragment更新
+                // 或者通过接口回调方式实现
+                currentCarFragment.updateVehicleStatus(newStatus);
+            });
+        }
+    }
+    private void updateHomeFragmentUI(HomeStatus newStatus) {
+
+    }
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager()
