@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
     <TextView
+        android:id="@+id/match_device_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/device_id"
@@ -31,6 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="5dp"/>
     <TextView
+        android:id="@+id/match_device_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/device_type"

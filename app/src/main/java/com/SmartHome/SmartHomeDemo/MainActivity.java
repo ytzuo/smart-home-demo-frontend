@@ -2,14 +2,21 @@ package com.SmartHome.SmartHomeDemo;
 
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.database.DeviceDao;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
@@ -22,13 +29,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 import idl.SmartDemo03.Alert;
+import idl.SmartDemo03.Presence;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private AppDatabase database;
+    private SmartHomeApplication app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // 获取数据库实例
-        SmartHomeApplication app = (SmartHomeApplication) getApplication();
+        app = (SmartHomeApplication) getApplication();
         database = app.getDatabase();
         // 使用数据库
         DeviceDao deviceDao = database.deviceDao();
@@ -47,6 +57,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAlertReceived(Alert alert) {
                 addAlertToLog(alert);
+            }
+        });
+
+        // 设置未知设备监听器
+        app.setOnUnknownDeviceListener(new SmartHomeApplication.OnUnknownDeviceListener() {
+            @Override
+            public void onUnknownDeviceDetected(Presence presence) {
+                showNewDeviceDialog(presence);
             }
         });
 
@@ -72,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
             }
             return loadFragment(selected);
         });
+
+
     }
 
     private boolean loadFragment(Fragment fragment) {
@@ -112,5 +132,71 @@ public class MainActivity extends AppCompatActivity {
 
         // 注意：如果LogFragment当前未加载，数据会在下次加载时显示，
         // 因为LogViewModel会保持数据状态
+    }
+
+    private void showNewDeviceDialog(Presence presence) {
+        // 加载对话框布局
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.window_match, null);
+
+        // 更新对话框中的文本
+        TextView deviceIdText = dialogView.findViewById(R.id.match_device_id);
+        TextView deviceTypeText = dialogView.findViewById(R.id.match_device_type);
+
+        if (deviceIdText != null) {
+            deviceIdText.setText(getString(R.string.device_id) + ": " + presence.deviceId);
+        }
+
+        if (deviceTypeText != null) {
+            deviceTypeText.setText(getString(R.string.device_type) + ": " + presence.deviceType);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // 设置按钮点击事件
+        if (dialogView.findViewById(R.id.add_new_done) != null) {
+            dialogView.findViewById(R.id.add_new_done).setOnClickListener(v -> {
+                // 用户点击确认，将设备插入数据库
+                addDeviceToDatabase(presence);
+                dialog.dismiss();
+            });
+        }
+
+        if (dialogView.findViewById(R.id.add_new_cancel) != null) {
+            dialogView.findViewById(R.id.add_new_cancel).setOnClickListener(v -> {
+                // 用户点击取消
+                dialog.dismiss();
+            });
+        }
+
+        dialog.show();
+    }
+
+    private void addDeviceToDatabase(Presence presence) {
+        // 在后台线程中插入数据库
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                // 创建设备实体并插入数据库
+                 Device device = new Device();
+                 device.setDeviceId(presence.deviceId);
+                 device.setDeviceType(presence.deviceType);
+                 database.deviceDao().insertDevice(device);
+
+                Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
+
+                // 如果需要更新UI，切换到主线程
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "设备已添加: " + presence.deviceId, Toast.LENGTH_SHORT).show();
+                });
+            } catch (Exception e) {
+                Log.e("MainActivity", "插入数据库时出错", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 }
