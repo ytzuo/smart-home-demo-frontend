@@ -50,6 +50,7 @@ public class VehicleStatusTypeSupport extends TypeSupport {
         VehicleStatus sample = (VehicleStatus)_sample;
         System.out.println("sample.engineOn:" + sample.engineOn);
         System.out.println("sample.doorsLocked:" + sample.doorsLocked);
+        System.out.println("sample.acOn:" + sample.acOn);
         System.out.println("sample.fuelPercent:" + sample.fuelPercent);
         if (sample.location != null){
             System.out.println("sample.location:" + sample.location);
@@ -103,6 +104,8 @@ public class VehicleStatusTypeSupport extends TypeSupport {
 
         offset += CDRSerializer.get_untype_size(1, offset);
 
+        offset += CDRSerializer.get_untype_size(1, offset);
+
         offset += CDRSerializer.get_untype_size(4, offset);
 
         offset += CDRSerializer.get_string_size(sample.location == null ? 0 : sample.location.getBytes().length, offset);
@@ -122,6 +125,11 @@ public class VehicleStatusTypeSupport extends TypeSupport {
 
         if (!CDRSerializer.put_boolean(cdr, sample.doorsLocked)){
             System.out.println("serialize sample.doorsLocked failed.");
+            return -2;
+        }
+
+        if (!CDRSerializer.put_boolean(cdr, sample.acOn)){
+            System.out.println("serialize sample.acOn failed.");
             return -2;
         }
 
@@ -156,6 +164,12 @@ public class VehicleStatusTypeSupport extends TypeSupport {
             return -2;
         }
         sample.doorsLocked= tmp_boolean_obj[0];
+
+        if (!CDRDeserializer.get_boolean_array(cdr, tmp_boolean_obj, 1)){
+            System.out.println("deserialize sample.acOn failed.");
+            return -2;
+        }
+        sample.acOn= tmp_boolean_obj[0];
 
         if (!CDRDeserializer.get_float_array(cdr, tmp_float_obj, 1)){
             System.out.println("deserialize sample.fuelPercent failed.");
@@ -252,6 +266,27 @@ public class VehicleStatusTypeSupport extends TypeSupport {
             return null;
         }
 
+        memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_BOOLEAN);
+        if (memberTc == null){
+            System.out.println("Get Member acOn TypeCode failed.");
+            factory.delete_TC(s_typeCode);
+            s_typeCode = null;
+            return null;
+        }
+        ret = s_typeCode.add_member_to_struct(
+            2,
+            2,
+            "acOn",
+            memberTc,
+            false,
+            false);
+        if (ret < 0)
+        {
+            factory.delete_TC(s_typeCode);
+            s_typeCode = null;
+            return null;
+        }
+
         memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_FLOAT);
         if (memberTc == null){
             System.out.println("Get Member fuelPercent TypeCode failed.");
@@ -260,8 +295,8 @@ public class VehicleStatusTypeSupport extends TypeSupport {
             return null;
         }
         ret = s_typeCode.add_member_to_struct(
-            2,
-            2,
+            3,
+            3,
             "fuelPercent",
             memberTc,
             false,
@@ -281,8 +316,8 @@ public class VehicleStatusTypeSupport extends TypeSupport {
             return null;
         }
         ret = s_typeCode.add_member_to_struct(
-            3,
-            3,
+            4,
+            4,
             "location",
             memberTc,
             false,
@@ -303,8 +338,8 @@ public class VehicleStatusTypeSupport extends TypeSupport {
             return null;
         }
         ret = s_typeCode.add_member_to_struct(
-            4,
-            4,
+            5,
+            5,
             "timeStamp",
             memberTc,
             false,

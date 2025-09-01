@@ -52,9 +52,22 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemClick(FurnitureItem item, int position) {
                 Toast.makeText(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), HomeFurnitureSpecific.class);
-                intent.putExtra("furniture_item", item);
-                startActivity(intent);
+                // 使用FragmentTransaction显示HomeFurnitureSpecific Fragment
+                HomeFurnitureSpecific fragment = new HomeFurnitureSpecific();
+
+                // 传递参数
+                Bundle args = new Bundle();
+                args.putSerializable("furniture_item", item);
+                fragment.setArguments(args);
+
+                // 使用FragmentTransaction显示Fragment
+                if (getActivity() != null) {
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
 

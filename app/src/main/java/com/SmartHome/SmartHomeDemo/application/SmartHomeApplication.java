@@ -256,7 +256,7 @@ public class SmartHomeApplication extends Application {
         });
     }
 
-    private void handleHomeStatus(idl.SmartDemo03.HomeStatus homeStatus) {
+    private void handleHomeStatus(HomeStatus homeStatus) {
         // 在这里处理收到的HomeStatus消息
         Log.i(TAG, "处理HomeStatus消息: " + homeStatus.toString());
         // 可以添加更多处理逻辑，例如更新UI或存储数据等

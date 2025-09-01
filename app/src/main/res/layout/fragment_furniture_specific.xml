@@ -22,10 +22,10 @@
         <!-- 返回按钮 -->
         <TextView
             android:id="@+id/btn_back"
-            android:layout_width="53dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
-            android:text="返回"
+            android:text="@string/back"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -34,12 +34,19 @@
             android:id="@+id/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="家具详情"
+            android:text="@string/furniture_specific"
             android:textSize="18sp"
             android:textColor="@color/black"
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"/>
+
+        <View
+            android:id="@+id/btn_back2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            />
 
     </LinearLayout>
 
@@ -50,7 +57,7 @@
         android:layout_height="240dp"
         android:layout_margin="16dp"
         android:src="@drawable/param_background"
-        android:contentDescription="家具图片"
+        android:contentDescription="@string/furniture_image"
         android:scaleType="centerInside"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +86,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="参数"
+                android:text="@string/param_label"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -110,7 +117,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="项1"
+                        android:text="item1"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -134,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="项2"
+                        android:text="item2"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -157,7 +164,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="项3"
+                        android:text="item3"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -180,7 +187,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="项4"
+                        android:text="item4"
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -481,7 +488,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="解绑设备"
+                android:text="@string/unbind_device"
                 android:backgroundTint="@color/ALERT_background"
                 android:onClick="unbind"/>
         </LinearLayout>

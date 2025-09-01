@@ -68,35 +68,15 @@ public class HomeStatusTypeSupport extends TypeSupport {
                 System.out.println("sample.deviceTypes.get_at(" + i + "): null");
             }
         }
-        int acTempTmpLen = sample.acTemp.length();
-        System.out.println("sample.acTemp.length():" +acTempTmpLen);
-        for (int i = 0; i < acTempTmpLen; ++i){
-            System.out.println("sample.acTemp.get_at(" + i + "):" + sample.acTemp.get_at(i));
-        }
-        int acStatusTmpLen = sample.acStatus.length();
-        System.out.println("sample.acStatus.length():" +acStatusTmpLen);
-        for (int i = 0; i < acStatusTmpLen; ++i){
-            if (sample.acStatus.get_at(i) != null){
-                System.out.println("sample.acStatus.get_at(" + i + "):" + sample.acStatus.get_at(i));
+        int deviceStatusTmpLen = sample.deviceStatus.length();
+        System.out.println("sample.deviceStatus.length():" +deviceStatusTmpLen);
+        for (int i = 0; i < deviceStatusTmpLen; ++i){
+            if (sample.deviceStatus.get_at(i) != null){
+                System.out.println("sample.deviceStatus.get_at(" + i + "):" + sample.deviceStatus.get_at(i));
             }
             else{
-                System.out.println("sample.acStatus.get_at(" + i + "): null");
+                System.out.println("sample.deviceStatus.get_at(" + i + "): null");
             }
-        }
-        int lightOnTmpLen = sample.lightOn.length();
-        System.out.println("sample.lightOn.length():" +lightOnTmpLen);
-        for (int i = 0; i < lightOnTmpLen; ++i){
-            System.out.println("sample.lightOn.get_at(" + i + "):" + sample.lightOn.get_at(i));
-        }
-        int lightPercentTmpLen = sample.lightPercent.length();
-        System.out.println("sample.lightPercent.length():" +lightPercentTmpLen);
-        for (int i = 0; i < lightPercentTmpLen; ++i){
-            System.out.println("sample.lightPercent.get_at(" + i + "):" + sample.lightPercent.get_at(i));
-        }
-        int cameraOnTmpLen = sample.cameraOn.length();
-        System.out.println("sample.cameraOn.length():" +cameraOnTmpLen);
-        for (int i = 0; i < cameraOnTmpLen; ++i){
-            System.out.println("sample.cameraOn.get_at(" + i + "):" + sample.cameraOn.get_at(i));
         }
         if (sample.timeStamp != null){
             System.out.println("sample.timeStamp:" + sample.timeStamp);
@@ -112,11 +92,11 @@ public class HomeStatusTypeSupport extends TypeSupport {
     }
 
     public int get_max_sizeI(){
-        return 201740;
+        return 199172;
     }
 
     public int get_max_key_sizeI(){
-        return 201740;
+        return 199172;
     }
 
     public boolean has_keyI(){
@@ -159,36 +139,12 @@ public class HomeStatusTypeSupport extends TypeSupport {
         }
 
         offset += CDRSerializer.get_untype_size(4, offset);
-        int acTempLen = sample.acTemp.length();
-        if (acTempLen != 0){
-            offset += 4 * acTempLen;
-        }
-
-        offset += CDRSerializer.get_untype_size(4, offset);
-        int acStatusLen = sample.acStatus.length();
-        if (acStatusLen != 0){
-            for(int i = 0; i<sample.acStatus.length(); ++i)
+        int deviceStatusLen = sample.deviceStatus.length();
+        if (deviceStatusLen != 0){
+            for(int i = 0; i<sample.deviceStatus.length(); ++i)
             {
-                offset += CDRSerializer.get_string_size(sample.acStatus.get_at(i).getBytes().length,offset);
+                offset += CDRSerializer.get_string_size(sample.deviceStatus.get_at(i).getBytes().length,offset);
             }
-        }
-
-        offset += CDRSerializer.get_untype_size(4, offset);
-        int lightOnLen = sample.lightOn.length();
-        if (lightOnLen != 0){
-            offset += 1 * lightOnLen;
-        }
-
-        offset += CDRSerializer.get_untype_size(4, offset);
-        int lightPercentLen = sample.lightPercent.length();
-        if (lightPercentLen != 0){
-            offset += 4 * lightPercentLen;
-        }
-
-        offset += CDRSerializer.get_untype_size(4, offset);
-        int cameraOnLen = sample.cameraOn.length();
-        if (cameraOnLen != 0){
-            offset += 1 * cameraOnLen;
         }
 
         offset += CDRSerializer.get_string_size(sample.timeStamp == null ? 0 : sample.timeStamp.getBytes().length, offset);
@@ -221,57 +177,13 @@ public class HomeStatusTypeSupport extends TypeSupport {
             }
         }
 
-        if (!CDRSerializer.put_int(cdr, sample.acTemp.length())){
-            System.out.println("serialize length of sample.acTemp failed.");
+        if (!CDRSerializer.put_int(cdr, sample.deviceStatus.length())){
+            System.out.println("serialize length of sample.deviceStatus failed.");
             return -2;
         }
-        if (sample.acTemp.length() != 0){
-            if (!CDRSerializer.put_float_array(cdr, sample.acTemp.get_contiguous_buffer(), sample.acTemp.length())){
-                System.out.println("serialize sample.acTemp failed.");
-                return -2;
-            }
-        }
-
-        if (!CDRSerializer.put_int(cdr, sample.acStatus.length())){
-            System.out.println("serialize length of sample.acStatus failed.");
-            return -2;
-        }
-        for (int i = 0; i < sample.acStatus.length(); ++i){
-            if (!CDRSerializer.put_string(cdr, sample.acStatus.get_at(i), sample.acStatus.get_at(i) == null ? 0 : sample.acStatus.get_at(i).length())){
-                System.out.println("serialize sample.acStatus failed.");
-                return -2;
-            }
-        }
-
-        if (!CDRSerializer.put_int(cdr, sample.lightOn.length())){
-            System.out.println("serialize length of sample.lightOn failed.");
-            return -2;
-        }
-        if (sample.lightOn.length() != 0){
-            if (!CDRSerializer.put_boolean_array(cdr, sample.lightOn.get_contiguous_buffer(), sample.lightOn.length())){
-                System.out.println("serialize sample.lightOn failed.");
-                return -2;
-            }
-        }
-
-        if (!CDRSerializer.put_int(cdr, sample.lightPercent.length())){
-            System.out.println("serialize length of sample.lightPercent failed.");
-            return -2;
-        }
-        if (sample.lightPercent.length() != 0){
-            if (!CDRSerializer.put_float_array(cdr, sample.lightPercent.get_contiguous_buffer(), sample.lightPercent.length())){
-                System.out.println("serialize sample.lightPercent failed.");
-                return -2;
-            }
-        }
-
-        if (!CDRSerializer.put_int(cdr, sample.cameraOn.length())){
-            System.out.println("serialize length of sample.cameraOn failed.");
-            return -2;
-        }
-        if (sample.cameraOn.length() != 0){
-            if (!CDRSerializer.put_boolean_array(cdr, sample.cameraOn.get_contiguous_buffer(), sample.cameraOn.length())){
-                System.out.println("serialize sample.cameraOn failed.");
+        for (int i = 0; i < sample.deviceStatus.length(); ++i){
+            if (!CDRSerializer.put_string(cdr, sample.deviceStatus.get_at(i), sample.deviceStatus.get_at(i) == null ? 0 : sample.deviceStatus.get_at(i).length())){
+                System.out.println("serialize sample.deviceStatus failed.");
                 return -2;
             }
         }
@@ -313,68 +225,16 @@ public class HomeStatusTypeSupport extends TypeSupport {
         }
 
         if (!CDRDeserializer.get_int_array(cdr, tmp_int_obj, 1)){
-            System.out.println("deserialize length of sample.acTemp failed.");
+            System.out.println("deserialize length of sample.deviceStatus failed.");
             return -2;
         }
-        if (!sample.acTemp.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
-            System.out.println("Set maxiumum member sample.acTemp failed.");
+        if (!sample.deviceStatus.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
+            System.out.println("Set maxiumum member sample.deviceStatus failed.");
             return -3;
         }
-        if (!CDRDeserializer.get_float_array(cdr, sample.acTemp.get_contiguous_buffer(), sample.acTemp.length())){
-            System.out.println("deserialize sample.acTemp failed.");
-            return -2;
-        }
-
-        if (!CDRDeserializer.get_int_array(cdr, tmp_int_obj, 1)){
-            System.out.println("deserialize length of sample.acStatus failed.");
-            return -2;
-        }
-        if (!sample.acStatus.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
-            System.out.println("Set maxiumum member sample.acStatus failed.");
-            return -3;
-        }
-        for(int i =0 ;i < sample.acStatus.length() ;++i)
+        for(int i =0 ;i < sample.deviceStatus.length() ;++i)
         {
-            sample.acStatus.set_at(i, CDRDeserializer.get_string(cdr));
-        }
-
-        if (!CDRDeserializer.get_int_array(cdr, tmp_int_obj, 1)){
-            System.out.println("deserialize length of sample.lightOn failed.");
-            return -2;
-        }
-        if (!sample.lightOn.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
-            System.out.println("Set maxiumum member sample.lightOn failed.");
-            return -3;
-        }
-        if (!CDRDeserializer.get_boolean_array(cdr, sample.lightOn.get_contiguous_buffer(), sample.lightOn.length())){
-            System.out.println("deserialize sample.lightOn failed.");
-            return -2;
-        }
-
-        if (!CDRDeserializer.get_int_array(cdr, tmp_int_obj, 1)){
-            System.out.println("deserialize length of sample.lightPercent failed.");
-            return -2;
-        }
-        if (!sample.lightPercent.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
-            System.out.println("Set maxiumum member sample.lightPercent failed.");
-            return -3;
-        }
-        if (!CDRDeserializer.get_float_array(cdr, sample.lightPercent.get_contiguous_buffer(), sample.lightPercent.length())){
-            System.out.println("deserialize sample.lightPercent failed.");
-            return -2;
-        }
-
-        if (!CDRDeserializer.get_int_array(cdr, tmp_int_obj, 1)){
-            System.out.println("deserialize length of sample.cameraOn failed.");
-            return -2;
-        }
-        if (!sample.cameraOn.ensure_length(tmp_int_obj[0], tmp_int_obj[0])){
-            System.out.println("Set maxiumum member sample.cameraOn failed.");
-            return -3;
-        }
-        if (!CDRDeserializer.get_boolean_array(cdr, sample.cameraOn.get_contiguous_buffer(), sample.cameraOn.length())){
-            System.out.println("deserialize sample.cameraOn failed.");
-            return -2;
+            sample.deviceStatus.set_at(i, CDRDeserializer.get_string(cdr));
         }
 
         sample.timeStamp = CDRDeserializer.get_string(cdr);
@@ -470,125 +330,21 @@ public class HomeStatusTypeSupport extends TypeSupport {
             return null;
         }
 
-        memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_FLOAT);
-        if (memberTc != null)
-        {
-            memberTc = factory.create_sequence_TC(255, memberTc);
-        }
-        if (memberTc == null){
-            System.out.println("Get Member acTemp TypeCode failed.");
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-        ret = s_typeCode.add_member_to_struct(
-            2,
-            2,
-            "acTemp",
-            memberTc,
-            false,
-            false);
-        factory.delete_TC(memberTc);
-        if (ret < 0)
-        {
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-
         memberTc = factory.create_string_TC(255);
         if (memberTc != null)
         {
             memberTc = factory.create_sequence_TC(255, memberTc);
         }
         if (memberTc == null){
-            System.out.println("Get Member acStatus TypeCode failed.");
+            System.out.println("Get Member deviceStatus TypeCode failed.");
             factory.delete_TC(s_typeCode);
             s_typeCode = null;
             return null;
         }
         ret = s_typeCode.add_member_to_struct(
-            3,
-            3,
-            "acStatus",
-            memberTc,
-            false,
-            false);
-        factory.delete_TC(memberTc);
-        if (ret < 0)
-        {
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-
-        memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_BOOLEAN);
-        if (memberTc != null)
-        {
-            memberTc = factory.create_sequence_TC(255, memberTc);
-        }
-        if (memberTc == null){
-            System.out.println("Get Member lightOn TypeCode failed.");
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-        ret = s_typeCode.add_member_to_struct(
-            4,
-            4,
-            "lightOn",
-            memberTc,
-            false,
-            false);
-        factory.delete_TC(memberTc);
-        if (ret < 0)
-        {
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-
-        memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_FLOAT);
-        if (memberTc != null)
-        {
-            memberTc = factory.create_sequence_TC(255, memberTc);
-        }
-        if (memberTc == null){
-            System.out.println("Get Member lightPercent TypeCode failed.");
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-        ret = s_typeCode.add_member_to_struct(
-            5,
-            5,
-            "lightPercent",
-            memberTc,
-            false,
-            false);
-        factory.delete_TC(memberTc);
-        if (ret < 0)
-        {
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-
-        memberTc = factory.get_primitive_TC(TypeCodeKind.DDS_TK_BOOLEAN);
-        if (memberTc != null)
-        {
-            memberTc = factory.create_sequence_TC(255, memberTc);
-        }
-        if (memberTc == null){
-            System.out.println("Get Member cameraOn TypeCode failed.");
-            factory.delete_TC(s_typeCode);
-            s_typeCode = null;
-            return null;
-        }
-        ret = s_typeCode.add_member_to_struct(
-            6,
-            6,
-            "cameraOn",
+            2,
+            2,
+            "deviceStatus",
             memberTc,
             false,
             false);
@@ -608,8 +364,8 @@ public class HomeStatusTypeSupport extends TypeSupport {
             return null;
         }
         ret = s_typeCode.add_member_to_struct(
-            7,
-            7,
+            3,
+            3,
             "timeStamp",
             memberTc,
             false,

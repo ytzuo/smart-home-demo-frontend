@@ -107,8 +107,7 @@ public class HomeViewModel extends AndroidViewModel {
                         "默认时间",
                         icon,
                         0,
-                        "0000",
-                        false,
+                        "00000000",
                         0
                 );
                 FurnitureItems.add(item);

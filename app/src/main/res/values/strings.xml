@@ -32,5 +32,10 @@
     <string name="unbind_confirm_label">解绑确认</string>
     <string name="unbind_confirm_content">是否解绑该设备？</string>
     <string name="unbind_done">确定解绑</string>
+    <string name="param_label">参数</string>
+    <string name="back">返回</string>
+    <string name="furniture_specific">家具详情</string>
+    <string name="furniture_image">家具图片</string>
+    <string name="unbind_device">解绑设备</string>
     <string name="location">当前位置</string>
 </resources>

@@ -11,7 +11,6 @@ public class FurnitureItem implements Serializable {
     private int imageResource;
     private float acTemp; //空调温度
     private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
-    private boolean lightOn;
     private float lightPercent;
 
 
@@ -31,13 +30,6 @@ public class FurnitureItem implements Serializable {
         this.switchStatus = acStatus;
     }
 
-    public boolean isLightOn() {
-        return lightOn;
-    }
-
-    public void setLightOn(boolean lightOn) {
-        this.lightOn = lightOn;
-    }
 
     public float getLightPercent() {
         return lightPercent;
@@ -48,7 +40,7 @@ public class FurnitureItem implements Serializable {
     }
 
     public FurnitureItem(String name, String deviceType, String workingStatus, String status, String time, int imageResource,
-                         float acTemp, String switchStatus, boolean lightOn, float lightPercent) {
+                         float acTemp, String switchStatus, float lightPercent) {
         this.deviceId = name;
         this.deviceType = deviceType;
         this.workingStatus = workingStatus;
@@ -57,7 +49,6 @@ public class FurnitureItem implements Serializable {
         this.imageResource = imageResource;
         this.acTemp = acTemp;
         this.switchStatus = switchStatus;
-        this.lightOn = lightOn;
         this.lightPercent = lightPercent;
     }
 
