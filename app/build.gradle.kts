@@ -48,6 +48,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     annotationProcessor(libs.room.compiler)
+    implementation(libs.gson)
 //    implementation("cn.pedant.sweetalert:library:1.3") //提示框的依赖, 可以用来提示用户敏感信息或弹出Alert
 //    implementation("jp.wasabeef:recyclerview-animators:4.0.2") //recycle view动效库
 }

@@ -75,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 设置VehicleStatus监听器
-        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
-        vehicleStatusDdsManager.setOnVehicleStatusReceivedListener(new VehicleStatusDdsManager.OnVehicleStatusReceivedListener() {
+//        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
+        // 设置VehicleStatus监听器
+        app.setOnVehicleStatusReceivedListener(new SmartHomeApplication.OnVehicleStatusReceivedListener() {
             @Override
             public void onVehicleStatusReceived(VehicleStatus vehicleStatus) {
                 updateCarFragmentUI(vehicleStatus);
@@ -238,4 +239,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    // 在MainActivity中
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 注意：Activity的onDestroy()也不一定总被调用
+        if (isFinishing()) {
+            // 如果是正常结束，执行清理操作
+            SmartHomeApplication app = (SmartHomeApplication) getApplication();
+            AppDatabase database = app.getDatabase();
+            if (database != null) {
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    database.deviceDao().deleteAll();
+                    Log.d("MainActivity", "应用关闭时删除设备数据");
+                });
+            }
+        }
+    }
+
 }

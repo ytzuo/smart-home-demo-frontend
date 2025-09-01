@@ -25,6 +25,7 @@ import java.util.function.ToDoubleBiFunction;
 
 import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
+import idl.SmartDemo03.VehicleStatus;
 
 /*
     统一管理数据库和所有DDS相关
@@ -62,6 +63,15 @@ public class SmartHomeApplication extends Application {
     // 添加设置监听器的方法
     public void setOnUnknownDeviceListener(OnUnknownDeviceListener listener) {
         this.unknownDeviceListener = listener;
+    }
+
+    private OnVehicleStatusReceivedListener vehicleStatusReceivedListener;
+    public interface OnVehicleStatusReceivedListener {
+        void onVehicleStatusReceived(VehicleStatus vehicleStatus);
+    }
+
+    public void setOnVehicleStatusReceivedListener(OnVehicleStatusReceivedListener listener) {
+        this.vehicleStatusReceivedListener = listener;
     }
 
 
@@ -280,7 +290,12 @@ public class SmartHomeApplication extends Application {
         // 在这里处理收到的VehicleStatus消息
         Log.i(TAG, "处理VehicleStatus消息: " + vehicleStatus.toString());
         // 可以添加更多处理逻辑，例如更新UI或存储数据等
-        // TODO: 可能需要通知CarFragment更新UI
+        // 通知监听器
+        if (vehicleStatusReceivedListener != null) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                vehicleStatusReceivedListener.onVehicleStatusReceived(vehicleStatus);
+            });
+        }
     }
 
     /*
@@ -325,8 +340,10 @@ public class SmartHomeApplication extends Application {
     @Override
     public void onTerminate() {
         // 应用终止前发送设备离开消息
+        Log.d(TAG, "terminate");
         if (isDeviceConnected) {
             presenceDdsManager.onDeviceLeft(deviceId, "SmartHomeDevice");
+            Log.d(TAG, "发送设备离开消息");
         }
 
         // 停止网络监听
@@ -343,7 +360,21 @@ public class SmartHomeApplication extends Application {
 
         //仅供测试时使用!!!
         if(database != null) {
-            database.deviceDao().deleteAll();
+            // 在后台线程中执行删除操作
+            Log.d(TAG, "开始删除设备数据");
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                // 删除前检查记录数
+                int beforeCount = database.deviceDao().getAllDevices().size();
+                Log.d(TAG, "删除前设备数量: " + beforeCount);
+
+                // 执行删除
+                database.deviceDao().deleteAll();
+
+                // 删除后检查记录数
+                int afterCount = database.deviceDao().getAllDevices().size();
+                Log.d(TAG, "删除后设备数量: " + afterCount);
+                Log.d(TAG, "设备数据删除完成");
+            });
         }
 
         super.onTerminate();

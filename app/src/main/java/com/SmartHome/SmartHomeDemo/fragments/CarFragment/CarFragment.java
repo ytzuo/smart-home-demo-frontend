@@ -1,21 +1,27 @@
 package com.SmartHome.SmartHomeDemo.fragments.CarFragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.LiveData;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.google.android.material.button.MaterialButton;
 
+import idl.SmartDemo03.Command;
 import idl.SmartDemo03.VehicleStatus;
 
 public class CarFragment extends Fragment {
+    private String TAG = "CarFragment";
     private CarViewModel carViewModel;
     private TextView carNameText;
     private TextView engineStatusText;
@@ -25,8 +31,16 @@ public class CarFragment extends Fragment {
     private MaterialButton lockButton;
     private MaterialButton acButton;
 
+    private SmartHomeApplication app;
+
     public CarFragment(){}
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // 在onCreate中初始化SmartHomeApplication成员变量
+        app = (SmartHomeApplication) getActivity().getApplication();
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,6 +73,8 @@ public class CarFragment extends Fragment {
                 }
             });
         }
+
+        setButtonClickListeners();
 
         return view;
     }
@@ -112,6 +128,80 @@ public class CarFragment extends Fragment {
             // 设置图标为灰色表示关闭状态
             acButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
         }
+    }
+
+    private void setButtonClickListeners() {
+        engineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 直接使用成员变量app
+                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+
+                // 发送控制发动机的命令
+                Command command = new Command();
+                command.deviceId = "My Car";
+                command.deviceType = "car";
+                if(engineButton.getText() == getString(R.string.car_engine_on)) {
+                    command.action = "engine_on";
+                } else {
+                    command.action = "engine_off";
+                }
+                command.value = 0;
+                command.timeStamp =  String.valueOf(System.currentTimeMillis());
+                commandDdsManager.sendCommand(command);
+
+                Log.i(TAG, "发送命令" + command.action);
+                Toast.makeText(getContext(), "发动机控制按钮被点击", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        lockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 直接使用成员变量app
+                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+
+                // 发送控制门锁的命令
+                Command command = new Command();
+                command.deviceId = "My Car";
+                command.deviceType = "car";
+                if(lockButton.getText() == getString(R.string.car_lock)) {
+                    command.action = "lock";
+                } else {
+                    command.action = "unlock";
+                }
+                command.value = 0;
+                command.timeStamp =  String.valueOf(System.currentTimeMillis());
+                commandDdsManager.sendCommand(command);
+
+                Log.i(TAG, "发送命令" + command.action);
+                Toast.makeText(getContext(), "门锁控制按钮被点击", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        acButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 直接使用成员变量app
+                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+
+                // TODO: 发送控制空调的命令 需要和后端指定的命令action统一
+                Command command = new Command();
+                command.deviceId = "My Car";
+                command.deviceType = "car";
+                if(acButton.getText() == getString(R.string.car_ac_on)) {
+                    command.action = "ac_on";
+                } else {
+                    command.action = "ac_off";
+                }
+                command.value = 0;
+                command.timeStamp =  String.valueOf(System.currentTimeMillis());
+                commandDdsManager.sendCommand(command);
+
+                Log.i(TAG, "发送命令" + command.action);
+                Toast.makeText(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }
