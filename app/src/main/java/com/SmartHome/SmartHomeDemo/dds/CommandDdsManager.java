@@ -22,7 +22,7 @@ public class CommandDdsManager {
     private Publisher publisher;
     private DataWriter dataWriter;
 
-    private static final String TOPIC_NAME = "CommandTopic";
+    private static final String TOPIC_NAME = "Command";
     public void initialize(BaseDdsManager baseManager) {
         try{
             Log.i(TAG, "开始初始化Command DDS组件...");

@@ -39,7 +39,7 @@ public class AlertDdsManager {
         void onAlertReceived(Alert alert);
     }
 
-    private static final String TOPIC_NAME = "AlertTopic";
+    private static final String TOPIC_NAME = "Alert";
 
     public void initialize(BaseDdsManager baseManager) {
         try {

@@ -16,7 +16,7 @@ public class BaseDdsManager {
     protected static BaseDdsManager instance;
     protected Context context;
 
-    protected static final int DOMAIN_ID = 80;
+    protected static final int DOMAIN_ID = 0;
 
     protected BaseDdsManager(Context context) {
         this.context = context.getApplicationContext();
