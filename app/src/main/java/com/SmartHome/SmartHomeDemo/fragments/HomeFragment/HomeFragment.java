@@ -61,6 +61,21 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void run() {
                         app.getDatabase().deviceDao().deleteAll();
+                        // 删除完成后，在主线程更新UI
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // 方式1: 通过ViewModel更新LiveData数据
+                                    if (homeViewModel != null) {
+                                        homeViewModel.updateFurnitureList(new ArrayList<FurnitureItem>());
+                                    }
+
+                                    // 方式2: 显示提示信息
+                                    //Toast.makeText(getContext(), "数据已清空", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 });
             }

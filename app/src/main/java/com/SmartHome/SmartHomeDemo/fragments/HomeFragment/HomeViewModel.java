@@ -51,18 +51,24 @@ public class HomeViewModel extends AndroidViewModel {
         database = ((SmartHomeApplication) application).getDatabase();
 
         //这一段仅供测试数据使用
-        String[] ids = {"智能灯具1", "智能空调1", "智能灯具2", "智能空调2", "智能灯具3"};
-        String[] types = {"light", "air_conditioner", "light", "air_conditioner", "light"};
+        //检查数据库是否为空，如果为空则插入测试数据
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            for(int i = 0 ; i < 5; i++) {
-                Device newDevice = new Device();
-                newDevice.setDeviceId(ids[i]);
-                newDevice.setDeviceType(types[i]);
-                database.deviceDao().insertDevice(newDevice);
+            List<Device> devices = database.deviceDao().getAllDevices();
+            if (devices.isEmpty()) {
+                //仅在数据库为空时插入测试数据
+                String[] ids = {"智能灯具1", "智能空调1", "智能灯具2", "智能空调2", "智能灯具3"};
+                String[] types = {"light", "air_conditioner", "light", "air_conditioner", "light"};
+                for(int i = 0 ; i < 5; i++) {
+                    Device newDevice = new Device();
+                    newDevice.setDeviceId(ids[i]);
+                    newDevice.setDeviceType(types[i]);
+                    database.deviceDao().insertDevice(newDevice);
+                }
             }
+
+            //从数据库加载数据
+            loadFurnitureFromDatabase();
         });
-         //从数据库加载日志
-        loadFurnitureFromDatabase();
     }
 
     public LiveData<List<FurnitureItem>> getFurnitureLiveData() {

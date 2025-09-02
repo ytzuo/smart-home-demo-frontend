@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private SmartHomeApplication app;
     private CarFragment currentCarFragment;
     private HomeFragment currentHomeFragment;
+    private LogFragment currentLogFragment;
+    private SettingFragment currentSettingFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,23 +104,45 @@ public class MainActivity extends AppCompatActivity {
 
         // 只有在savedInstanceState为null时才加载初始Fragment
         // 避免旋转屏幕等配置更改时重复加载
+        // 只有在savedInstanceState为null时才加载初始Fragment
+        // 避免旋转屏幕等配置更改时重复加载
         if (savedInstanceState == null) {
-            loadFragment(new CarFragment());
+            currentCarFragment = new CarFragment();
+            currentHomeFragment = new HomeFragment();
+            currentLogFragment = new LogFragment();
+            currentSettingFragment = new SettingFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, currentCarFragment, "CarFragment")
+                    .add(R.id.fragment_container, currentHomeFragment, "HomeFragment")
+                    .add(R.id.fragment_container, currentLogFragment, "LogFragment")
+                    .add(R.id.fragment_container, currentSettingFragment, "SettingFragment")
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .commit();
+        } else {
+            // 从savedInstanceState恢复Fragment引用
+            currentCarFragment = (CarFragment) getSupportFragmentManager().findFragmentByTag("CarFragment");
+            currentHomeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+            currentLogFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
+            currentSettingFragment = (SettingFragment) getSupportFragmentManager().findFragmentByTag("SettingFragment");
         }
+
 
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
             int id = item.getItemId();
             if (id == R.id.nav_car) {
-                selected = new CarFragment();
+                selected = currentCarFragment;
             } else if (id == R.id.nav_home) {
-                selected = new HomeFragment();
+                selected = currentHomeFragment;
             } else if (id == R.id.nav_log) {
-                selected = new LogFragment();
+                selected = currentLogFragment;
             } else if (id == R.id.nav_setting) {
-                selected = new SettingFragment();
+                selected = currentSettingFragment;
             }
-            return loadFragment(selected);
+            return showFragment(selected);
         });
 
 
@@ -138,11 +162,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private boolean loadFragment(Fragment fragment) {
+    private boolean showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
+                    .hide(currentCarFragment)
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .show(fragment)
                     .commit();
             return true;
         }
@@ -176,6 +204,12 @@ public class MainActivity extends AppCompatActivity {
 
         // 注意：如果LogFragment当前未加载，数据会在下次加载时显示，
         // 因为LogViewModel会保持数据状态
+        com.SmartHome.SmartHomeDemo.database.Log newLog = new com.SmartHome.SmartHomeDemo.database.Log();
+        newLog.setLogType(alert.level);
+        newLog.setLogId(""+alert.alert_id);
+        newLog.setDescription(alert.description);
+        newLog.setTimestamp(alert.timeStamp);
+        app.getDatabase().logDao().insertLog(newLog);
     }
 
     private void showNewDeviceDialog(Presence presence) {
