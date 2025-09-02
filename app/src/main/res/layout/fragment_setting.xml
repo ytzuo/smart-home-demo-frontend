@@ -30,15 +30,14 @@
                     android:paddingHorizontal="10dp"
                     android:backgroundTint="@android:color/transparent"
                     android:text="黑夜模式"
-                    android:textColor="@color/black"
                     android:textSize="20sp" />
 
                 <Switch
+                    android:id="@+id/dark_mode_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:backgroundTint="@android:color/transparent"
-                    android:textColor="@color/black"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -55,15 +54,14 @@
                     android:paddingHorizontal="10dp"
                     android:backgroundTint="@android:color/transparent"
                     android:text="允许通知"
-                    android:textColor="@color/black"
                     android:textSize="20sp" />
 
                 <Switch
+                    android:id="@+id/notification_allow_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:backgroundTint="@android:color/transparent"
-                    android:textColor="@color/black"
                     android:textSize="20sp" />
             </LinearLayout>
 

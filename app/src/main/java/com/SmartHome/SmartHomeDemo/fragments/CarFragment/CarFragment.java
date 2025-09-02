@@ -25,6 +25,8 @@ public class CarFragment extends Fragment {
     private CarViewModel carViewModel;
     private TextView carNameText;
     private TextView engineStatusText;
+    private TextView lockStatusText;
+    private TextView acStatusText;
     private TextView fuelStatusText;
     private TextView mileStatusText;
     private MaterialButton engineButton;
@@ -50,13 +52,15 @@ public class CarFragment extends Fragment {
         carViewModel = new ViewModelProvider(this).get(CarViewModel.class);
 
         // 获取UI元素引用
-        carNameText = view.findViewById(R.id.car_name);
+        carNameText      = view.findViewById(R.id.car_name);
         engineStatusText = view.findViewById(R.id.car_engine_status);
-        fuelStatusText = view.findViewById(R.id.car_fuel_status);
-        mileStatusText = view.findViewById(R.id.car_mile_status);
-        engineButton = view.findViewById(R.id.control_car_engine);
-        lockButton = view.findViewById(R.id.control_car_lock);
-        acButton = view.findViewById(R.id.control_car_ac);
+        lockStatusText   = view.findViewById(R.id.car_lock_status);
+        acStatusText     = view.findViewById(R.id.car_ac_status);
+        fuelStatusText   = view.findViewById(R.id.car_fuel_status);
+        mileStatusText   = view.findViewById(R.id.car_mile_status);
+        engineButton     = view.findViewById(R.id.control_car_engine);
+        lockButton       = view.findViewById(R.id.control_car_lock);
+        acButton         = view.findViewById(R.id.control_car_ac);
 
         // 观察LiveData变化并更新UI
         LiveData<CarItem> carLiveData = carViewModel.getCarLiveData();
@@ -84,12 +88,11 @@ public class CarFragment extends Fragment {
             // 根据VehicleStatus创建新的CarItem
             CarItem carItem = new CarItem(
                     "我的汽车",  // 汽车名称
-                    "车辆名称："+(vehicleStatus.engineOn ? "运行中" : "已熄火"),  // 发动机状态
                     "剩余油量："+String.format("%.1f%%", vehicleStatus.fuelPercent),  // 燃油百分比
                     vehicleStatus.location,
-                    vehicleStatus.doorsLocked,
+                    vehicleStatus.doorsLocked, // 车门状态
                     vehicleStatus.engineOn,  // 发动机状态
-                    false   // 空调状态无法从VehicleStatus获取
+                    vehicleStatus.acOn   // 空调状态
             );
 
             // 更新ViewModel中的数据
@@ -103,30 +106,36 @@ public class CarFragment extends Fragment {
             engineButton.setText(R.string.car_engine_off);
             // 设置图标为绿色表示开启状态
             engineButton.setIconTint(getResources().getColorStateList(R.color.green, null));
+            engineStatusText.setText(R.string.enginOn);
         } else {
             engineButton.setText(R.string.car_engine_on);
             // 设置图标为灰色表示关闭状态
             engineButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+            engineStatusText.setText(R.string.enginOff);
         }
 
         if (carItem.isLock()) {
             lockButton.setText(R.string.car_unlock);
             // 设置图标为橙色表示锁定状态
             lockButton.setIconTint(getResources().getColorStateList(R.color.orange, null));
+            lockStatusText.setText(R.string.lock);
         } else {
             lockButton.setText(R.string.car_lock);
             // 设置图标为灰色表示未锁定状态
             lockButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+            lockStatusText.setText(R.string.unlock);
         }
 
         if (carItem.isAcOn()) {
             acButton.setText(R.string.car_ac_pff);
             // 设置图标为蓝色表示开启状态
             acButton.setIconTint(getResources().getColorStateList(R.color.blue, null));
+            acStatusText.setText(R.string.acON);
         } else {
             acButton.setText(R.string.car_ac_on);
             // 设置图标为灰色表示关闭状态
             acButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+            acStatusText.setText(R.string.acOFF);
         }
     }
 
@@ -143,8 +152,16 @@ public class CarFragment extends Fragment {
                 command.deviceType = "car";
                 if(engineButton.getText() == getString(R.string.car_engine_on)) {
                     command.action = "engine_on";
+                    engineButton.setText(R.string.car_engine_off);
+                    // 设置图标为绿色表示开启状态
+                    engineButton.setIconTint(getResources().getColorStateList(R.color.green, null));
+                    engineStatusText.setText(R.string.enginOn);
                 } else {
                     command.action = "engine_off";
+                    engineButton.setText(R.string.car_engine_on);
+                    // 设置图标为灰色表示关闭状态
+                    engineButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+                    engineStatusText.setText(R.string.enginOff);
                 }
                 command.value = 0;
                 command.timeStamp =  String.valueOf(System.currentTimeMillis());
@@ -167,8 +184,16 @@ public class CarFragment extends Fragment {
                 command.deviceType = "car";
                 if(lockButton.getText() == getString(R.string.car_lock)) {
                     command.action = "lock";
+                    lockButton.setText(R.string.car_unlock);
+                    // 设置图标为橙色表示锁定状态
+                    lockButton.setIconTint(getResources().getColorStateList(R.color.orange, null));
+                    lockStatusText.setText(R.string.lock);
                 } else {
                     command.action = "unlock";
+                    lockButton.setText(R.string.car_lock);
+                    // 设置图标为灰色表示未锁定状态
+                    lockButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+                    lockStatusText.setText(R.string.unlock);
                 }
                 command.value = 0;
                 command.timeStamp =  String.valueOf(System.currentTimeMillis());
@@ -191,8 +216,16 @@ public class CarFragment extends Fragment {
                 command.deviceType = "car";
                 if(acButton.getText() == getString(R.string.car_ac_on)) {
                     command.action = "ac_on";
+                    acButton.setText(R.string.car_ac_pff);
+                    // 设置图标为蓝色表示开启状态
+                    acButton.setIconTint(getResources().getColorStateList(R.color.blue, null));
+                    acStatusText.setText(R.string.acON);
                 } else {
                     command.action = "ac_off";
+                    acButton.setText(R.string.car_ac_on);
+                    // 设置图标为灰色表示关闭状态
+                    acButton.setIconTint(getResources().getColorStateList(R.color.gray, null));
+                    acStatusText.setText(R.string.acOFF);
                 }
                 command.value = 0;
                 command.timeStamp =  String.valueOf(System.currentTimeMillis());

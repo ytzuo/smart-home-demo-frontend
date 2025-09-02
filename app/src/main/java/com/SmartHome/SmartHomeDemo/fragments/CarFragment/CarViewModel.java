@@ -14,8 +14,8 @@ public class CarViewModel extends AndroidViewModel {
         super(application);
         //测试数据
         item = new MutableLiveData<>();
-        carItem = new CarItem("默认汽车名", "车辆状态：熄火",
-                "剩余油量：80%", "车辆位置：默认位置", false, false, false);
+        carItem = new CarItem("默认汽车名",
+                "剩余油量：80%", "车辆位置：默认位置", true, false, false);
         item.setValue(carItem);
     }
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="?attr/actionBarSize"
+
     app:layout_constraintBottom_toBottomOf="parent">
 <LinearLayout
     android:id="@+id/furniture_layout"
@@ -29,6 +29,11 @@
         tools:ignore="RtlSymmetry">
 
     </androidx.recyclerview.widget.RecyclerView>
-
+    <Button
+        android:id="@+id/btn_test_del_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="测试按钮, 删除所有数据"/>
 </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

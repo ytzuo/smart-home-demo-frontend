@@ -11,7 +11,8 @@
     <string name="log_time">日志时间</string>
     <string name="log_des">日志信息</string>
     <string name="name_car">汽车名</string>
-    <string name="enginOn">发动机状态</string>
+    <string name="enginOn">发动机状态：已启动</string>
+    <string name="enginOff">发动机状态：已熄火</string>
     <string name="fuel">剩余油量</string>
     <string name="mile">剩余里程</string>
     <string name="logID">日志ID</string>
@@ -38,4 +39,8 @@
     <string name="furniture_image">家具图片</string>
     <string name="unbind_device">解绑设备</string>
     <string name="location">当前位置</string>
+    <string name="lock">车门状态：已锁定</string>
+    <string name="unlock">车门状态：已解锁</string>
+    <string name="acON">空调状态：已开启</string>
+    <string name="acOFF">空调状态：已关闭</string>
 </resources>

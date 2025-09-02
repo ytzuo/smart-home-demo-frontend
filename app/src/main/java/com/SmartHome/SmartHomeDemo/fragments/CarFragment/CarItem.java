@@ -9,9 +9,8 @@ public class CarItem {
     private boolean engineOn;
     private boolean acOn;
 
-    public CarItem(String carName, String engineStatus, String fuel, String location, boolean lock, boolean engineOn, boolean acOn) {
+    public CarItem(String carName, String fuel, String location, boolean lock, boolean engineOn, boolean acOn) {
         this.carName = carName;
-        this.engineStatus = engineStatus;
         this.fuel = fuel;
         this.location = location;
         this.lock = lock;
@@ -74,4 +73,5 @@ public class CarItem {
     public void setAcOn(boolean acOn) {
         this.acOn = acOn;
     }
+
 }
