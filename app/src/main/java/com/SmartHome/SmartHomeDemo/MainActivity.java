@@ -22,6 +22,7 @@ import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
@@ -29,7 +30,9 @@ import com.SmartHome.SmartHomeDemo.fragments.SettingFragment.SettingFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 
@@ -45,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private SmartHomeApplication app;
     private CarFragment currentCarFragment;
     private HomeFragment currentHomeFragment;
+    private LogFragment currentLogFragment;
+    private SettingFragment currentSettingFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 设置HomeStatus监听器
+        app.setOnHomeStatusReceivedListener(new SmartHomeApplication.OnHomeStatusReceivedListener() {
+            @Override
+            public void onHomeStatusReceived(HomeStatus homeStatus) {
+                updateHomeFragmentUI(homeStatus);
+            }
+        });
+
+
+
         // 设置VehicleStatus监听器
 //        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
         // 设置VehicleStatus监听器
@@ -84,36 +99,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 设置HomeStatus监听器
-        HomeStatusDdsManager homeStatusDdsManager = app.getHomeStatusDdsManager();
-        homeStatusDdsManager.setOnHomeStatusReceivedListener(new HomeStatusDdsManager.OnHomeStatusReceivedListener() {
-            @Override
-            public void onHomeStatusReceived(HomeStatus homeStatus) {
-                updateHomeFragmentUI(homeStatus);
-            }
-        });
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
         // 只有在savedInstanceState为null时才加载初始Fragment
         // 避免旋转屏幕等配置更改时重复加载
+        // 只有在savedInstanceState为null时才加载初始Fragment
+        // 避免旋转屏幕等配置更改时重复加载
         if (savedInstanceState == null) {
-            loadFragment(new CarFragment());
+            currentCarFragment = new CarFragment();
+            currentHomeFragment = new HomeFragment();
+            currentLogFragment = new LogFragment();
+            currentSettingFragment = new SettingFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, currentCarFragment, "CarFragment")
+                    .add(R.id.fragment_container, currentHomeFragment, "HomeFragment")
+                    .add(R.id.fragment_container, currentLogFragment, "LogFragment")
+                    .add(R.id.fragment_container, currentSettingFragment, "SettingFragment")
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .commit();
+        } else {
+            // 从savedInstanceState恢复Fragment引用
+            currentCarFragment = (CarFragment) getSupportFragmentManager().findFragmentByTag("CarFragment");
+            currentHomeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+            currentLogFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
+            currentSettingFragment = (SettingFragment) getSupportFragmentManager().findFragmentByTag("SettingFragment");
         }
+
 
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
             int id = item.getItemId();
             if (id == R.id.nav_car) {
-                selected = new CarFragment();
+                selected = currentCarFragment;
             } else if (id == R.id.nav_home) {
-                selected = new HomeFragment();
+                selected = currentHomeFragment;
             } else if (id == R.id.nav_log) {
-                selected = new LogFragment();
+                selected = currentLogFragment;
             } else if (id == R.id.nav_setting) {
-                selected = new SettingFragment();
+                selected = currentSettingFragment;
             }
-            return loadFragment(selected);
+            return showFragment(selected);
         });
 
 
@@ -131,14 +160,17 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-    private void updateHomeFragmentUI(HomeStatus newStatus) {
 
-    }
-    private boolean loadFragment(Fragment fragment) {
+
+    private boolean showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
+                    .hide(currentCarFragment)
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .show(fragment)
                     .commit();
             return true;
         }
@@ -172,6 +204,12 @@ public class MainActivity extends AppCompatActivity {
 
         // 注意：如果LogFragment当前未加载，数据会在下次加载时显示，
         // 因为LogViewModel会保持数据状态
+        com.SmartHome.SmartHomeDemo.database.Log newLog = new com.SmartHome.SmartHomeDemo.database.Log();
+        newLog.setLogType(alert.level);
+        newLog.setLogId(""+alert.alert_id);
+        newLog.setDescription(alert.description);
+        newLog.setTimestamp(alert.timeStamp);
+        app.getDatabase().logDao().insertLog(newLog);
     }
 
     private void showNewDeviceDialog(Presence presence) {
@@ -255,6 +293,26 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MainActivity", "应用关闭时删除设备数据");
                 });
             }
+        }
+    }
+
+    private void updateHomeFragmentUI(HomeStatus newStatus) {
+        // 更新HomeFragment UI
+        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+        if (homeFragment == null) {
+            // 如果通过tag找不到，尝试通过当前显示的fragment判断
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment instanceof HomeFragment) {
+                homeFragment = (HomeFragment) currentFragment;
+            }
+        }
+
+        if (homeFragment != null) {
+            // 创建final变量以在lambda表达式中使用
+            final HomeFragment finalHomeFragment = homeFragment;
+            final HomeStatus finalNewStatus = newStatus;
+            // 在主线程中更新UI
+            runOnUiThread(() -> finalHomeFragment.handleHomeStatus(finalNewStatus));
         }
     }
 

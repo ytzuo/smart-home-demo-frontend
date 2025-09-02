@@ -2,6 +2,7 @@ package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import idl.SmartDemo03.HomeStatus;
 
 public class HomeFragment extends Fragment {
     public HomeFragment(){}
@@ -59,6 +62,21 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void run() {
                         app.getDatabase().deviceDao().deleteAll();
+                        // 删除完成后，在主线程更新UI
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // 方式1: 通过ViewModel更新LiveData数据
+                                    if (homeViewModel != null) {
+                                        homeViewModel.updateFurnitureList(new ArrayList<FurnitureItem>());
+                                    }
+
+                                    // 方式2: 显示提示信息
+                                    //Toast.makeText(getContext(), "数据已清空", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -98,5 +116,34 @@ public class HomeFragment extends Fragment {
 
         return view;
 
+    }
+
+    // 添加更新HomeStatus的方法
+    public void handleHomeStatus(HomeStatus homeStatus) {
+        if (homeViewModel != null) {
+            List<FurnitureItem> items = new ArrayList<>();
+            int len = homeStatus.deviceIds.length();
+            for(int i = 0; i < len; i++) {
+                FurnitureItem newItem = new FurnitureItem();
+                newItem.setDeviceId(homeStatus.deviceIds.get_at(i));
+                newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
+                newItem.setTime(homeStatus.timeStamp);
+
+                if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
+                    newItem.updateSelfFromDataPack();
+                } else {
+                    Log.i("HomeFragment", "JSON转换失败/更新失败 "
+                            + homeStatus.deviceStatus.get_at(i));
+                }
+                items.add(newItem);
+            }
+            if (homeViewModel != null) {
+                homeViewModel.updateFurnitureList(items);
+            }
+        }
+    }
+
+    public HomeViewModel getHomeViewModel() {
+        return homeViewModel;
     }
 }

@@ -2,12 +2,14 @@ package com.SmartHome.SmartHomeDemo.database;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 import android.content.Context;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Device.class, Log.class}, version = 2, exportSchema = false)
+@Database(entities = {Device.class, Log.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     //
@@ -28,6 +30,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "smart_home_database")
+                            .fallbackToDestructiveMigration() // 允许破坏性迁移，会删除并重新创建表
                             .build();
 //                            .allowMainThreadQueries() // 仅用于测试，实际应用中应避免在主线程执行数据库操作
                     //.build();

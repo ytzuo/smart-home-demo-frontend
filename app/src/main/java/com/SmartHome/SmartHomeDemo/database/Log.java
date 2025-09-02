@@ -13,7 +13,7 @@ public class Log {
     private String logType;
 
     @ColumnInfo(name = "timestamp")
-    private long timestamp;
+    private String timestamp;
 
     @ColumnInfo(name = "log_id")
     private String logId;
@@ -48,11 +48,11 @@ public class Log {
         this.logType = logType;
     }
 
-    public long getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

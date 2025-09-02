@@ -67,10 +67,8 @@ public class LogViewModel extends AndroidViewModel {
             List<Log> logs = database.logDao().getAllLogs();
             List<LogItem> logItems = new ArrayList<>();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-
             for (Log log : logs) {
-                String time = sdf.format(new Date(log.getTimestamp()));
+                String time = log.getTimestamp();
                 LogItem item = new LogItem(
                         log.getLogType(),
                         time,

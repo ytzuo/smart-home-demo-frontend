@@ -16,9 +16,13 @@ import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.PresenceDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 import com.zrdds.infrastructure.FloatSeq;
 import com.zrdds.infrastructure.StringSeq;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.function.ToDoubleBiFunction;
@@ -253,6 +257,17 @@ public class SmartHomeApplication extends Application {
 
 
 
+    // 添加HomeStatus监听器接口
+    public interface OnHomeStatusReceivedListener {
+        void onHomeStatusReceived(HomeStatus homeStatus);
+    }
+
+    private OnHomeStatusReceivedListener homeStatusListener;
+
+    public void setOnHomeStatusReceivedListener(OnHomeStatusReceivedListener listener) {
+        this.homeStatusListener = listener;
+    }
+
     private void setupHomeStatusListener() {
         homeStatusDdsManager.setOnHomeStatusReceivedListener(new HomeStatusDdsManager.OnHomeStatusReceivedListener() {
             @Override
@@ -260,18 +275,17 @@ public class SmartHomeApplication extends Application {
                 Log.d(TAG, "收到HomeStatus消息: deviceId=" + homeStatus.deviceIds.toString() +
                         ", status=" + homeStatus.deviceTypes.toString());
 
-                // 处理HomeStatus消息
-                handleHomeStatus(homeStatus);
+                // 通知监听器
+                if (homeStatusListener != null) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        homeStatusListener.onHomeStatusReceived(homeStatus);
+                    });
+                }
             }
         });
     }
 
-    private void handleHomeStatus(HomeStatus homeStatus) {
-        // 在这里处理收到的HomeStatus消息
-        Log.i(TAG, "处理HomeStatus消息: " + homeStatus.toString());
-        // 可以添加更多处理逻辑，例如更新UI或存储数据等
-        //TODO 将采用JSON格式进行家具属性的传输和解析
-    }
+
 
     private void setupVehicleStatusListener() {
         vehicleStatusDdsManager.setOnVehicleStatusReceivedListener(new VehicleStatusDdsManager.OnVehicleStatusReceivedListener() {
