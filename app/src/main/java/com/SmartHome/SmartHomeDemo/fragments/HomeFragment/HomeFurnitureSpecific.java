@@ -194,9 +194,9 @@ public class HomeFurnitureSpecific extends Fragment {
 
             case "light":
                 // 设置参数项2显示灯光亮度
-                TextView lightArg2TextView = view.findViewById(R.id.arg2);
+                TextView lightArg2TextView = view.findViewById(R.id.arg2_item);
                 if (lightArg2TextView != null) {
-                    lightArg2TextView.setText("亮度：" + (int)furnitureItem.getLightPercent() + "%");
+                    lightArg2TextView.setText((int)furnitureItem.getLightPercent() + "%");
                 }
 
                 // 根据lightPercent调整滑块位置，lightPercent范围为10-100
