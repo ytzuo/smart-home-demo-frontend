@@ -1,5 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import com.SmartHome.SmartHomeDemo.R;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,11 @@ public class FurnitureItem implements Serializable {
             sb.append(receivedStatus.get(i) ? "1" : "0");
         }
         switchStatus = sb.toString();
+        if(switchStatus.charAt(0) == '1') {
+            workingStatus = "工作中";
+        } else {
+            workingStatus = "关机";
+        }
 
         // 检查params列表是否存在且不为空
         List<Float> params = furnitureDataPack.getParams();
@@ -80,12 +87,16 @@ public class FurnitureItem implements Serializable {
                 case "air_conditioner":
                     if (params.size() > 0) {
                         acTemp = params.get(0);
+                        status = "温度 " + acTemp;
                     }
+                    imageResource = R.drawable.icon_air_conditioner;
                     break;
                 case "light":
                     if (params.size() > 0) {
                         lightPercent = params.get(0);
+
                     }
+                    imageResource = R.drawable.icon_light;
                     break;
             }
         } catch (IndexOutOfBoundsException e) {
@@ -160,6 +171,7 @@ public class FurnitureItem implements Serializable {
         this.lightPercent = lightPercent;
     }
 
+    public FurnitureItem() {}
     public FurnitureItem(String name, String deviceType, String workingStatus, String status, String time, int imageResource,
                          float acTemp, String switchStatus, float lightPercent) {
         this.deviceId = name;
