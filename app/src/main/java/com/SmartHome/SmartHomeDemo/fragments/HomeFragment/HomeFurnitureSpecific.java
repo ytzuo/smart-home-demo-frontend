@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import idl.SmartDemo03.Presence;
 
@@ -375,7 +376,7 @@ public class HomeFurnitureSpecific extends Fragment {
         String switchName = getResources().getResourceEntryName(switchView.getId());
         // 这里可以添加实际的设备控制逻辑
         if (isAdded()) {
-            Toast.makeText(requireContext(), switchName + " 状态: " + (isChecked ? "开启" : "关闭"), Toast.LENGTH_SHORT).show();
+            ToastUtil.showToast(requireContext(), switchName + " 状态: " + (isChecked ? "开启" : "关闭"), Toast.LENGTH_SHORT);
         }
     }
 
@@ -384,7 +385,7 @@ public class HomeFurnitureSpecific extends Fragment {
         String seekBarName = getResources().getResourceEntryName(seekBar.getId());
         // 这里可以添加实际的设备控制逻辑
         if (isAdded()) {
-            Toast.makeText(requireContext(), seekBarName + " 值: " + progress, Toast.LENGTH_SHORT).show();
+            ToastUtil.showToast(requireContext(), seekBarName + " 值: " + progress, Toast.LENGTH_SHORT);
         }
     }
 
@@ -397,7 +398,7 @@ public class HomeFurnitureSpecific extends Fragment {
 
             // 可以在这里添加其他报警相关的UI更新
             if (isAdded()) {
-                Toast.makeText(requireContext(), "设备报警！", Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(requireContext(), "设备报警！", Toast.LENGTH_SHORT);
             }
         }
     }

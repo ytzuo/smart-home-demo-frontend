@@ -12,7 +12,6 @@
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -26,8 +25,8 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
             android:text="@string/back"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+
+            android:textSize="16sp" />
 
         <!-- 标题 -->
         <TextView
@@ -35,8 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/furniture_specific"
-            android:textSize="18sp"
-            android:textColor="@color/black"
+            android:textSize="20sp"
+
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"/>
@@ -56,7 +55,6 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_margin="16dp"
-        android:src="@drawable/param_background"
         android:contentDescription="@string/furniture_image"
         android:scaleType="centerInside"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
@@ -87,14 +85,13 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/param_label"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
+
+                android:textSize="20sp" />
 
             <LinearLayout
                 android:id="@+id/param_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/param_background"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -111,14 +108,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项1："
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                     <TextView
                         android:id="@+id/arg1_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item1"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                 </LinearLayout>
 
 
@@ -135,14 +132,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项2："
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                     <TextView
                         android:id="@+id/arg2_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item2"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                 </LinearLayout>
 
                 <!-- 参数项3 -->
@@ -158,14 +155,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项3："
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                     <TextView
                         android:id="@+id/arg3_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item3"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                 </LinearLayout>
 
                 <!-- 参数项4 -->
@@ -181,14 +178,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项4："
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                     <TextView
                         android:id="@+id/arg4_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item4"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -201,8 +198,8 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="设置项"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
+
+                android:textSize="20sp" />
 
             <!-- 开关设置项区域 (一行最多4个) -->
             <LinearLayout
@@ -227,7 +224,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项11"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_11"
@@ -249,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项12"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_12"
@@ -271,7 +268,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项13"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_13"
@@ -293,7 +290,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项14"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_14"
@@ -325,7 +322,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项21"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_21"
@@ -348,7 +345,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项22"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_22"
@@ -371,7 +368,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项23"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_23"
@@ -394,7 +391,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="设置项24"
-                        android:textSize="14sp" />
+                        android:textSize="17sp" />
 
                     <Switch
                         android:id="@+id/switch_24"
@@ -422,7 +419,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="滑块1"
-                    android:textSize="14sp" />
+                    android:textSize="17sp" />
 
                 <SeekBar
                     android:id="@+id/seekbar_1"
@@ -447,7 +444,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="滑块2"
-                    android:textSize="14sp" />
+                    android:textSize="17sp" />
 
                 <SeekBar
                     android:id="@+id/seekbar_2"
@@ -472,7 +469,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="滑块3"
-                    android:textSize="14sp" />
+                    android:textSize="17sp" />
 
                 <SeekBar
                     android:id="@+id/seekbar_3"
@@ -489,7 +486,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/unbind_device"
-                android:backgroundTint="@color/ALERT_background"
+                android:backgroundTint="@color/Red_background"
                 android:onClick="unbind"/>
         </LinearLayout>
     </ScrollView>

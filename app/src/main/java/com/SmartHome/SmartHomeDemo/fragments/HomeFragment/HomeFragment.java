@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class HomeFragment extends Fragment {
         adapter.setOnItemClickListener(new HomeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(FurnitureItem item, int position) {
-                Toast.makeText(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT);
                 // 使用FragmentTransaction显示HomeFurnitureSpecific Fragment
                 HomeFurnitureSpecific fragment = new HomeFurnitureSpecific();
 

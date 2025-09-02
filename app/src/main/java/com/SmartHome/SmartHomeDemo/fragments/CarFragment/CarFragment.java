@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 import com.google.android.material.button.MaterialButton;
 
 import idl.SmartDemo03.Command;
@@ -168,7 +169,7 @@ public class CarFragment extends Fragment {
                 commandDdsManager.sendCommand(command);
 
                 Log.i(TAG, "发送命令" + command.action);
-                Toast.makeText(getContext(), "发动机控制按钮被点击", Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(getContext(), "发动机控制按钮被点击", Toast.LENGTH_SHORT);
             }
         });
 
@@ -200,7 +201,7 @@ public class CarFragment extends Fragment {
                 commandDdsManager.sendCommand(command);
 
                 Log.i(TAG, "发送命令" + command.action);
-                Toast.makeText(getContext(), "门锁控制按钮被点击", Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(getContext(), "门锁控制按钮被点击", Toast.LENGTH_SHORT);
             }
         });
 
