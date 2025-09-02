@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FurnitureDataPack {
-    private List<Boolean> status; //
+    private List<Boolean> status;
     private List<Float> params;
 
     public FurnitureDataPack() {
