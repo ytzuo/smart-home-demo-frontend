@@ -32,18 +32,12 @@
             app:shapeAppearanceOverlay="@style/RoundedImage"
             tools:layout_editor_absoluteX="9dp" />
 
-        <View
-            android:id="@+id/mid_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/iv_car"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/mid_view"
+            app:layout_constraintTop_toBottomOf="@id/iv_car"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">

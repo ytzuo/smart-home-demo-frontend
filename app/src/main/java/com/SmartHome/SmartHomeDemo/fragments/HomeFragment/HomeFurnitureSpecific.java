@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
+
+import java.time.LocalDateTime;
 
 import idl.SmartDemo03.Presence;
 
@@ -328,15 +331,14 @@ public class HomeFurnitureSpecific extends Fragment {
                             handleSeekBarChange(seekBar, progress);
                         }
                     }
-
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
                         // 可选：处理开始拖动事件
                     }
-
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
                         // 可选：处理停止拖动事件
+                        handleSeekBarStopTracking(seekBar);
                     }
                 });
             }
@@ -378,6 +380,7 @@ public class HomeFurnitureSpecific extends Fragment {
         if (isAdded()) {
             ToastUtil.showToast(requireContext(), switchName + " 状态: " + (isChecked ? "开启" : "关闭"), Toast.LENGTH_SHORT);
         }
+        sendRequestSwitch(switchView, isChecked);
     }
 
     private void handleSeekBarChange(SeekBar seekBar, int progress) {
@@ -387,6 +390,12 @@ public class HomeFurnitureSpecific extends Fragment {
         if (isAdded()) {
             ToastUtil.showToast(requireContext(), seekBarName + " 值: " + progress, Toast.LENGTH_SHORT);
         }
+    }
+
+    private void handleSeekBarStopTracking(SeekBar seekBar) {
+        // 当用户停止拖动滑块时发送命令
+        int progress = seekBar.getProgress();
+        sendRequestSeekbar(seekBar, progress);
     }
 
     public void AlarmUpdateUI() {
@@ -404,12 +413,84 @@ public class HomeFurnitureSpecific extends Fragment {
         }
     }
 
-    private void sendRequestSwitch(){
+    private void sendRequestSwitch(CompoundButton switchView, boolean isChecked) {
+        // 获取开关的编号 (例如 switch_11 -> 11)
+        String switchName = getResources().getResourceEntryName(switchView.getId());
+        String switchNumber = switchName.substring(switchName.length() - 2);
 
+        // 构建命令
+        idl.SmartDemo03.Command command = new idl.SmartDemo03.Command();
+        command.deviceId = furnitureItem.getDeviceId();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            command.timeStamp = LocalDateTime.now().toString();
+        }
+
+        // 根据设备类型和开关编号构建action
+        switch (furnitureItem.getDeviceType()) {
+            case "air_conditioner":
+                if ("11".equals(switchNumber)) {
+                    // 主开关
+                    command.action = "switch_" + (isChecked ? "on" : "off");
+                    command.deviceType = "ac";
+                } else if ("12".equals(switchNumber)) {
+                    // 制冷开关
+                    command.action = "cool_" + (isChecked ? "on" : "off");
+                    command.deviceType = "ac";
+                } else if ("13".equals(switchNumber)) {
+                    // 扫风开关
+                    command.action = "fan_" + (isChecked ? "on" : "off");
+                    command.deviceType = "ac";
+                } else if ("14".equals(switchNumber)) {
+                    // 除湿开关
+                    command.action = "dehumidify_" + (isChecked ? "on" : "off");
+                    command.deviceType = "ac";
+                }
+                break;
+            case "light":
+                if ("11".equals(switchNumber)) {
+                    // 主开关
+                    command.action = "switch_" + (isChecked ? "on" : "off");
+                    command.deviceType = "light";
+                }
+                break;
+        }
+
+        // TODO发送命令的逻辑应该在这里实现
+        // 由于代码中没有提供具体的发送方法，这里只是构建了命令对象
+        // 实际项目中应该调用相应的发送方法，例如:
+        // commandDataWriter.write(command);
     }
 
-    private void sendRequestSeekbar(){
+    private void sendRequestSeekbar(SeekBar seekBar, int progress) {
+        // 构建命令
+        idl.SmartDemo03.Command command = new idl.SmartDemo03.Command();
+        command.deviceId = furnitureItem.getDeviceId();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            command.timeStamp = LocalDateTime.now().toString();
+        }
 
+        // 根据设备类型构建action
+        switch (furnitureItem.getDeviceType()) {
+            case "air_conditioner":
+                command.deviceType = "ac";
+                // 将进度(0-100)映射到温度范围(15-30)
+                float temp = 15 + (progress / 100.0f) * (30 - 15);
+                command.action = "temp_" + Math.round(temp);
+                command.value = temp;
+                break;
+            case "light":
+                command.deviceType = "light";
+                // 将进度(0-100)映射到亮度范围(10-100)
+                int brightness = (int) (10 + (progress / 100.0f) * (100 - 10));
+                command.action = "brightness_" + brightness;
+                command.value = brightness;
+                break;
+        }
+
+        // TODO发送命令的逻辑应该在这里实现
+        // 由于代码中没有提供具体的发送方法，这里只是构建了命令对象
+        // 实际项目中应该调用相应的发送方法，例如:
+        // commandDataWriter.write(command);
     }
 
     private void showUnbindDialog(Presence presence, View view) {

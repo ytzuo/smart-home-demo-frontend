@@ -16,6 +16,7 @@ import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogAdapter;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogViewModel;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class LogFragment extends Fragment {
         adapter.setOnItemClickListener(new LogAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(LogItem item, int position) {
-                Toast.makeText(getContext(), "点击了: " + item.getLogID(), Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(getContext(), "点击了: " + item.getLogID(), Toast.LENGTH_SHORT);
             }
         });
 
