@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ import idl.SmartDemo03.Presence;
 public class HomeFurnitureSpecific extends Fragment {
 
     private FurnitureItem furnitureItem;
+
+    private CommandDdsManager commandDdsManager;
 
     public HomeFurnitureSpecific() {
         // Required empty public constructor
@@ -456,9 +459,7 @@ public class HomeFurnitureSpecific extends Fragment {
         }
 
         // TODO发送命令的逻辑应该在这里实现
-        // 由于代码中没有提供具体的发送方法，这里只是构建了命令对象
-        // 实际项目中应该调用相应的发送方法，例如:
-        // commandDataWriter.write(command);
+        commandDdsManager.sendCommand(command);
     }
 
     private void sendRequestSeekbar(SeekBar seekBar, int progress) {
@@ -488,9 +489,7 @@ public class HomeFurnitureSpecific extends Fragment {
         }
 
         // TODO发送命令的逻辑应该在这里实现
-        // 由于代码中没有提供具体的发送方法，这里只是构建了命令对象
-        // 实际项目中应该调用相应的发送方法，例如:
-        // commandDataWriter.write(command);
+        commandDdsManager.sendCommand(command);
     }
 
     private void showUnbindDialog(Presence presence, View view) {
