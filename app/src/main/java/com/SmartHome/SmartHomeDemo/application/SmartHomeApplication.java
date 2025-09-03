@@ -69,6 +69,11 @@ public class SmartHomeApplication extends Application {
         this.unknownDeviceListener = listener;
     }
 
+    private AlertDdsManager.OnAlertReceivedListener alertReceivedListener;
+    public void setOnAlertReceivedListener(AlertDdsManager.OnAlertReceivedListener listener) {
+        this.alertDdsManager.setOnAlertReceivedListener(listener);
+    }
+
     private OnVehicleStatusReceivedListener vehicleStatusReceivedListener;
     public interface OnVehicleStatusReceivedListener {
         void onVehicleStatusReceived(VehicleStatus vehicleStatus);

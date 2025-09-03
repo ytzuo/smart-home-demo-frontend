@@ -1,5 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.util.Log;
+
 import com.SmartHome.SmartHomeDemo.R;
 
 import java.io.Serializable;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FurnitureItem implements Serializable {
+    private String TAG = "FurnitureItem";
     private static final long serialVersionUID = 1L;
     private String deviceId;
     private String deviceType; //"air_conditioner" 或 "light"
@@ -36,6 +39,7 @@ public class FurnitureItem implements Serializable {
         }
 
         try {
+            Log.i(TAG, receivedDataJson);
             com.google.gson.Gson gson = new com.google.gson.Gson();
             furnitureDataPack = gson.fromJson(receivedDataJson, FurnitureDataPack.class);
 

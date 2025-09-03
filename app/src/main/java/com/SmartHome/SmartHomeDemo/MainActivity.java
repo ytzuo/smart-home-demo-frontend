@@ -71,8 +71,7 @@ public class MainActivity extends AppCompatActivity {
         DeviceDao deviceDao = database.deviceDao();
 
         // 设置Alert监听器
-        AlertDdsManager alertDdsManager = app.getAlertDdsManager();
-        alertDdsManager.setOnAlertReceivedListener(new AlertDdsManager.OnAlertReceivedListener() {
+        app.setOnAlertReceivedListener(new AlertDdsManager.OnAlertReceivedListener() {
             @Override
             public void onAlertReceived(Alert alert) {
                 addAlertToLog(alert);
@@ -156,9 +155,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 启动处理警报的线程
-        startAlertHandlingThread();
-
-
+        //startAlertHandlingThread();
     }
 
     private void updateCarFragmentUI(VehicleStatus newStatus) {
@@ -222,7 +219,14 @@ public class MainActivity extends AppCompatActivity {
         newLog.setLogId(""+alert.alert_id);
         newLog.setDescription(alert.description);
         newLog.setTimestamp(alert.timeStamp);
-        app.getDatabase().logDao().insertLog(newLog);
+        // 在后台线程中执行数据库操作
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                app.getDatabase().logDao().insertLog(newLog);
+            }
+        });
+        Log.i("MainActivity", "插入Alert数据");
     }
 
     private void showNewDeviceDialog(Presence presence) {
@@ -251,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         if (dialogView.findViewById(R.id.add_new_done) != null) {
             dialogView.findViewById(R.id.add_new_done).setOnClickListener(v -> {
                 // 用户点击确认，将设备插入数据库
-                //addDeviceToDatabase(presence);
+                addDeviceToDatabase(presence);
                 dialog.dismiss();
             });
         }
@@ -268,27 +272,58 @@ public class MainActivity extends AppCompatActivity {
     private void addDeviceToDatabase(Presence presence) {
         // 在后台线程中插入数据库
         Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                // 创建设备实体并插入数据库
-                Device device = new Device();
-                device.setDeviceId(presence.deviceId);
-                device.setDeviceType(presence.deviceType);
-                database.deviceDao().insertDevice(device);
+                try {
+                    // 创建设备实体并插入数据库
+                    Device device = new Device();
+                    device.setDeviceId(presence.deviceId);
+                    device.setDeviceType(presence.deviceType);
+                    database.deviceDao().insertDevice(device);
 
-                Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
+                    Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
 
-                // 如果需要更新UI，切换到主线程
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "设备已添加: " + presence.deviceId, Toast.LENGTH_SHORT).show();
-                });
-            } catch (Exception e) {
-                Log.e("MainActivity", "插入数据库时出错", e);
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
-    }
+                    // 从数据库获取最新的设备列表
+                    List<Device> devices = database.deviceDao().getAllDevices();
+
+                    // 转换为FurnitureItem列表
+                    List<FurnitureItem> furnitureItems = new ArrayList<>();
+                    for (Device dev : devices) {
+                        if ("light".equals(dev.getDeviceType()) || "air_conditioner".equals(dev.getDeviceType())) {
+                            FurnitureItem item = new FurnitureItem();
+                            item.setDeviceId(dev.getDeviceId());
+                            item.setDeviceType(dev.getDeviceType());
+                            item.setWorkingStatus("未连接");
+                            item.setStatus("未连接");
+                            item.setTime("默认时间");
+
+                            // 设置图片资源
+                            if ("light".equals(dev.getDeviceType())) {
+                                item.setImageResource(R.drawable.icon_light);
+                            } else if ("air_conditioner".equals(dev.getDeviceType())) {
+                                item.setImageResource(R.drawable.icon_air_conditioner);
+                            }
+
+                            furnitureItems.add(item);
+                        }
+                    }
+
+                    // 如果需要更新UI，切换到主线程
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "设备已添加: " + presence.deviceId, Toast.LENGTH_SHORT).show();
+
+                        // 更新HomeFragment中的设备列表
+                        if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
+                            // 更新ViewModel数据
+                            currentHomeFragment.getHomeViewModel().updateFurnitureList(furnitureItems);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("MainActivity", "插入数据库时出错", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        }
 
     // 在MainActivity中
     @Override

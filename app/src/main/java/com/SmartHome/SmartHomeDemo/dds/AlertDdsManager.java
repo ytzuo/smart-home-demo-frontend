@@ -150,6 +150,7 @@ public class AlertDdsManager {
 
     private void readAlertData(DataReader reader) {
         try {
+            Log.i(TAG, "readAlertData");
             AlertSeq alerts = new AlertSeq();
             SampleInfoSeq sampleInfos = new SampleInfoSeq();
 
@@ -161,12 +162,14 @@ public class AlertDdsManager {
                     InstanceStateKind.ANY_INSTANCE_STATE);
 
             if (result == ReturnCode_t.RETCODE_OK) {
+                Log.i(TAG, "result == ReturnCode_t.RETCODE_OK");
                 for (int i = 0; i < sampleInfos.length(); i++) {
                     if (sampleInfos.get_at(i).valid_data) {
                         Alert receivedAlert = alerts.get_at(i);
-
+                        Log.i(TAG, "sampleInfos.get_at(i).valid_data");
                         // 通知监听器
                         if (alertListener != null) {
+                            Log.i(TAG, "通知监听器");
                             final Alert finalAlert = new Alert(receivedAlert); // 复制数据
                             new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
                                 @Override
