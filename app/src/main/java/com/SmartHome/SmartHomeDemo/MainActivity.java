@@ -1,3 +1,4 @@
+
 package com.SmartHome.SmartHomeDemo;
 
 
@@ -21,7 +22,9 @@ import com.SmartHome.SmartHomeDemo.database.DeviceDao;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
@@ -50,6 +53,11 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment currentHomeFragment;
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
+
+    // 添加一个线程处理所有警报
+    private Thread alertHandlingThread;
+    private volatile boolean isAlertThreadRunning = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAlertReceived(Alert alert) {
                 addAlertToLog(alert);
+                // 根据deviceType分发到不同的处理逻辑
+                handleAlertByType(alert);
             }
         });
 
@@ -144,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
             }
             return showFragment(selected);
         });
+
+        // 启动处理警报的线程
+        startAlertHandlingThread();
 
 
     }
@@ -258,10 +271,10 @@ public class MainActivity extends AppCompatActivity {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 // 创建设备实体并插入数据库
-                 Device device = new Device();
-                 device.setDeviceId(presence.deviceId);
-                 device.setDeviceType(presence.deviceType);
-                 database.deviceDao().insertDevice(device);
+                Device device = new Device();
+                device.setDeviceId(presence.deviceId);
+                device.setDeviceType(presence.deviceType);
+                database.deviceDao().insertDevice(device);
 
                 Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
 
@@ -282,6 +295,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 停止警报处理线程
+        isAlertThreadRunning = false;
         // 注意：Activity的onDestroy()也不一定总被调用
         if (isFinishing()) {
             // 如果是正常结束，执行清理操作
@@ -313,6 +328,97 @@ public class MainActivity extends AppCompatActivity {
             final HomeStatus finalNewStatus = newStatus;
             // 在主线程中更新UI
             runOnUiThread(() -> finalHomeFragment.handleHomeStatus(finalNewStatus));
+        }
+    }
+
+    // 启动处理警报的线程
+    private void startAlertHandlingThread() {
+        // 启动警报处理线程
+        alertHandlingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("MainActivity", "警报处理线程已启动");
+                while (isAlertThreadRunning) {
+                    try {
+                        // 线程保持运行，实际处理在onAlertReceived中通过handleAlertByType分发
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.d("MainActivity", "警报处理线程被中断");
+                        break;
+                    }
+                }
+                Log.d("MainActivity", "警报处理线程已停止");
+            }
+        });
+        alertHandlingThread.start();
+    }
+
+    // 根据设备类型分发警报到相应处理逻辑
+    private void handleAlertByType(Alert alert) {
+        if ("car".equals(alert.deviceType)) {
+            // 在主线程中显示车辆警报弹窗
+            runOnUiThread(() -> showCarAlert(alert));
+        } else if ("light".equals(alert.deviceType) || "air_conditioner".equals(alert.deviceType)) {
+            // 家具类设备（灯或空调）在主线程中显示家具警报弹窗
+            runOnUiThread(() -> showFurnitureAlert(alert));
+        }
+    }
+
+    // 显示车辆警报弹窗
+    private void showCarAlert(Alert alert) {
+        CarAlert carAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType);
+        carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
+            @Override
+            public void onConfirmClick() {
+                // 处理确认按钮点击事件
+                if (getSupportFragmentManager().isStateSaved()) {
+                    getSupportFragmentManager().beginTransaction().remove(carAlert).commitAllowingStateLoss();
+                } else {
+                    getSupportFragmentManager().beginTransaction().remove(carAlert).commit();
+                }
+            }
+        });
+
+        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(carAlert, "car_alert")
+                    .commitAllowingStateLoss();
+        }
+    }
+
+    // 显示家具警报弹窗
+    private void showFurnitureAlert(Alert alert) {
+        FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType);
+        furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
+            @Override
+            public void onConfirmClick() {
+                // 处理确认按钮点击事件
+                if (getSupportFragmentManager().isStateSaved()) {
+                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commitAllowingStateLoss();
+                } else {
+                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commit();
+                }
+            }
+
+            @Override
+            public void onViewAlertClick() {
+                // 处理查看设备按钮点击事件
+                if (getSupportFragmentManager().isStateSaved()) {
+                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commitAllowingStateLoss();
+                } else {
+                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commit();
+                }
+                // 切换到HomeFragment查看设备
+                showFragment(currentHomeFragment);
+                BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+                bottomNav.setSelectedItemId(R.id.nav_home);
+            }
+        });
+
+        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(furnitureAlert, "furniture_alert")
+                    .commitAllowingStateLoss();
         }
     }
 

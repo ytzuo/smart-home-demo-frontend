@@ -389,7 +389,7 @@ public class HomeFurnitureSpecific extends Fragment {
         }
     }
 
-    public void triggerAlarm() {
+    public void AlarmUpdateUI() {
         if (getView() != null) {
             TextView arg1TextView = getView().findViewById(R.id.arg1);
             if (arg1TextView != null) {
@@ -399,6 +399,7 @@ public class HomeFurnitureSpecific extends Fragment {
             // 可以在这里添加其他报警相关的UI更新
             if (isAdded()) {
                 ToastUtil.showToast(requireContext(), "设备报警！", Toast.LENGTH_SHORT);
+
             }
         }
     }

@@ -43,4 +43,7 @@
     <string name="unlock">车门状态：已解锁</string>
     <string name="acON">空调状态：已开启</string>
     <string name="acOFF">空调状态：已关闭</string>
+    <string name="alert_message">报警信息：</string>
+    <string name="alert_label">设备报警！</string>
+    <string name="confirm">确定</string>
 </resources>

@@ -71,9 +71,8 @@ public class HomeFragment extends Fragment {
                                     if (homeViewModel != null) {
                                         homeViewModel.updateFurnitureList(new ArrayList<FurnitureItem>());
                                     }
-
                                     // 方式2: 显示提示信息
-                                    //Toast.makeText(getContext(), "数据已清空", Toast.LENGTH_SHORT).show();
+                                    ToastUtil.showToast(getContext(), "数据已清空", Toast.LENGTH_SHORT);
                                 }
                             });
                         }
