@@ -32,12 +32,13 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alert_message"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/alert_car_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/alert_message"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="10dp"/>

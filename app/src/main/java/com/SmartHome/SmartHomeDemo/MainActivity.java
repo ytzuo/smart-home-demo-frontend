@@ -205,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 "ID: " + alert.alert_id,        // Alert ID
                 alert.description               // Alert 描述
         );
+        Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
         // 直接通过FragmentManager找到当前的LogFragment（如果存在）
         LogFragment logFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
@@ -400,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 显示车辆警报弹窗
     private void showCarAlert(Alert alert) {
-        CarAlert carAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType);
+        CarAlert carAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
         carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
             @Override
             public void onConfirmClick() {
@@ -409,14 +410,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+        //if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
             carAlert.show(getSupportFragmentManager(), "car_alert");
-        }
+        //}
     }
 
     // 显示家具警报弹窗
     private void showFurnitureAlert(Alert alert) {
-        FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType);
+        FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
         furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
             @Override
             public void onConfirmClick() {
@@ -435,9 +436,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+//        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
             furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
-        }
+        //}
     }
 
 }

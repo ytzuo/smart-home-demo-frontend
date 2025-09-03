@@ -16,9 +16,11 @@ public class CarAlert extends DialogFragment {
 
     private TextView carPartTextView;
     private TextView carLocationTextView;
+    private TextView carDescriptionTextView;
 
     private String carPart = "";
     private String carLocation = "";
+    private String carDescription = "";
 
 
     // 按钮点击监听器
@@ -31,11 +33,12 @@ public class CarAlert extends DialogFragment {
     public CarAlert() {
     }
 
-    public static CarAlert newInstance(String carPart, String carLocation) {
+    public static CarAlert newInstance(String carPart, String carLocation, String carDescription) {
         CarAlert fragment = new CarAlert();
         Bundle args = new Bundle();
         args.putString("car_part", carPart);
         args.putString("car_location", carLocation);
+        args.putString("car_description", carDescription);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,6 +49,7 @@ public class CarAlert extends DialogFragment {
         if (getArguments() != null) {
             carPart = getArguments().getString("car_part", "");
             carLocation = getArguments().getString("car_location", "");
+            carDescription = getArguments().getString("car_description", "");
         }
     }
 
@@ -55,8 +59,9 @@ public class CarAlert extends DialogFragment {
         View view = inflater.inflate(R.layout.window_car_alert, container, false);
 
         // 初始化视图组件
-        carPartTextView = view.findViewById(R.id.alert_car_part);
-        carLocationTextView = view.findViewById(R.id.alert_car_location);
+        carPartTextView        = view.findViewById(R.id.alert_car_part);
+        carLocationTextView    = view.findViewById(R.id.alert_car_location);
+        carDescriptionTextView = view.findViewById(R.id.alert_car_description);
         MaterialButton confirmButton = view.findViewById(R.id.alert_car_confirm);
 
         // 设置按钮点击事件
@@ -74,6 +79,7 @@ public class CarAlert extends DialogFragment {
         // 更新报警部件和车辆位置显示
         updateCarPart(carPart);
         updateCarLocation(carLocation);
+        updateCarDescription(carDescription);
 
         return view;
     }
@@ -117,6 +123,13 @@ public class CarAlert extends DialogFragment {
         this.carLocation = carLocation;
         if (carLocationTextView != null) {
             carLocationTextView.setText("车辆位置: " + carLocation);
+        }
+    }
+
+    public void updateCarDescription(String carDescription) {
+        this.carDescription = carDescription;
+        if(carDescriptionTextView != null) {
+            carDescriptionTextView.setText("报警信息: " + carDescription);
         }
     }
 }

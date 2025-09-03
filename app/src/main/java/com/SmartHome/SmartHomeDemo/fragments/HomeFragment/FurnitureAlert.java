@@ -16,9 +16,11 @@ public class FurnitureAlert extends DialogFragment {
 
     private TextView deviceIdTextView;
     private TextView deviceTypeTextView;
+    private TextView deviceDescriptionTextView;
 
     private String deviceId = "";
     private String deviceType = "";
+    private String deviceDescription = "";
 
 
     // 按钮点击监听器
@@ -32,11 +34,12 @@ public class FurnitureAlert extends DialogFragment {
     public FurnitureAlert() {
     }
 
-    public static FurnitureAlert newInstance(String deviceId, String deviceType) {
+    public static FurnitureAlert newInstance(String deviceId, String deviceType, String deviceDescription) {
         FurnitureAlert fragment = new FurnitureAlert();
         Bundle args = new Bundle();
         args.putString("device_id", deviceId);
         args.putString("device_type", deviceType);
+        args.putString("device_description", deviceDescription);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,8 +48,9 @@ public class FurnitureAlert extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            deviceId = getArguments().getString("device_id", "");
-            deviceType = getArguments().getString("device_type", "");
+            deviceId          = getArguments().getString("device_id", "");
+            deviceType        = getArguments().getString("device_type", "");
+            deviceDescription = getArguments().getString("device_description", "");
         }
     }
 
@@ -57,9 +61,10 @@ public class FurnitureAlert extends DialogFragment {
         View view = inflater.inflate(R.layout.window_furniture_alert, container, false);
 
         // 初始化视图组件
-        deviceIdTextView = view.findViewById(R.id.alert_device_id);
-        deviceTypeTextView = view.findViewById(R.id.alert_device_type);
-        MaterialButton confirmButton = view.findViewById(R.id.alert_confirm);
+        deviceIdTextView          = view.findViewById(R.id.alert_device_id);
+        deviceTypeTextView        = view.findViewById(R.id.alert_device_type);
+        deviceDescriptionTextView = view.findViewById(R.id.alert_device_description);
+        MaterialButton confirmButton   = view.findViewById(R.id.alert_confirm);
         MaterialButton viewAlertButton = view.findViewById(R.id.view_alert);
 
         // 设置按钮点击事件
@@ -88,6 +93,7 @@ public class FurnitureAlert extends DialogFragment {
         // 更新设备ID和设备类型显示
         updateDeviceId(deviceId);
         updateDeviceType(deviceType);
+        updateDeviceDescription(deviceDescription);
 
         return view;
     }
@@ -131,6 +137,13 @@ public class FurnitureAlert extends DialogFragment {
         this.deviceType = deviceType;
         if (deviceTypeTextView != null) {
             deviceTypeTextView.setText(getString(R.string.device_type) + ": " + deviceType);
+        }
+    }
+
+    public void updateDeviceDescription(String deviceDescription) {
+        this.deviceDescription = deviceDescription;
+        if(deviceDescriptionTextView != null) {
+            deviceDescriptionTextView.setText("报警信息: " + deviceDescription);
         }
     }
 }

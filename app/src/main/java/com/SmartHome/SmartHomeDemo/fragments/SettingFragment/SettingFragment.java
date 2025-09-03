@@ -84,7 +84,7 @@ public class SettingFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             // 创建一个测试的报警对话框
-                            FurnitureAlert furnitureAlert = FurnitureAlert.newInstance("TEST001", "AC");
+                            FurnitureAlert furnitureAlert = FurnitureAlert.newInstance("TEST001", "AC", "");
                             furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
                                 @Override
                                 public void onConfirmClick() {
@@ -115,7 +115,7 @@ public class SettingFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             // 创建一个测试的报警对话框
-                            CarAlert carAlert = CarAlert.newInstance("TEST002", "100100");
+                            CarAlert carAlert = CarAlert.newInstance("TEST002", "100100", "");
                             carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
                                 @Override
                                 public void onConfirmClick() {
