@@ -1,4 +1,3 @@
-
 package com.SmartHome.SmartHomeDemo.fragments.CarFragment;
 
 import android.os.Bundle;
@@ -7,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.SmartHome.SmartHomeDemo.R;
 import com.google.android.material.button.MaterialButton;
 
-public class CarAlert extends Fragment {
+public class CarAlert extends DialogFragment {
 
     private TextView carPartTextView;
     private TextView carLocationTextView;
@@ -29,7 +28,8 @@ public class CarAlert extends Fragment {
 
     private OnButtonClickListener buttonClickListener;
 
-    public CarAlert() {}
+    public CarAlert() {
+    }
 
     public static CarAlert newInstance(String carPart, String carLocation) {
         CarAlert fragment = new CarAlert();
@@ -65,6 +65,8 @@ public class CarAlert extends Fragment {
             public void onClick(View v) {
                 if (buttonClickListener != null) {
                     buttonClickListener.onConfirmClick();
+                } else {
+                    dismiss(); // 默认关闭对话框
                 }
             }
         });
@@ -74,6 +76,18 @@ public class CarAlert extends Fragment {
         updateCarLocation(carLocation);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // 设置对话框的宽度，让它更宽一些
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            int width = getResources().getDimensionPixelSize(R.dimen.alert_dialog_width);
+            int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+            getDialog().getWindow().setLayout(width, height);
+        }
     }
 
     /**

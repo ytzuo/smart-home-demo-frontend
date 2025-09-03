@@ -262,7 +262,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             });
         }
-
         dialog.show();
     }
 
@@ -371,18 +370,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onConfirmClick() {
                 // 处理确认按钮点击事件
-                if (getSupportFragmentManager().isStateSaved()) {
-                    getSupportFragmentManager().beginTransaction().remove(carAlert).commitAllowingStateLoss();
-                } else {
-                    getSupportFragmentManager().beginTransaction().remove(carAlert).commit();
-                }
+                carAlert.dismiss();
             }
         });
 
         if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(carAlert, "car_alert")
-                    .commitAllowingStateLoss();
+            carAlert.show(getSupportFragmentManager(), "car_alert");
         }
     }
 
@@ -393,21 +386,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onConfirmClick() {
                 // 处理确认按钮点击事件
-                if (getSupportFragmentManager().isStateSaved()) {
-                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commitAllowingStateLoss();
-                } else {
-                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commit();
-                }
+                furnitureAlert.dismiss();
             }
 
             @Override
             public void onViewAlertClick() {
                 // 处理查看设备按钮点击事件
-                if (getSupportFragmentManager().isStateSaved()) {
-                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commitAllowingStateLoss();
-                } else {
-                    getSupportFragmentManager().beginTransaction().remove(furnitureAlert).commit();
-                }
+                furnitureAlert.dismiss();
                 // 切换到HomeFragment查看设备
                 showFragment(currentHomeFragment);
                 BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -416,9 +401,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(furnitureAlert, "furniture_alert")
-                    .commitAllowingStateLoss();
+            furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
         }
     }
 

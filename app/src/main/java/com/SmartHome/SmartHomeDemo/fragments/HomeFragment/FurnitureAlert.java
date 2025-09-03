@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.SmartHome.SmartHomeDemo.R;
 import com.google.android.material.button.MaterialButton;
 
-public class FurnitureAlert extends Fragment {
+public class FurnitureAlert extends DialogFragment {
 
     private TextView deviceIdTextView;
     private TextView deviceTypeTextView;
@@ -29,7 +29,8 @@ public class FurnitureAlert extends Fragment {
 
     private OnButtonClickListener buttonClickListener;
 
-    public FurnitureAlert() {}
+    public FurnitureAlert() {
+    }
 
     public static FurnitureAlert newInstance(String deviceId, String deviceType) {
         FurnitureAlert fragment = new FurnitureAlert();
@@ -52,6 +53,7 @@ public class FurnitureAlert extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // 注意：这里将attachToRoot设置为true，以确保布局正确显示
         View view = inflater.inflate(R.layout.window_furniture_alert, container, false);
 
         // 初始化视图组件
@@ -66,6 +68,8 @@ public class FurnitureAlert extends Fragment {
             public void onClick(View v) {
                 if (buttonClickListener != null) {
                     buttonClickListener.onConfirmClick();
+                } else {
+                    dismiss(); // 默认关闭对话框
                 }
             }
         });
@@ -75,6 +79,8 @@ public class FurnitureAlert extends Fragment {
             public void onClick(View v) {
                 if (buttonClickListener != null) {
                     buttonClickListener.onViewAlertClick();
+                } else {
+                    dismiss(); // 默认关闭对话框
                 }
             }
         });
@@ -84,6 +90,18 @@ public class FurnitureAlert extends Fragment {
         updateDeviceType(deviceType);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // 设置对话框的宽度，让它更宽一些
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            int width = getResources().getDimensionPixelSize(R.dimen.alert_dialog_width);
+            int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+            getDialog().getWindow().setLayout(width, height);
+        }
     }
 
     /**

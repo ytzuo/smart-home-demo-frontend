@@ -63,8 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingStart="30dp"
-        android:paddingEnd="30dp">
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/alert_confirm"
@@ -74,7 +74,6 @@
             android:text="@string/confirm"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_gravity="start"
-            android:gravity="center"
             android:textSize="18sp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -85,7 +84,6 @@
             android:text="查看设备"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_gravity="end"
-            android:gravity="center"
             android:textSize="18sp"/>
 
     </LinearLayout>
