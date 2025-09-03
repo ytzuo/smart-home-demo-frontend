@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
@@ -26,6 +27,7 @@ public class HomeFurnitureSpecific extends Fragment {
 
     private FurnitureItem furnitureItem;
 
+    private BaseDdsManager baseDdsManager;
     private CommandDdsManager commandDdsManager;
 
     public HomeFurnitureSpecific() {
@@ -54,6 +56,8 @@ public class HomeFurnitureSpecific extends Fragment {
         TextView temp;
         temp = view.findViewById(R.id.Title);
         temp.setText(furnitureItem.getDeviceId());
+        baseDdsManager.initialize();
+        commandDdsManager.initialize(baseDdsManager);
 
         switch (furnitureItem.getDeviceType()) {
             case "air_conditioner":
