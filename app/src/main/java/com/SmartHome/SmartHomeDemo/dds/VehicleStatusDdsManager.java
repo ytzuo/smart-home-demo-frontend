@@ -43,7 +43,7 @@ public class VehicleStatusDdsManager {
         void onVehicleStatusReceived(VehicleStatus status);
     }
 
-    private static final String TOPIC_NAME = "VehicleStatusTopic";
+    private static final String TOPIC_NAME = "VehicleStatus";
 
     public void initialize(BaseDdsManager baseManager) {
         try {

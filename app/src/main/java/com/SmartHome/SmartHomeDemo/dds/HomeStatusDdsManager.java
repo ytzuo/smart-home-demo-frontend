@@ -40,7 +40,7 @@ public class HomeStatusDdsManager {
         void onHomeStatusReceived(HomeStatus homeStatus);
     }
 
-    private static final String TOPIC_NAME = "HomeStatusTopic";
+    private static final String TOPIC_NAME = "HomeStatus";
 
     public void initialize(BaseDdsManager baseManager) {
         try {

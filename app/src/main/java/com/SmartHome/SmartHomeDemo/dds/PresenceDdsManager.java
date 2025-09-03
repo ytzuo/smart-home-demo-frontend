@@ -49,7 +49,7 @@ public class PresenceDdsManager {
         void onPresenceReceived(Presence presence);
     }
 
-    private static final String TOPIC_NAME = "PresenceTopic";
+    private static final String TOPIC_NAME = "Presence";
 
     public void initialize(BaseDdsManager baseManager) {
         try {
