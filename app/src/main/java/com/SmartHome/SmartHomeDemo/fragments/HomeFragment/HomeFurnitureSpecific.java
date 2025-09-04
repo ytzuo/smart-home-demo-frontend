@@ -448,26 +448,26 @@ public class HomeFurnitureSpecific extends Fragment {
             case "air_conditioner":
                 if ("11".equals(switchNumber)) {
                     // 主开关
-                    command.action = "switch_" + (isChecked ? "on" : "off");
+                    command.action = "switch_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("12".equals(switchNumber)) {
                     // 制冷开关
-                    command.action = "cool_" + (isChecked ? "on" : "off");
+                    command.action = "cool_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("13".equals(switchNumber)) {
                     // 扫风开关
-                    command.action = "fan_" + (isChecked ? "on" : "off");
+                    command.action = "fan_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("14".equals(switchNumber)) {
                     // 除湿开关
-                    command.action = "dehumidify_" + (isChecked ? "on" : "off");
+                    command.action = "dehumidify_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 }
                 break;
             case "light":
                 if ("11".equals(switchNumber)) {
                     // 主开关
-                    command.action = "switch_" + (isChecked ? "on" : "off");
+                    command.action = "switch_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "light";
                 }
                 break;
