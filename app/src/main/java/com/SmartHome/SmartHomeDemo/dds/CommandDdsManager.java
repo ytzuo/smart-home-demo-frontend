@@ -3,10 +3,14 @@ package com.SmartHome.SmartHomeDemo.dds;
 import android.util.Log;
 
 import com.zrdds.domain.DomainParticipant;
+import com.zrdds.infrastructure.DurabilityQosPolicyKind;
+import com.zrdds.infrastructure.HistoryQosPolicyKind;
 import com.zrdds.infrastructure.InstanceHandle_t;
+import com.zrdds.infrastructure.ReliabilityQosPolicyKind;
 import com.zrdds.infrastructure.ReturnCode_t;
 import com.zrdds.infrastructure.StatusKind;
 import com.zrdds.publication.DataWriter;
+import com.zrdds.publication.DataWriterQos;
 import com.zrdds.publication.Publisher;
 import com.zrdds.topic.Topic;
 
@@ -74,9 +78,15 @@ public class CommandDdsManager {
                 return;
             }
 
+            DataWriterQos dwQos = new DataWriterQos();
+            publisher.get_default_datawriter_qos(dwQos);
+            dwQos.durability.kind = DurabilityQosPolicyKind.TRANSIENT_LOCAL_DURABILITY_QOS;
+            dwQos.reliability.kind = ReliabilityQosPolicyKind.RELIABLE_RELIABILITY_QOS;
+            dwQos.history.kind = HistoryQosPolicyKind.KEEP_LAST_HISTORY_QOS;
+            dwQos.history.depth = 10;
             dataWriter = publisher.create_datawriter(
                     topic,
-                    Publisher.DATAWRITER_QOS_DEFAULT,
+                    dwQos,
                     null,
                     StatusKind.STATUS_MASK_ALL
             );

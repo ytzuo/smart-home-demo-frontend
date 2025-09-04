@@ -2,6 +2,7 @@ package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 import static java.security.AccessController.getContext;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
@@ -24,14 +26,23 @@ import java.time.LocalDateTime;
 import idl.SmartDemo03.Presence;
 
 public class HomeFurnitureSpecific extends Fragment {
+    private String TAG = "HomeFurnitureSpecific";
 
     private FurnitureItem furnitureItem;
 
-    private BaseDdsManager baseDdsManager;
+    private SmartHomeApplication app;
     private CommandDdsManager commandDdsManager;
 
     public HomeFurnitureSpecific() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        app = (SmartHomeApplication) getActivity().getApplication();
+        commandDdsManager = app.getCommandDdsManager();
+        Log.i(TAG, "commandDdsManager初始化完成");
     }
 
     @Override
@@ -56,8 +67,8 @@ public class HomeFurnitureSpecific extends Fragment {
         TextView temp;
         temp = view.findViewById(R.id.Title);
         temp.setText(furnitureItem.getDeviceId());
-        baseDdsManager.initialize();
-        commandDdsManager.initialize(baseDdsManager);
+        //baseDdsManager.initialize();
+        //commandDdsManager.initialize(baseDdsManager);
 
         switch (furnitureItem.getDeviceType()) {
             case "air_conditioner":

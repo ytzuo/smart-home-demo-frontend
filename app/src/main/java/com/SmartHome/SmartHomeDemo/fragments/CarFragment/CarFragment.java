@@ -35,6 +35,7 @@ public class CarFragment extends Fragment {
     private MaterialButton acButton;
 
     private SmartHomeApplication app;
+    private CommandDdsManager commandDdsManager;
 
     public CarFragment(){}
 
@@ -43,6 +44,7 @@ public class CarFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // 在onCreate中初始化SmartHomeApplication成员变量
         app = (SmartHomeApplication) getActivity().getApplication();
+        commandDdsManager = app.getCommandDdsManager();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -145,7 +147,7 @@ public class CarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // 直接使用成员变量app
-                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+                 //= app.getCommandDdsManager();
 
                 // 发送控制发动机的命令
                 Command command = new Command();
@@ -177,7 +179,7 @@ public class CarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // 直接使用成员变量app
-                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+                //CommandDdsManager commandDdsManager = app.getCommandDdsManager();
 
                 // 发送控制门锁的命令
                 Command command = new Command();
@@ -209,9 +211,8 @@ public class CarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // 直接使用成员变量app
-                CommandDdsManager commandDdsManager = app.getCommandDdsManager();
+                //CommandDdsManager commandDdsManager = app.getCommandDdsManager();
 
-                // TODO: 发送控制空调的命令 需要和后端指定的命令action统一
                 Command command = new Command();
                 command.deviceId = "My Car";
                 command.deviceType = "car";
