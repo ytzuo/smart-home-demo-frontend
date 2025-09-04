@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/furniture_specific"
-            android:textSize="20sp"
+            android:textSize="24sp"
 
             android:layout_weight="1"
             android:layout_gravity="center"
@@ -60,6 +60,21 @@
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/iv_furniture"-->
+<!--        style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="240dp"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:contentDescription="@string/furniture_image"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/top_bar"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:textColor="#FF9E9E9E"-->
+<!--        app:iconGravity="textStart"-->
+<!--        app:iconPadding="0dp"-->
+<!--        app:iconSize="230dp"-->
+<!--        app:cornerRadius="0dp"/>-->
 
     <!-- 可扩展的参数和设置项框架 -->
     <ScrollView
@@ -85,8 +100,7 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/param_label"
-
-                android:textSize="20sp" />
+                android:textSize="22sp" />
 
             <LinearLayout
                 android:id="@+id/param_container"
@@ -108,14 +122,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项1："
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                     <TextView
                         android:id="@+id/arg1_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item1"
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                 </LinearLayout>
 
 
@@ -132,14 +146,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项2："
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                     <TextView
                         android:id="@+id/arg2_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item2"
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                 </LinearLayout>
 
                 <!-- 参数项3 -->
@@ -155,14 +169,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项3："
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                     <TextView
                         android:id="@+id/arg3_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item3"
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                 </LinearLayout>
 
                 <!-- 参数项4 -->
@@ -178,14 +192,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="参数项4："
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                     <TextView
                         android:id="@+id/arg4_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="item4"
-                        android:textSize="17sp" />
+                        android:textSize="19sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -194,12 +208,12 @@
                 android:id="@+id/settings_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="设置项"
 
-                android:textSize="20sp" />
+                android:textSize="22sp" />
 
             <!-- 开关设置项区域 (一行最多4个) -->
             <LinearLayout

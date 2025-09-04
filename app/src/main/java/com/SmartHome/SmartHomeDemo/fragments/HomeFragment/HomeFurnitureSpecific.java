@@ -5,6 +5,7 @@
     import androidx.annotation.Nullable;
     import androidx.appcompat.app.AlertDialog;
     import androidx.fragment.app.Fragment;
+    import androidx.lifecycle.ViewModelProvider;
 
     import android.content.Intent;
     import android.os.Build;
@@ -20,6 +21,7 @@
     import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
     import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
     import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
+    import com.google.android.material.button.MaterialButton;
 
     import java.time.LocalDateTime;
 
@@ -29,6 +31,9 @@
         private String TAG = "HomeFurnitureSpecific";
 
         private FurnitureItem furnitureItem;
+
+        private FurnitureItemViewModel viewModel;
+        private boolean isInitialized = false;
 
         private SmartHomeApplication app;
         private CommandDdsManager commandDdsManager;
@@ -40,6 +45,10 @@
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+            // 初始化ViewModel
+            viewModel = new ViewModelProvider(this).get(FurnitureItemViewModel.class);
+
             app = (SmartHomeApplication) getActivity().getApplication();
             commandDdsManager = app.getCommandDdsManager();
             Log.i(TAG, "commandDdsManager初始化完成");
@@ -77,14 +86,69 @@
             // 获取传递的参数
             if (getArguments() != null) {
                 furnitureItem = (FurnitureItem) getArguments().getSerializable("furniture_item");
+                Log.i(TAG, furnitureItem.getStatus());
             }
-
             initialization(view);
             setupEventListeners(view);
+            // 恢复UI状态
+            //restoreUIFromViewModel(view);
             refreshUI(view);
-
             return view;
         }
+
+//        private void restoreUIFromViewModel(View view) {
+//            FurnitureItemViewModel.UIState savedState =
+//                    viewModel.getUIState(furnitureItem.getDeviceId());
+//
+//            if (savedState != null) {
+//                // 恢复文本状态
+//                TextView arg1TextView = view.findViewById(R.id.arg1_item);
+//                if (arg1TextView != null) {
+//                    arg1TextView.setText(savedState.arg1Text);
+//                }
+//
+//                TextView arg2TextView = view.findViewById(R.id.arg2_item);
+//                if (arg2TextView != null) {
+//                    arg2TextView.setText(savedState.arg2Text);
+//                }
+//
+//                // 恢复开关状态
+//                furnitureItem.setSwitchStatus(savedState.switchStatus);
+//                furnitureItem.setAcTemp(savedState.acTemp);
+//                furnitureItem.setLightPercent(savedState.lightPercent);
+//
+//                // 更新UI
+//                updateUISwitchStatueFromObject(view);
+//                updateUISeekBarFromObject(view);
+//                updateControlStates(view);
+//            }
+//        }
+//        private void saveUIToViewModel() {
+//            if (furnitureItem != null && getView() != null) {
+//                View view = getView();
+//                TextView arg1TextView = view.findViewById(R.id.arg1_item);
+//                TextView arg2TextView = view.findViewById(R.id.arg2_item);
+//
+//                String arg1Text = arg1TextView != null ? arg1TextView.getText().toString() : "";
+//                String arg2Text = arg2TextView != null ? arg2TextView.getText().toString() : "";
+//
+//                FurnitureItemViewModel.UIState state = new FurnitureItemViewModel.UIState(
+//                        arg1Text,
+//                        arg2Text,
+//                        furnitureItem.getSwitchStatus(),
+//                        furnitureItem.getAcTemp(),
+//                        furnitureItem.getLightPercent()
+//                );
+//
+//                viewModel.saveUIState(furnitureItem.getDeviceId(), state);
+//            }
+//        }
+//        @Override
+//        public void onPause() {
+//            super.onPause();
+//            // 在Fragment暂停时保存UI状态
+//            saveUIToViewModel();
+//        }
 
         private void initialization(View view){
             TextView temp;
@@ -93,11 +157,20 @@
             //baseDdsManager.initialize();
             //commandDdsManager.initialize(baseDdsManager);
 
+
             switch (furnitureItem.getDeviceType()) {
                 case "air_conditioner":
                     //设置图标
                     ImageView tempImage = view.findViewById(R.id.iv_furniture);
                     tempImage.setImageResource(R.drawable.icon_air_conditioner);
+                    Log.i(TAG, furnitureItem.getStatus());
+                    // 检查状态是否为null
+                    String status = furnitureItem.getStatus();
+                    if(status != null && status.length() > 0 && status.charAt(0) == '1') {
+                        tempImage.setColorFilter(getResources().getColor(R.color.blue));
+                    } else {
+                        tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                    }
 
                     //设置参数项文本
                     temp = view.findViewById(R.id.arg1);
@@ -127,7 +200,14 @@
                     //设置图标
                     tempImage = view.findViewById(R.id.iv_furniture);
                     tempImage.setImageResource(R.drawable.icon_light);
-
+                    Log.i(TAG, furnitureItem.getStatus());
+                    // 检查状态是否为null
+                    status = furnitureItem.getStatus();
+                    if(status != null && status.length() > 0 && status.charAt(0) == '1') {
+                        tempImage.setColorFilter(getResources().getColor(R.color.WARN_text));
+                    } else {
+                        tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                    }
                     //设置参数项文本
                     temp = view.findViewById(R.id.arg1);
                     temp.setText("状态：");
@@ -147,7 +227,6 @@
                     hideUnusedItems(view);
                     break;
             }
-
         }
 
         // 根据FurnitureItem中的switchStatus更新开关状态
@@ -241,16 +320,12 @@
             }
         }
         private void refreshUI(View view){
+            ImageView tempImage = view.findViewById(R.id.iv_furniture);
+            FurnitureItemViewModel.UIState savedState = viewModel.getUIState(furnitureItem.getDeviceId());
+
             TextView arg1TextView = view.findViewById(R.id.arg1_item);
             Switch switch11 = view.findViewById(R.id.switch_11);
 
-            if (switch11 != null && arg1TextView != null) {
-                if (switch11.isChecked()) {
-                    arg1TextView.setText("正常运行");
-                } else {
-                    arg1TextView.setText("停止工作");
-                }
-            }
 
             // 根据FurnitureItem中的switchStatus更新开关状态
             updateUISwitchStatueFromObject(view);
@@ -260,12 +335,31 @@
             // 根据主开关状态启用或禁用其他控件
             updateControlStates(view);
 
+            if (switch11 != null && arg1TextView != null) {
+                // 如果没有保存的状态，则根据开关状态设置默认文本
+                if (savedState == null) {
+                    if (switch11.isChecked()) {
+                        arg1TextView.setText("正常运行");
+                    } else {
+                        arg1TextView.setText("停止工作");
+                    }
+                }
+            }
+
             switch (furnitureItem.getDeviceType()) {
                 case "air_conditioner":
+                    if (switch11.isChecked()) {
+                        tempImage.setColorFilter(getResources().getColor(R.color.blue));
+                    } else {
+                        tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                    }
                     // 设置参数项2显示空调当前温度
                     TextView arg2TextView = view.findViewById(R.id.arg2_item);
                     if (arg2TextView != null) {
-                        arg2TextView.setText(furnitureItem.getAcTemp() + "℃");
+                        // 如果没有保存的状态，则设置默认文本
+                        if (savedState == null) {
+                            arg2TextView.setText(furnitureItem.getAcTemp() + "℃");
+                        }
                     }
 
                     // 根据acTemp调整滑块位置，acTemp范围为15-30
@@ -305,9 +399,17 @@
 
                 case "light":
                     // 设置参数项2显示灯光亮度
+                    if (switch11.isChecked()) {
+                        tempImage.setColorFilter(getResources().getColor(R.color.WARN_text));
+                    } else {
+                        tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                    }
                     TextView lightArg2TextView = view.findViewById(R.id.arg2_item);
                     if (lightArg2TextView != null) {
-                        lightArg2TextView.setText((int)furnitureItem.getLightPercent() + "%");
+                        // 如果没有保存的状态，则设置默认文本
+                        if (savedState == null) {
+                            lightArg2TextView.setText((int)furnitureItem.getLightPercent() + "%");
+                        }
                     }
 
                     // 根据lightPercent调整滑块位置，lightPercent范围为10-100
@@ -594,6 +696,7 @@
             // 获取开关的编号 (例如 switch_11 -> 11)
             String switchName = getResources().getResourceEntryName(switchView.getId());
             String switchNumber = switchName.substring(switchName.length() - 2);
+            ImageView tempImage = this.getView().findViewById(R.id.iv_furniture);
 
             // 构建命令
             idl.SmartDemo03.Command command = new idl.SmartDemo03.Command();
@@ -611,6 +714,11 @@
                         command.deviceType = "ac";
                         // 更新furnitureItem中的switchStatus
                         updateUISwitchStatusToObject(0, isChecked);
+                        if(isChecked) {
+                            tempImage.setColorFilter(getResources().getColor(R.color.blue));
+                        } else {
+                            tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                        }
 
                     } else if ("12".equals(switchNumber)) {
                         // 制冷开关
@@ -637,6 +745,11 @@
                         command.action = "switch_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                         command.deviceType = "light";
                         updateUISwitchStatusToObject(0, isChecked);
+                        if(isChecked) {
+                            tempImage.setColorFilter(getResources().getColor(R.color.WARN_text));
+                        } else {
+                            tempImage.setColorFilter(getResources().getColor(R.color.gray));
+                        }
                     }
                     break;
             }

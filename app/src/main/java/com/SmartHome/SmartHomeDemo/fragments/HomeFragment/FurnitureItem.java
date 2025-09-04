@@ -14,7 +14,7 @@ public class FurnitureItem implements Serializable {
     private String deviceId;
     private String deviceType; //"air_conditioner" 或 "light"
     private String workingStatus;
-    private String status;
+    private String status = "00000000";
     private String time;
     private int imageResource;
     private float acTemp; //空调温度
