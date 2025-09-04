@@ -136,12 +136,11 @@ public class HomeFragment extends Fragment {
                         break;
                 }
 
-                Log.i("newItem", "开始读取JSON");
+                //Log.i("newItem", "开始读取JSON");
                 if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
                     Log.i("newItem", newItem.getFurnitureDataPack().toString());
                 } else {
-                    Log.i("newItem", "JSON转换失败/更新失败 "
-                            + homeStatus.deviceStatus.get_at(i));
+                    //Log.i("newItem", "JSON转换失败/更新失败"+ homeStatus.deviceStatus.get_at(i));
                 }
                 items.add(newItem);
             }
