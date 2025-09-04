@@ -4,7 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FurnitureDataPack {
-    private List<Boolean> status;
+    @Override
+    public String toString() {
+        return "FurnitureDataPack{" +
+                "status=" + status.toString() +
+                ", params=" + params.toString() +
+                '}';
+    }
+
+    private List<Integer> status;
     private List<Float> params;
 
     public FurnitureDataPack() {
@@ -12,16 +20,16 @@ public class FurnitureDataPack {
         params = new ArrayList<>();
     }
 
-    public FurnitureDataPack(List<Boolean> status, List<Float> params) {
+    public FurnitureDataPack(List<Integer> status, List<Float> params) {
         this.status = status;
         this.params = params;
     }
 
-    public List<Boolean> getStatus() {
+    public List<Integer> getStatus() {
         return status;
     }
 
-    public void setStatus(List<Boolean> status) {
+    public void setStatus(List<Integer> status) {
         this.status = status;
     }
 

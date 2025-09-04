@@ -20,6 +20,11 @@ public class FurnitureItem implements Serializable {
     private float acTemp; //空调温度
     private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
     private float lightPercent;
+
+    public FurnitureDataPack getFurnitureDataPack() {
+        return furnitureDataPack;
+    }
+
     private FurnitureDataPack furnitureDataPack;
 
 
@@ -62,7 +67,7 @@ public class FurnitureItem implements Serializable {
             return false;
         }
 
-        List<Boolean> receivedStatus = furnitureDataPack.getStatus();
+        List<Integer> receivedStatus = furnitureDataPack.getStatus();
         if (receivedStatus == null) {
             return false;
         }
@@ -70,7 +75,7 @@ public class FurnitureItem implements Serializable {
         // 重新构建switchStatus而不是追加
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < receivedStatus.size(); i++){
-            sb.append(receivedStatus.get(i) ? "1" : "0");
+            sb.append(receivedStatus.get(i) == 1 ? "1" : "0");
         }
         switchStatus = sb.toString();
         if(switchStatus.charAt(0) == '1') {
@@ -123,16 +128,16 @@ public class FurnitureItem implements Serializable {
         furnitureDataPack.getParams().clear();
 
         // 将switchStatus的前4位分成4个布尔值并加入FurnitureDataPack的status中
-        List<Boolean> statusList = new ArrayList<>();
+        List<Integer> statusList = new ArrayList<>();
         if (switchStatus != null && switchStatus.length() >= 4) {
             for (int i = 0; i < 4; i++) {
                 char c = switchStatus.charAt(i);
-                statusList.add(c == '1');
+                statusList.add(c == '1' ? 1 : 0);
             }
         } else {
             // 如果switchStatus为空或长度不足，添加默认值
             for (int i = 0; i < 4; i++) {
-                statusList.add(false);
+                statusList.add(0);
             }
         }
 

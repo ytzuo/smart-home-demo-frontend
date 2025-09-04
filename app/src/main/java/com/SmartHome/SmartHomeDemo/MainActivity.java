@@ -361,9 +361,9 @@ public class MainActivity extends AppCompatActivity {
             final HomeStatus finalNewStatus = newStatus;
             // 在主线程中更新UI
             //int l = newStatus.deviceIds.length();
-            for(int i = 0; i < 1; i++) {
-                Log.i("HomeFragment", "Device: "+newStatus.deviceIds.get_at(i)+" "+newStatus.deviceTypes.get_at(i));
-            }
+//            for(int i = 0; i < 1; i++) {
+//                Log.i("HomeFragment", "Device: "+newStatus.deviceIds.get_at(i)+" "+newStatus.deviceTypes.get_at(i));
+//            }
             runOnUiThread(() -> finalHomeFragment.handleHomeStatus(finalNewStatus));
         }
     }
