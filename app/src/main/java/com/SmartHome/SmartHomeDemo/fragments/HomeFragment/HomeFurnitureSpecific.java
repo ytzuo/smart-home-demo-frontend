@@ -448,26 +448,26 @@ public class HomeFurnitureSpecific extends Fragment {
             case "air_conditioner":
                 if ("11".equals(switchNumber)) {
                     // 主开关
-                    command.action = "switch_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
+                    command.action = "switch_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("12".equals(switchNumber)) {
                     // 制冷开关
-                    command.action = "cool_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
+                    command.action = "cool_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("13".equals(switchNumber)) {
                     // 扫风开关
-                    command.action = "fan_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
+                    command.action = "fan_"+ command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 } else if ("14".equals(switchNumber)) {
                     // 除湿开关
-                    command.action = "dehumidify_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
+                    command.action = "dehumidify_"+ command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "ac";
                 }
                 break;
             case "light":
                 if ("11".equals(switchNumber)) {
                     // 主开关
-                    command.action = "switch_" + "_" + command.deviceId + "_" +(isChecked ? "on" : "off");
+                    command.action = "switch_" + command.deviceId + "_" +(isChecked ? "on" : "off");
                     command.deviceType = "light";
                 }
                 break;
@@ -491,14 +491,14 @@ public class HomeFurnitureSpecific extends Fragment {
                 command.deviceType = "ac";
                 // 将进度(0-100)映射到温度范围(15-30)
                 float temp = 15 + (progress / 100.0f) * (30 - 15);
-                command.action = "temp_" + Math.round(temp);
+                command.action = "temp_" + command.deviceId + "_"  + Math.round(temp);
                 command.value = temp;
                 break;
             case "light":
                 command.deviceType = "light";
                 // 将进度(0-100)映射到亮度范围(10-100)
                 int brightness = (int) (10 + (progress / 100.0f) * (100 - 10));
-                command.action = "brightness_" + brightness;
+                command.action = "brightness_" + command.deviceId + "_"  + brightness;
                 command.value = brightness;
                 break;
         }
