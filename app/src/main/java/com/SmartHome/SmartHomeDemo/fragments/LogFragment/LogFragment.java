@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogAdapter;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogViewModel;
@@ -20,12 +23,17 @@ import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LogFragment extends Fragment {
     public LogFragment(){}
     private RecyclerView recyclerView;
     private LogAdapter adapter;
     private LogViewModel logViewModel;
+    private Button test_btn;
+    private SmartHomeApplication app;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +50,35 @@ public class LogFragment extends Fragment {
         // 设置适配器
         adapter = new LogAdapter(new ArrayList<LogItem>());
         recyclerView.setAdapter(adapter);
+
+        //测试用按钮, 用于清空数据库
+        test_btn = view.findViewById(R.id.log_btn_test_del_all);
+        app = (SmartHomeApplication) getActivity().getApplication();
+        test_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        app.getDatabase().logDao().deleteAllLogs();
+                        // 删除完成后，在主线程更新UI
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // 方式1: 通过ViewModel更新LiveData数据
+                                    if (logViewModel != null) {
+                                        logViewModel.updateLogList(new ArrayList<LogItem>());
+                                    }
+                                    // 方式2: 显示提示信息
+                                    ToastUtil.showToast(getContext(), "数据已清空", Toast.LENGTH_SHORT);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
 
         // 观察日志数据变化
         logViewModel.getLogListLiveData().observe(getViewLifecycleOwner(), new Observer<List<LogItem>>() {

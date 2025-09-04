@@ -127,6 +127,14 @@ public class HomeFragment extends Fragment {
                 newItem.setDeviceId(homeStatus.deviceIds.get_at(i));
                 newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
                 newItem.setTime(homeStatus.timeStamp);
+                switch(newItem.getDeviceType()) {
+                    case "light":
+                        newItem.setImageResource(R.drawable.icon_light);
+                        break;
+                    case "air_conditioner":
+                        newItem.setImageResource(R.drawable.icon_air_conditioner);
+                        break;
+                }
 
                 if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
                     newItem.updateSelfFromDataPack();

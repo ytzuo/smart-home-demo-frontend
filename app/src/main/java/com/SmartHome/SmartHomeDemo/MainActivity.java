@@ -224,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 app.getDatabase().logDao().insertLog(newLog);
+                Log.i("MainActivity", newLog.getLogId() + "已插入数据库");
             }
         });
         Log.i("MainActivity", "插入Alert数据");
@@ -359,6 +360,10 @@ public class MainActivity extends AppCompatActivity {
             final HomeFragment finalHomeFragment = homeFragment;
             final HomeStatus finalNewStatus = newStatus;
             // 在主线程中更新UI
+            //int l = newStatus.deviceIds.length();
+            for(int i = 0; i < 1; i++) {
+                Log.i("HomeFragment", "Device: "+newStatus.deviceIds.get_at(i)+" "+newStatus.deviceTypes.get_at(i));
+            }
             runOnUiThread(() -> finalHomeFragment.handleHomeStatus(finalNewStatus));
         }
     }

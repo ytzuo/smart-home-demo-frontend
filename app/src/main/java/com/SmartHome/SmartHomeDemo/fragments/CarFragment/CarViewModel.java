@@ -15,7 +15,7 @@ public class CarViewModel extends AndroidViewModel {
         //测试数据
         item = new MutableLiveData<>();
         carItem = new CarItem("默认汽车名",
-                "剩余油量：80%", "车辆位置：默认位置", true, false, false);
+                "剩余油量：80%", "默认位置", true, false, false);
         item.setValue(carItem);
     }
 
