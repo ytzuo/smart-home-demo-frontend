@@ -10,11 +10,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/log_type"
-        android:layout_width="110dp"
-        android:layout_height="68dp"
+        android:layout_width="95dp"
+        android:layout_height="58dp"
         android:text="@string/INFO"
-        android:textSize="18sp"
-        app:cornerRadius="12dp"
+        android:textSize="14sp"
+        app:cornerRadius="10dp"
         app:backgroundTint="@color/INFO_background"
         android:textColor="@color/INFO_text"/>
     <LinearLayout

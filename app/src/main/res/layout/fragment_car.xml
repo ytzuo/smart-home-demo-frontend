@@ -126,7 +126,7 @@
                         app:iconTint="@color/orange"
                         app:iconGravity="textTop"
                         android:text="@string/car_unlock"
-                        android:textColor="@color/black"/>
+                        android:textColor="#FF9E9E9E"/>
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/control_car_engine"                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
                         app:iconTint="#FF9E9E9E"
                         app:iconGravity="textTop"
                         android:text="@string/car_engine_on"
-                        android:textColor="@color/black"/>
+                        android:textColor="#FF9E9E9E"/>
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/control_car_ac"                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
@@ -152,7 +152,7 @@
                         app:iconSize="80dp"
                         app:iconGravity="textTop"
                         android:text="@string/car_ac_on"
-                        android:textColor="@color/black"/>
+                        android:textColor="#FF9E9E9E"/>
                 </LinearLayout>
             </LinearLayout>
 

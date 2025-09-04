@@ -73,7 +73,7 @@ public class CarFragment extends Fragment {
                     carNameText.setText(carItem.getCarName());
                     engineStatusText.setText(carItem.getEngineStatus());
                     fuelStatusText.setText(carItem.getFuel());
-                    mileStatusText.setText(carItem.getLocation());
+                    mileStatusText.setText("当前位置："+carItem.getLocation());
 
                     // 可以根据状态更新按钮UI等其他操作
                     updateControlButtons(carItem);
