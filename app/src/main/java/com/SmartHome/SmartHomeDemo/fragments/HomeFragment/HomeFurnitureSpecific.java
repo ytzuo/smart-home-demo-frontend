@@ -257,6 +257,9 @@
             // 根据FurnitureItem中的参数更新滑块状态
             updateUISeekBarFromObject(view);
 
+            // 根据主开关状态启用或禁用其他控件
+            updateControlStates(view);
+
             switch (furnitureItem.getDeviceType()) {
                 case "air_conditioner":
                     // 设置参数项2显示空调当前温度
@@ -341,6 +344,55 @@
                         });
                     }
                     break;
+            }
+        }
+
+        private void updateControlStates(View view) {
+            Switch mainSwitch = view.findViewById(R.id.switch_11);
+            boolean isEnabled = mainSwitch != null && mainSwitch.isChecked();
+
+            // 禁用/启用其他开关 (除了主开关)
+            for (int i = 1; i <= 2; i++) {
+                for (int j = 1; j <= 4; j++) {
+                    // 跳过主开关 (11)
+                    if (i == 1 && j == 1) {
+                        continue;
+                    }
+
+                    int switchId = getResources().getIdentifier("switch_" + i + j, "id", requireContext().getPackageName());
+                    Switch switchView = view.findViewById(switchId);
+                    if (switchView != null) {
+                        switchView.setEnabled(isEnabled);
+                        // 设置透明度以提供视觉反馈
+                        switchView.setAlpha(isEnabled ? 1.0f : 0.5f);
+                    }
+
+                    // 同时禁用对应的标签
+                    int labelId = getResources().getIdentifier("switch_label_" + i + j, "id", requireContext().getPackageName());
+                    TextView labelView = view.findViewById(labelId);
+                    if (labelView != null) {
+                        labelView.setEnabled(isEnabled);
+                        labelView.setAlpha(isEnabled ? 1.0f : 0.5f);
+                    }
+                }
+            }
+
+            // 禁用/启用滑块
+            for (int i = 1; i <= 3; i++) {
+                int seekBarId = getResources().getIdentifier("seekbar_" + i, "id", requireContext().getPackageName());
+                SeekBar seekBar = view.findViewById(seekBarId);
+                if (seekBar != null) {
+                    seekBar.setEnabled(isEnabled);
+                    seekBar.setAlpha(isEnabled ? 1.0f : 0.5f);
+                }
+
+                // 同时禁用对应的标签
+                int labelId = getResources().getIdentifier("seekbar_label_" + i, "id", requireContext().getPackageName());
+                TextView labelView = view.findViewById(labelId);
+                if (labelView != null) {
+                    labelView.setEnabled(isEnabled);
+                    labelView.setAlpha(isEnabled ? 1.0f : 0.5f);
+                }
             }
         }
 
@@ -467,6 +519,13 @@
                 ToastUtil.showToast(requireContext(), switchName + " 状态: " + (isChecked ? "开启" : "关闭"), Toast.LENGTH_SHORT);
             }
             sendRequestSwitch(switchView, isChecked);
+
+            // 如果是主开关发生变化，需要更新其他控件的启用状态
+            if (switchView.getId() == R.id.switch_11) {
+                if (getView() != null) {
+                    updateControlStates(getView());
+                }
+            }
         }
 
         private void handleSeekBarChange(SeekBar seekBar, int progress) {
@@ -702,7 +761,6 @@
                     dialog.dismiss();
                 });
             }
-
             dialog.show();
         }
     }
