@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="RoundedImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>   <!-- 4个角统一 -->
+        <!-- 也可以单独指定：topLeft、topRight、bottomLeft、bottomRight -->
+    </style>
+</resources>

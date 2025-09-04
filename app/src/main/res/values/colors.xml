@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="INFO_background">#4C4CAF50</color>
+    <color name="WARN_background">#4CFFEB3B</color>
+    <color name="ALERT_background">#4CFF5252</color>
+    <color name="Red_background">#C74E4E</color>
+    <color name="INFO_text">#FF388E3C</color>
+    <color name="WARN_text">#FFFBC02D</color>
+    <color name="ALERT_text">#FFD32F2F</color>
+    <color name="green">#4CAF50</color>
+    <color name="gray">#9E9E9E</color>
+    <color name="orange">#FF9800</color>
+    <color name="blue">#2196F3</color>
+    <color name="card_background_light">#FFFFFF</color>
+    <color name="card_background_dark">#1E1E1E</color>
 </resources>

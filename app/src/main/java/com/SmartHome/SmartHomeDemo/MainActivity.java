@@ -1,444 +1,424 @@
+
 package com.SmartHome.SmartHomeDemo;
 
-import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-import com.zrdds.domain.DomainParticipant;
-import com.zrdds.domain.DomainParticipantFactory;
-import com.zrdds.domain.DomainParticipantFactoryQos;
-import com.zrdds.domain.DomainParticipantQos;
-import com.zrdds.topic.Topic;
-import com.zrdds.publication.Publisher;
-import com.zrdds.publication.DataWriter;
-import com.zrdds.subscription.Subscriber;
-import com.zrdds.subscription.DataReader;
-import com.zrdds.subscription.DataReaderListener;
-import com.zrdds.infrastructure.SampleInfo;
-import com.zrdds.infrastructure.StatusKind;
-import com.zrdds.infrastructure.*;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.Device;
+import com.SmartHome.SmartHomeDemo.database.DeviceDao;
+import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
+import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarFragment;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
+import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
+import com.SmartHome.SmartHomeDemo.fragments.SettingFragment.SettingFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-//public class MainActivity extends AppCompatActivity {
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        EdgeToEdge.enable(this);
-//        setContentView(R.layout.activity_main);
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
-//    }
-//}
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Executors;
+
+import idl.SmartDemo03.Alert;
+import idl.SmartDemo03.HomeStatus;
+import idl.SmartDemo03.Presence;
+import idl.SmartDemo03.VehicleStatus;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    private AppDatabase database;
+    private SmartHomeApplication app;
+    private CarFragment currentCarFragment;
+    private HomeFragment currentHomeFragment;
+    private LogFragment currentLogFragment;
+    private SettingFragment currentSettingFragment;
+
+    // 添加一个线程处理所有警报
+    private Thread alertHandlingThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // 获取数据库实例
+        app = (SmartHomeApplication) getApplication();
+        database = app.getDatabase();
+        // 使用数据库
+        DeviceDao deviceDao = database.deviceDao();
+
+        // 设置Alert监听器
+        app.setOnAlertReceivedListener(new AlertDdsManager.OnAlertReceivedListener() {
+            @Override
+            public void onAlertReceived(Alert alert) {
+                addAlertToLog(alert);
+                // 根据deviceType分发到不同的处理逻辑
+                handleAlertByType(alert);
+            }
         });
 
-        System.loadLibrary("ZRDDS_JAVA");
-        System.setProperty("ZRDDS_HOME", "/sdcard/");
+        // 设置未知设备监听器
+        app.setOnUnknownDeviceListener(new SmartHomeApplication.OnUnknownDeviceListener() {
+            @Override
+            public void onUnknownDeviceDetected(Presence presence) {
+                showNewDeviceDialog(presence);
+            }
+        });
 
-        initializeZRDDS();
+        // 设置HomeStatus监听器
+        app.setOnHomeStatusReceivedListener(new SmartHomeApplication.OnHomeStatusReceivedListener() {
+            @Override
+            public void onHomeStatusReceived(HomeStatus homeStatus) {
+                updateHomeFragmentUI(homeStatus);
+            }
+        });
+
+
+
+        // 设置VehicleStatus监听器
+//        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
+        // 设置VehicleStatus监听器
+        app.setOnVehicleStatusReceivedListener(new SmartHomeApplication.OnVehicleStatusReceivedListener() {
+            @Override
+            public void onVehicleStatusReceived(VehicleStatus vehicleStatus) {
+                updateCarFragmentUI(vehicleStatus);
+            }
+        });
+
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+
+        // 只有在savedInstanceState为null时才加载初始Fragment
+        // 避免旋转屏幕等配置更改时重复加载
+        // 只有在savedInstanceState为null时才加载初始Fragment
+        // 避免旋转屏幕等配置更改时重复加载
+        if (savedInstanceState == null) {
+            currentCarFragment = new CarFragment();
+            currentHomeFragment = new HomeFragment();
+            currentLogFragment = new LogFragment();
+            currentSettingFragment = new SettingFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, currentCarFragment, "CarFragment")
+                    .add(R.id.fragment_container, currentHomeFragment, "HomeFragment")
+                    .add(R.id.fragment_container, currentLogFragment, "LogFragment")
+                    .add(R.id.fragment_container, currentSettingFragment, "SettingFragment")
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .commit();
+        } else {
+            // 从savedInstanceState恢复Fragment引用
+            currentCarFragment = (CarFragment) getSupportFragmentManager().findFragmentByTag("CarFragment");
+            currentHomeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+            currentLogFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
+            currentSettingFragment = (SettingFragment) getSupportFragmentManager().findFragmentByTag("SettingFragment");
+        }
+
+
+        bottomNav.setOnNavigationItemSelectedListener(item -> {
+            Fragment selected = null;
+            int id = item.getItemId();
+            if (id == R.id.nav_car) {
+                selected = currentCarFragment;
+            } else if (id == R.id.nav_home) {
+                selected = currentHomeFragment;
+            } else if (id == R.id.nav_log) {
+                selected = currentLogFragment;
+            } else if (id == R.id.nav_setting) {
+                selected = currentSettingFragment;
+            }
+            return showFragment(selected);
+        });
+
+        // 启动处理警报的线程
+        //startAlertHandlingThread();
     }
 
-    private EditText msgEdit = null;
-    private EditText msgDisplay = null;
-    public void onSendClicked(View v) {
-        if (msgEdit == null) {
-            msgEdit = findViewById(R.id.msgEdit);
-        }
-        if (msgDisplay == null) {
-            msgDisplay = findViewById(R.id.msgDisplay);
-        }
-        if (msgEdit.getText().length() == 0) {
-            return;
-        }
-        sendZRDDSData(msgEdit.getText().toString());
-        //displayMsg(msgEdit.getText().toString());
-        msgEdit.getText().clear();
-    }
-    private void displayMsg(String msg) {
-        msgDisplay.getText().append("\n");
-        msgDisplay.getText().append(msg);
-    }
-
-    /**
-     * 初始化ZRDDS组件
-     */
-    private void initializeZRDDS() {
-        try {
-
-            Log.i(TAG, "开始初始化ZRDDS...");
-            DomainParticipantFactoryQos dpfQos = new DomainParticipantFactoryQos();
-            dpfQos.dds_log.file_mask = 0;
-            dpfQos.dds_log.console_mask = 0xffff;
-            Property_t property = new Property_t();
-            property.name = "sysctl.global.licence";
-            property.value = "data:UserName: \nAuth Date: 2020/09/15:19:17:26\nExpire Date: 2025/10/21:19:17:26\nMACS:\nunlimited\nHDS:\nunlimited\nSignature:\nb4b93ac94879a73959465ad0692722934efb100a1069d1e91d4fc14596483cf651496531f7376f389b2a6cea9dc4b276f8cdd3ce171f2c333a5f6061e0033a94889282b1d142ca3709b69e6e88cd24252818bd543c1f66a1ae905bdb8b854e03055a1535fa262570fbefcdb7c05b63f872809cd57f82dfcc72cc495eee824ff0\nLastVerifyDate:2024/11/21:11:01:5022325d7c7825924f6f8c0ab42a65414c";
-            dpfQos.property.value.ensure_length(0, 1);
-            dpfQos.property.value.append(property);
-
-            DomainParticipantFactory factory = DomainParticipantFactory.get_instance_w_qos(dpfQos);
-            if (factory == null) {
-                Log.e(TAG, "无法获取DomainParticipantFactory实例");
-                return;
-            }
-            Log.i(TAG, "✓ DomainParticipantFactory创建成功");
-
-            DomainParticipantQos dpQos = new DomainParticipantQos();
-            factory.get_default_participant_qos(dpQos);
-            dpQos.discovery_config.participant_liveliness_lease_duration.sec = 10;
-            dpQos.discovery_config.participant_liveliness_assert_period.sec = 1;
-            // 2. 创建域参与者
-            participant = factory.create_participant(
-                    DOMAIN_ID,
-                    dpQos,
-                    null, // listener
-                    StatusKind.STATUS_MASK_NONE
-            );
-
-            if (participant == null) {
-                Log.e(TAG, "创建DomainParticipant失败");
-                return;
-            }
-            Log.i(TAG, "✓ DomainParticipant创建成功，Domain ID: " + DOMAIN_ID);
-
-            // 3. 创建内置Bytes主题
-            createBytesTopic();
-
-            // 4. 创建发布者和订阅者
-            createPublisher();
-            createSubscriber();
-
-            Log.i(TAG, "✓ ZRDDS初始化完成");
-
-        } catch (Exception e) {
-            Log.e(TAG, "ZRDDS初始化失败", e);
-        }
-    }
-
-    /**
-     * 创建内置Bytes主题
-     */
-    private void createBytesTopic() {
-        try {
-            // 注册内置Bytes类型
-            ReturnCode_t result = BytesTypeSupport.get_instance().register_type(
-                    participant,
-                    null
-            );
-
-            if (result != ReturnCode_t.RETCODE_OK) {
-                Log.e(TAG, "注册Bytes类型失败，错误码: " + result);
-                return;
-            }
-
-            // 创建主题
-            topic = participant.create_topic(
-                    TOPIC_NAME,
-                    BytesTypeSupport.get_instance().get_type_name(),
-                    DomainParticipant.TOPIC_QOS_DEFAULT,
-                    null, // listener
-                    StatusKind.STATUS_MASK_NONE
-            );
-
-            if (topic == null) {
-                Log.e(TAG, "创建Topic失败");
-                return;
-            }
-
-            Log.i(TAG, "✓ Bytes主题创建成功: " + TOPIC_NAME);
-
-        } catch (Exception e) {
-            Log.e(TAG, "创建Bytes主题失败", e);
+    private void updateCarFragmentUI(VehicleStatus newStatus) {
+        // 更新CarFragment UI
+        if (currentCarFragment != null) {
+            // 在主线程中更新UI
+            runOnUiThread(() -> {
+                // 可以通过接口或ViewModel等方式通知CarFragment更新UI
+                // 这里使用广播方式通知CarFragment更新
+                // 或者通过接口回调方式实现
+                currentCarFragment.updateVehicleStatus(newStatus);
+            });
         }
     }
 
-    /**
-     * 创建发布者和数据写入器
-     */
-    private void createPublisher() {
-        try {
-            // 创建发布者
-            publisher = participant.create_publisher(
-                    DomainParticipant.PUBLISHER_QOS_DEFAULT,
-                    null, // listener
-                    StatusKind.STATUS_MASK_NONE
-            );
 
-            if (publisher == null) {
-                Log.e(TAG, "创建Publisher失败");
-                return;
-            }
-
-            // 创建数据写入器
-            dataWriter = publisher.create_datawriter(
-                    topic,
-                    Publisher.DATAWRITER_QOS_DEFAULT,
-                    null, // listener
-                    StatusKind.STATUS_MASK_NONE
-            );
-
-            if (dataWriter == null) {
-                Log.e(TAG, "创建DataWriter失败");
-                return;
-            }
-
-            Log.i(TAG, "✓ Publisher和DataWriter创建成功");
-
-        } catch (Exception e) {
-            Log.e(TAG, "创建Publisher失败", e);
+    private boolean showFragment(Fragment fragment) {
+        if (fragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .hide(currentCarFragment)
+                    .hide(currentHomeFragment)
+                    .hide(currentLogFragment)
+                    .hide(currentSettingFragment)
+                    .show(fragment)
+                    .commit();
+            return true;
         }
+        return false;
     }
 
-    /**
-     * 创建订阅者和数据读取器
-     */
-    private void createSubscriber() {
-        try {
-            // 创建订阅者
-            subscriber = participant.create_subscriber(
-                    DomainParticipant.SUBSCRIBER_QOS_DEFAULT,
-                    null, // listener
-                    StatusKind.STATUS_MASK_NONE
-            );
-
-            if (subscriber == null) {
-                Log.e(TAG, "创建Subscriber失败");
-                return;
-            }
-
-            // 创建数据读取器，带监听器
-            DataReaderListener readerListener = new DataReaderListener() {
-                @Override
-                public void on_data_available(DataReader reader) {
-                    Log.i(TAG, "📨 收到新数据！");
-                    readZRDDSData(reader);
-                }
-
-                @Override
-                public void on_data_arrived(DataReader reader, Object obj, SampleInfo sampleInfo) {
-                    Log.i(TAG, "📨 收到新数据！");
-                    readZRDDSData(reader);
-                }
-
-                @Override
-                public void on_sample_lost(DataReader reader, SampleLostStatus status) {
-                    Log.w(TAG, "数据丢失: " + status.total_count);
-                }
-
-                @Override
-                public void on_sample_rejected(DataReader reader, SampleRejectedStatus status) {
-                    Log.w(TAG, "数据被拒绝: " + status.total_count);
-                }
-
-                @Override
-                public void on_requested_deadline_missed(DataReader reader, RequestedDeadlineMissedStatus status) {
-                    Log.w(TAG, "请求截止时间错过: " + status.total_count);
-                }
-
-                @Override
-                public void on_requested_incompatible_qos(DataReader reader, RequestedIncompatibleQosStatus status) {
-                    Log.w(TAG, "请求的QoS不兼容: " + status.total_count);
-                }
-
-                @Override
-                public void on_liveliness_changed(DataReader reader, LivelinessChangedStatus status) {
-                    Log.i(TAG, "存活状态改变: alive=" + status.alive_count + ", not_alive=" + status.not_alive_count);
-                }
-
-                @Override
-                public void on_subscription_matched(DataReader reader, SubscriptionMatchedStatus status) {
-                    Log.i(TAG, "订阅匹配: current=" + status.current_count + ", total=" + status.total_count);
-                }
-            };
-
-            dataReader = subscriber.create_datareader(
-                    topic,
-                    Subscriber.DATAREADER_QOS_DEFAULT,
-                    readerListener,
-                    StatusKind.STATUS_MASK_ALL
-            );
-
-            if (dataReader == null) {
-                Log.e(TAG, "创建DataReader失败");
-                return;
-            }
-//            WaitSet ws = new WaitSet();
-//            ws.attach_condition(dataReader.create_readcondition(
-//                    SampleStateKind.NOT_READ_SAMPLE_STATE,
-//                    ViewStateKind.ANY_VIEW_STATE,
-//                    InstanceStateKind.ANY_INSTANCE_STATE));
-//            Thread recvThread = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    while (true) {
-//                        ConditionSeq activeConditionSeq = new ConditionSeq();
-//                        if (ws.wait(activeConditionSeq, Duration_t.DURATION_INFINITE) == ReturnCode_t.RETCODE_OK) {
-//                            // 读取并显示数据
-//                            readZRDDSData(dataReader);
-//                        }
-//                    }
-//                }
-//            });
-//            recvThread.start();
-            Log.i(TAG, "✓ Subscriber和DataReader创建成功");
-
-        } catch (Exception e) {
-            Log.e(TAG, "创建Subscriber失败", e);
-        }
+    // 提供获取数据库实例的方法
+    public AppDatabase getDatabase() {
+        return database;
     }
 
-    /**
-     * 发送ZRDDS数据（按钮点击事件）
-     */
-    private void sendZRDDSData(String msg) {
-        try {
-            if (dataWriter == null) {
-                displayMsg("ZRDDS未初始化完成");
-                return;
-            }
+    // 添加alert到日志
+    private void addAlertToLog(Alert alert) {
+        // 创建时间戳
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String currentTime = sdf.format(new Date());
 
-            // 准备要发送的数据
-            messageCounter++;
-            byte[] data = msg.getBytes("UTF-8");
+        // 创建LogItem
+        LogItem logItem = new LogItem(
+                alert.level,                    // 日志类型 (INFO/WARN/ALERT)
+                currentTime,                    // 当前时间
+                "ID: " + alert.alert_id,        // Alert ID
+                alert.description               // Alert 描述
+        );
+        Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
-            // 创建Bytes数据对象
-            Bytes sample = new Bytes();
-            sample.value.from_array(data, data.length);
-            BytesDataWriter bytesDataWriter = (BytesDataWriter) dataWriter;
-            // 发送数据
-            ReturnCode_t result = bytesDataWriter.write(sample, InstanceHandle_t.HANDLE_NIL_NATIVE);
-
-            if (result == ReturnCode_t.RETCODE_OK) {
-                String successMsg = "✓ 数据发送成功 #" + messageCounter + ": " + msg;
-                Log.i(TAG, successMsg);
-                displayMsg(successMsg);
-            } else {
-                String errorMsg = "❌ 数据发送失败，错误码: " + result;
-                Log.e(TAG, errorMsg);
-                displayMsg(errorMsg);
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "发送数据时发生异常", e);
-            displayMsg("发送失败: " + e.getMessage());
+        // 直接通过FragmentManager找到当前的LogFragment（如果存在）
+        LogFragment logFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
+        if (logFragment != null && logFragment.isVisible()) {
+            logFragment.addLogItem(logItem);
         }
-        //Publish.pub();
+
+        // 注意：如果LogFragment当前未加载，数据会在下次加载时显示，
+        // 因为LogViewModel会保持数据状态
+        com.SmartHome.SmartHomeDemo.database.Log newLog = new com.SmartHome.SmartHomeDemo.database.Log();
+        newLog.setLogType(alert.level);
+        newLog.setLogId(""+alert.alert_id);
+        newLog.setDescription(alert.description);
+        newLog.setTimestamp(alert.timeStamp);
+        // 在后台线程中执行数据库操作
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                app.getDatabase().logDao().insertLog(newLog);
+                Log.i("MainActivity", newLog.getLogId() + "已插入数据库");
+            }
+        });
+        Log.i("MainActivity", "插入Alert数据");
     }
 
-    /**
-     * 读取ZRDDS数据
-     */
-    private void readZRDDSData(DataReader reader) {
-        try {
-            // 读取数据
-            SampleInfoSeq sampleInfos = new SampleInfoSeq();
-            BytesSeq samples = new BytesSeq();
+    private void showNewDeviceDialog(Presence presence) {
+        // 加载对话框布局
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.window_match, null);
 
-            BytesDataReader bytesDataReader = (BytesDataReader) reader;
+        // 更新对话框中的文本
+        TextView deviceIdText = dialogView.findViewById(R.id.match_device_id);
+        TextView deviceTypeText = dialogView.findViewById(R.id.match_device_type);
 
-            ReturnCode_t result = bytesDataReader.take(samples, sampleInfos, 10,
-                    SampleStateKind.ANY_SAMPLE_STATE,
-                    ViewStateKind.ANY_VIEW_STATE,
-                    InstanceStateKind.ANY_INSTANCE_STATE);
+        if (deviceIdText != null) {
+            deviceIdText.setText(getString(R.string.device_id) + ": " + presence.deviceId);
+        }
 
-            if (result == ReturnCode_t.RETCODE_OK) {
-                for (int i = 0; i < sampleInfos.length(); i++) {
-                    if (sampleInfos.get_at(i).valid_data) {
-                        // 处理接收到的数据
-                        Bytes receivedData = samples.get_at(i);
-                        String message = new String(
-                                receivedData.value.get_contiguous_buffer(), 0, receivedData.value.length(),
-                                "UTF-8");
-                        Log.i(TAG, "📨 接收到数据: " + message);
-                        // 在UI线程显示消息
-                        this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Log.i(TAG, "收到: " + message);
-                                    displayMsg("收到: " + message);
-                                }catch (Exception e) {
-                                    Log.e("UIThread", "Exception", e);
-                                }
+        if (deviceTypeText != null) {
+            deviceTypeText.setText(getString(R.string.device_type) + ": " + presence.deviceType);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // 设置按钮点击事件
+        if (dialogView.findViewById(R.id.add_new_done) != null) {
+            dialogView.findViewById(R.id.add_new_done).setOnClickListener(v -> {
+                // 用户点击确认，将设备插入数据库
+                addDeviceToDatabase(presence);
+                dialog.dismiss();
+            });
+        }
+
+        if (dialogView.findViewById(R.id.add_new_cancel) != null) {
+            dialogView.findViewById(R.id.add_new_cancel).setOnClickListener(v -> {
+                // 用户点击取消
+                dialog.dismiss();
+            });
+        }
+        dialog.show();
+    }
+
+    private void addDeviceToDatabase(Presence presence) {
+        // 在后台线程中插入数据库
+        Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    // 创建设备实体并插入数据库
+                    Device device = new Device();
+                    device.setDeviceId(presence.deviceId);
+                    device.setDeviceType(presence.deviceType);
+                    database.deviceDao().insertDevice(device);
+
+                    Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
+
+                    // 从数据库获取最新的设备列表
+                    List<Device> devices = database.deviceDao().getAllDevices();
+
+                    // 转换为FurnitureItem列表
+                    List<FurnitureItem> furnitureItems = new ArrayList<>();
+                    for (Device dev : devices) {
+                        if ("light".equals(dev.getDeviceType()) || "air_conditioner".equals(dev.getDeviceType())) {
+                            FurnitureItem item = new FurnitureItem();
+                            item.setDeviceId(dev.getDeviceId());
+                            item.setDeviceType(dev.getDeviceType());
+                            item.setWorkingStatus("未连接");
+                            item.setStatus("未连接");
+                            item.setTime("默认时间");
+
+                            // 设置图片资源
+                            if ("light".equals(dev.getDeviceType())) {
+                                item.setImageResource(R.drawable.icon_light);
+                            } else if ("air_conditioner".equals(dev.getDeviceType())) {
+                                item.setImageResource(R.drawable.icon_air_conditioner);
                             }
-                        });
+
+                            furnitureItems.add(item);
+                        }
                     }
+
+                    // 如果需要更新UI，切换到主线程
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "设备已添加: " + presence.deviceId, Toast.LENGTH_SHORT).show();
+
+                        // 更新HomeFragment中的设备列表
+                        if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
+                            // 更新ViewModel数据
+                            currentHomeFragment.getHomeViewModel().updateFurnitureList(furnitureItems);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("MainActivity", "插入数据库时出错", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
+                    });
                 }
+            });
+        }
 
-                // 返还数据
-                bytesDataReader.return_loan(samples, sampleInfos);
+    // 在MainActivity中
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 注意：Activity的onDestroy()也不一定总被调用
+        if (isFinishing()) {
+            // 如果是正常结束，执行清理操作
+            SmartHomeApplication app = (SmartHomeApplication) getApplication();
+            AppDatabase database = app.getDatabase();
+            if (database != null) {
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    database.deviceDao().deleteAll();
+                    Log.d("MainActivity", "应用关闭时删除设备数据");
+                });
             }
-
-        } catch (Exception e) {
-            Log.e(TAG, "读取数据时发生异常", e);
         }
     }
 
-    /**
-     * 清理ZRDDS资源
-     */
-    private void cleanupZRDDS() {
-        try {
-            Log.i(TAG, "开始清理ZRDDS资源...");
-
-            if (participant != null) {
-                // 删除所有实体
-                participant.delete_contained_entities();
-
-                // 删除域参与者
-                DomainParticipantFactory factory = DomainParticipantFactory.get_instance();
-                if (factory != null) {
-                    factory.delete_participant(participant);
-                }
-
-                participant = null;
+    private void updateHomeFragmentUI(HomeStatus newStatus) {
+        // 更新HomeFragment UI
+        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+        if (homeFragment == null) {
+            // 如果通过tag找不到，尝试通过当前显示的fragment判断
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment instanceof HomeFragment) {
+                homeFragment = (HomeFragment) currentFragment;
             }
+        }
 
-            Log.i(TAG, "✓ ZRDDS资源清理完成");
-
-        } catch (Exception e) {
-            Log.e(TAG, "清理ZRDDS资源时发生异常", e);
+        if (homeFragment != null) {
+            // 创建final变量以在lambda表达式中使用
+            final HomeFragment finalHomeFragment = homeFragment;
+            final HomeStatus finalNewStatus = newStatus;
+            // 在主线程中更新UI
+            //int l = newStatus.deviceIds.length();
+            for(int i = 0; i < 1; i++) {
+                Log.i("HomeFragment", "Device: "+newStatus.deviceIds.get_at(i)+" "+newStatus.deviceTypes.get_at(i));
+            }
+            runOnUiThread(() -> finalHomeFragment.handleHomeStatus(finalNewStatus));
         }
     }
 
+    // 根据设备类型分发警报到相应处理逻辑
+    private void handleAlertByType(Alert alert) {
+        if ("car".equals(alert.deviceType)) {
+            // 在主线程中显示车辆警报弹窗
+            runOnUiThread(() -> showCarAlert(alert));
+        } else if ("light".equals(alert.deviceType) || "air_conditioner".equals(alert.deviceType)) {
+            // 家具类设备（灯或空调）在主线程中显示家具警报弹窗
+            runOnUiThread(() -> showFurnitureAlert(alert));
+        }
+    }
 
-    private static final String TAG = "ZRDDSDemo";
-    private static final String TOPIC_NAME = "BytesTestTopic";
-    private static final int DOMAIN_ID = 0;
+    // 显示车辆警报弹窗
+    private void showCarAlert(Alert alert) {
+        CarAlert carAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
+        carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
+            @Override
+            public void onConfirmClick() {
+                // 处理确认按钮点击事件
+                carAlert.dismiss();
+            }
+        });
 
-    // ZRDDS 组件
-    private DomainParticipant participant;
-    private Publisher publisher;
-    private Subscriber subscriber;
-    private Topic topic;
-    private DataWriter dataWriter;
-    private DataReader dataReader;
+        //if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+            carAlert.show(getSupportFragmentManager(), "car_alert");
+        //}
+    }
 
-    // 数据包计数器
-    private int messageCounter = 0;
+    // 显示家具警报弹窗
+    private void showFurnitureAlert(Alert alert) {
+        FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
+        furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
+            @Override
+            public void onConfirmClick() {
+                // 处理确认按钮点击事件
+                furnitureAlert.dismiss();
+            }
+
+            @Override
+            public void onViewAlertClick() {
+                // 处理查看设备按钮点击事件
+                furnitureAlert.dismiss();
+                // 切换到HomeFragment查看设备
+                showFragment(currentHomeFragment);
+                BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+                bottomNav.setSelectedItemId(R.id.nav_home);
+            }
+        });
+
+//        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
+            furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
+        //}
+    }
+
 }

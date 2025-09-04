@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="25dp"
+    android:orientation="vertical">
+
+    <!-- 导航栏 -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 返回按钮 -->
+        <TextView
+            android:id="@+id/btn_back"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:text="@string/back"
+
+            android:textSize="16sp" />
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/furniture_specific"
+            android:textSize="20sp"
+
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"/>
+
+        <View
+            android:id="@+id/btn_back2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            />
+
+    </LinearLayout>
+
+    <!-- 家具图像 -->
+    <ImageView
+        android:id="@+id/iv_furniture"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/furniture_image"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 可扩展的参数和设置项框架 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/iv_furniture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 参数区域 -->
+            <TextView
+                android:id="@+id/param_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/param_label"
+
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:id="@+id/param_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 参数项1 -->
+                <LinearLayout
+                    android:id="@+id/param_container_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项1："
+                        android:textSize="17sp" />
+                    <TextView
+                        android:id="@+id/arg1_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="item1"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+
+                <!-- 参数项2 -->
+                <LinearLayout
+                    android:id="@+id/param_container_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项2："
+                        android:textSize="17sp" />
+                    <TextView
+                        android:id="@+id/arg2_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="item2"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <!-- 参数项3 -->
+                <LinearLayout
+                    android:id="@+id/param_container_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项3："
+                        android:textSize="17sp" />
+                    <TextView
+                        android:id="@+id/arg3_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="item3"
+                        android:textSize="17sp" />
+                </LinearLayout>
+
+                <!-- 参数项4 -->
+                <LinearLayout
+                    android:id="@+id/param_container_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- 参数项1 -->
+                    <TextView
+                        android:id="@+id/arg4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="参数项4："
+                        android:textSize="17sp" />
+                    <TextView
+                        android:id="@+id/arg4_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="item4"
+                        android:textSize="17sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 设置项标题 -->
+            <TextView
+                android:id="@+id/settings_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="设置项"
+
+                android:textSize="20sp" />
+
+            <!-- 开关设置项区域 (一行最多4个) -->
+            <LinearLayout
+                android:id="@+id/switch_row_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="left"
+                android:orientation="horizontal">
+
+                <!-- 开关1 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项11"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 开关2 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项12"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 开关3 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项13"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 开关4 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项14"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 第二行开关 (如果需要更多开关) -->
+            <LinearLayout
+                android:id="@+id/switch_row_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="left"
+                android:orientation="horizontal">
+
+                <!-- 开关5 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项21"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_21"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- 开关6 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项22"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- 开关7 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项23"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_23"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- 开关8 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch_label_24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="设置项24"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/switch_24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+
+                <!-- 其他开关可以继续添加 -->
+            </LinearLayout>
+
+            <!-- 滑块设置项1 (占一整行) -->
+            <LinearLayout
+                android:id="@+id/seekbar_container_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/seekbar_label_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="滑块1"
+                    android:textSize="17sp" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:max="100" />
+            </LinearLayout>
+
+            <!-- 滑块设置项2 -->
+            <LinearLayout
+                android:id="@+id/seekbar_container_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/seekbar_label_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="滑块2"
+                    android:textSize="17sp" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:max="40" />
+            </LinearLayout>
+
+            <!-- 滑块设置项3 -->
+            <LinearLayout
+                android:id="@+id/seekbar_container_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/seekbar_label_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="滑块3"
+                    android:textSize="17sp" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:max="100" />
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/unbind_device"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/unbind_device"
+                android:backgroundTint="@color/Red_background"
+                android:onClick="unbind"/>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
