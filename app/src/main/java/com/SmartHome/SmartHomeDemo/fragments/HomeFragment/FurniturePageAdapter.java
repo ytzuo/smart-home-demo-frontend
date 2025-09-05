@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
@@ -95,10 +95,20 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
                     case "light" :
                         float bright = pack.getParams().get(0);
                         statusText.setText("亮度: "+bright+"%");
+                        if(pack.getStatus().get(0) == 1) {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.WARN_text));
+                        } else {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
+                        }
                         break;
                     case "air_conditioner" :
                         float temp = pack.getParams().get(0);
                         statusText.setText("温度: "+temp+"℃");
+                        if(pack.getStatus().get(0) == 1) {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.blue));
+                        } else {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
+                        }
                         break;
                     default:
                         statusText.setText(status);
