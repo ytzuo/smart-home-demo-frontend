@@ -3,15 +3,12 @@ package com.SmartHome.SmartHomeDemo.fragments.LogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
-import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
-import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeAdapter;
 import com.google.android.material.button.MaterialButton;
 import androidx.core.content.ContextCompat;
 import java.util.List;

@@ -2,10 +2,15 @@
 package com.SmartHome.SmartHomeDemo;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +39,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -247,6 +253,27 @@ public class MainActivity extends AppCompatActivity {
             deviceTypeText.setText(getString(R.string.device_type) + ": " + presence.deviceType);
         }
 
+        // 获取分组相关的UI组件
+        Spinner groupSpinner = dialogView.findViewById(R.id.spinner_device_group);
+
+        // 创建三个默认分组列表
+        List<String> groups = new ArrayList<>(Arrays.asList("默认分组1", "默认分组2", "默认分组3"));
+
+        // 从SharedPreferences获取用户自定义的分组名称
+        SharedPreferences prefs = getSharedPreferences("device_groups", MODE_PRIVATE);
+        String group1 = prefs.getString("group1", "默认分组1");
+        String group2 = prefs.getString("group2", "默认分组2");
+        String group3 = prefs.getString("group3", "默认分组3");
+
+        groups.set(0, group1);
+        groups.set(1, group2);
+        groups.set(2, group3);
+
+        // 创建适配器并设置Spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, groups);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(adapter);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
 
@@ -255,8 +282,14 @@ public class MainActivity extends AppCompatActivity {
         // 设置按钮点击事件
         if (dialogView.findViewById(R.id.add_new_done) != null) {
             dialogView.findViewById(R.id.add_new_done).setOnClickListener(v -> {
+                // 获取选中的分组
+                String selectedGroup = (String) groupSpinner.getSelectedItem();
+                if (selectedGroup == null) {
+                    selectedGroup = "默认分组1"; // 默认分组
+                }
+
                 // 用户点击确认，将设备插入数据库
-                addDeviceToDatabase(presence);
+                addDeviceToDatabase(presence, selectedGroup);
                 dialog.dismiss();
             });
         }
@@ -270,61 +303,72 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void addDeviceToDatabase(Presence presence) {
+    private void addDeviceToDatabase(Presence presence, String deviceGroup) {
         // 在后台线程中插入数据库
         Executors.newSingleThreadExecutor().execute(() -> {
-                try {
-                    // 创建设备实体并插入数据库
-                    Device device = new Device();
-                    device.setDeviceId(presence.deviceId);
-                    device.setDeviceType(presence.deviceType);
-                    database.deviceDao().insertDevice(device);
+            try {
+                // 创建设备实体并插入数据库
+                Device device = new Device();
+                device.setDeviceId(presence.deviceId);
+                device.setDeviceType(presence.deviceType);
+                device.setDeviceGroup(deviceGroup); // 设置设备分组
+                database.deviceDao().insertDevice(device);
 
-                    Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId);
+                Log.i("MainActivity", "设备已添加到数据库: " + presence.deviceId + " 分组: " + deviceGroup);
 
-                    // 从数据库获取最新的设备列表
-                    List<Device> devices = database.deviceDao().getAllDevices();
+                // 从数据库获取最新的设备列表
+                List<Device> devices = database.deviceDao().getAllDevices();
+                Log.i("MainActivity", "数据库现在包含 " + devices.size() + " 个设备");
 
-                    // 转换为FurnitureItem列表
-                    List<FurnitureItem> furnitureItems = new ArrayList<>();
-                    for (Device dev : devices) {
-                        if ("light".equals(dev.getDeviceType()) || "air_conditioner".equals(dev.getDeviceType())) {
-                            FurnitureItem item = new FurnitureItem();
-                            item.setDeviceId(dev.getDeviceId());
-                            item.setDeviceType(dev.getDeviceType());
-                            item.setWorkingStatus("未连接");
-                            item.setStatus("未连接");
-                            item.setTime("默认时间");
+                // 转换为FurnitureItem列表
+                List<FurnitureItem> furnitureItems = new ArrayList<>();
+                for (Device dev : devices) {
+                    if ("light".equals(dev.getDeviceType()) || "air_conditioner".equals(dev.getDeviceType())) {
+                        FurnitureItem item = new FurnitureItem();
+                        item.setDeviceId(dev.getDeviceId());
+                        item.setDeviceType(dev.getDeviceType());
+                        item.setDeviceGroup(dev.getDeviceGroup()); // 设置设备分组
+                        item.setWorkingStatus("未连接");
+                        item.setStatus("未连接");
+                        item.setTime("默认时间");
 
-                            // 设置图片资源
-                            if ("light".equals(dev.getDeviceType())) {
-                                item.setImageResource(R.drawable.icon_light);
-                            } else if ("air_conditioner".equals(dev.getDeviceType())) {
-                                item.setImageResource(R.drawable.icon_air_conditioner);
-                            }
-
-                            furnitureItems.add(item);
+                        // 设置图片资源
+                        if ("light".equals(dev.getDeviceType())) {
+                            item.setImageResource(R.drawable.icon_light);
+                        } else if ("air_conditioner".equals(dev.getDeviceType())) {
+                            item.setImageResource(R.drawable.icon_air_conditioner);
                         }
+
+                        furnitureItems.add(item);
                     }
-
-                    // 如果需要更新UI，切换到主线程
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "设备已添加: " + presence.deviceId, Toast.LENGTH_SHORT).show();
-
-                        // 更新HomeFragment中的设备列表
-                        if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
-                            // 更新ViewModel数据
-                            currentHomeFragment.getHomeViewModel().updateFurnitureList(furnitureItems);
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e("MainActivity", "插入数据库时出错", e);
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
-                    });
                 }
-            });
-        }
+
+                Log.i("MainActivity", "转换后得到 " + furnitureItems.size() + " 个家具项");
+
+                // 如果需要更新UI，切换到主线程
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "设备已添加: " + presence.deviceId + " 分组: " + deviceGroup, Toast.LENGTH_SHORT).show();
+
+                    // 更新HomeFragment中的设备列表
+                    if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
+                        // 更新ViewModel数据
+                        Log.i("MainActivity", "更新HomeFragment数据，包含 " + furnitureItems.size() + " 个项目");
+                        currentHomeFragment.getHomeViewModel().updateFurnitureList(furnitureItems);
+                    } else {
+                        Log.w("MainActivity", "无法更新HomeFragment数据，currentHomeFragment或viewModel为null");
+                    }
+                });
+            } catch (Exception e) {
+                Log.e("MainActivity", "插入数据库时出错", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+
+
 
     // 在MainActivity中
     @Override

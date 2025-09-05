@@ -20,6 +20,7 @@ public class FurnitureItem implements Serializable {
     private float acTemp; //空调温度
     private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
     private float lightPercent;
+    private String deviceGroup; // 新增设备组字段
 
     public FurnitureDataPack getFurnitureDataPack() {
         return furnitureDataPack;
@@ -242,4 +243,11 @@ public class FurnitureItem implements Serializable {
         this.deviceType = deviceType;
     }
 
+    public String getDeviceGroup() {
+        return deviceGroup;
+    }
+
+    public void setDeviceGroup(String deviceGroup) {
+        this.deviceGroup = deviceGroup;
+    }
 }

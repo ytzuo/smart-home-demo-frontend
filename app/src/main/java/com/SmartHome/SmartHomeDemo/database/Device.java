@@ -12,13 +12,11 @@ public class Device {
         private String deviceId;
         @ColumnInfo(name = "device_type")
         private String deviceType;
+        @ColumnInfo(name = "device_group")
+        private String deviceGroup;
+
         // 无参构造函数
         public Device() {}
-
-//        public Device(String deviceId, String deviceType) {
-//                this.deviceId = deviceId;
-//                this.deviceType = deviceType;
-//        }
 
         public String getDeviceId() {
                 return deviceId;
@@ -44,4 +42,11 @@ public class Device {
                 this.id = id;
         }
 
+        public String getDeviceGroup() {
+                return deviceGroup;
+        }
+
+        public void setDeviceGroup(String deviceGroup) {
+                this.deviceGroup = deviceGroup;
+        }
 }
