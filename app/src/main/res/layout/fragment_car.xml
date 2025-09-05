@@ -115,7 +115,8 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/control_car_lock"                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:id="@+id/control_car_lock"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/icon_lock"
@@ -128,7 +129,8 @@
                         android:text="@string/car_unlock"
                         android:textColor="#FF9E9E9E"/>
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/control_car_engine"                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:id="@+id/control_car_engine"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/icon_car_engine"
@@ -141,7 +143,8 @@
                         android:text="@string/car_engine_on"
                         android:textColor="#FF9E9E9E"/>
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/control_car_ac"                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:id="@+id/control_car_ac"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/icon_car_ac"
