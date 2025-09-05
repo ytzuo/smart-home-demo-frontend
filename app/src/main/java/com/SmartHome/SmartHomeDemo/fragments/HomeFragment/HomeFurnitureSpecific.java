@@ -544,22 +544,6 @@
                     }
                 }
             });
-
-            //为解绑按钮添加监听器
-            Button unbindButton = view.findViewById(R.id.unbind_device);
-            if (unbindButton != null) {
-                unbindButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // 创建一个临时的Presence对象用于演示
-                        // 在实际应用中，您需要从furnitureItem获取真实数据
-                        Presence presence = new Presence();
-                        presence.deviceId = furnitureItem.getDeviceId();
-                        presence.deviceType = furnitureItem.getDeviceType();
-                        showUnbindDialog(presence, view);
-                    }
-                });
-            }
         }
 
         private void showPopupMenu(View view) {
