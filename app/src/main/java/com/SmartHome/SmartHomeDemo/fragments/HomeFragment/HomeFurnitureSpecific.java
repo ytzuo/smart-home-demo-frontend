@@ -33,7 +33,6 @@
         private FurnitureItem furnitureItem;
 
         private FurnitureItemViewModel viewModel;
-        private boolean isInitialized = false;
 
         private SmartHomeApplication app;
         private CommandDdsManager commandDdsManager;
@@ -90,72 +89,14 @@
             }
             initialization(view);
             setupEventListeners(view);
-            // 恢复UI状态
-            //restoreUIFromViewModel(view);
             refreshUI(view);
             return view;
         }
-
-//        private void restoreUIFromViewModel(View view) {
-//            FurnitureItemViewModel.UIState savedState =
-//                    viewModel.getUIState(furnitureItem.getDeviceId());
-//
-//            if (savedState != null) {
-//                // 恢复文本状态
-//                TextView arg1TextView = view.findViewById(R.id.arg1_item);
-//                if (arg1TextView != null) {
-//                    arg1TextView.setText(savedState.arg1Text);
-//                }
-//
-//                TextView arg2TextView = view.findViewById(R.id.arg2_item);
-//                if (arg2TextView != null) {
-//                    arg2TextView.setText(savedState.arg2Text);
-//                }
-//
-//                // 恢复开关状态
-//                furnitureItem.setSwitchStatus(savedState.switchStatus);
-//                furnitureItem.setAcTemp(savedState.acTemp);
-//                furnitureItem.setLightPercent(savedState.lightPercent);
-//
-//                // 更新UI
-//                updateUISwitchStatueFromObject(view);
-//                updateUISeekBarFromObject(view);
-//                updateControlStates(view);
-//            }
-//        }
-//        private void saveUIToViewModel() {
-//            if (furnitureItem != null && getView() != null) {
-//                View view = getView();
-//                TextView arg1TextView = view.findViewById(R.id.arg1_item);
-//                TextView arg2TextView = view.findViewById(R.id.arg2_item);
-//
-//                String arg1Text = arg1TextView != null ? arg1TextView.getText().toString() : "";
-//                String arg2Text = arg2TextView != null ? arg2TextView.getText().toString() : "";
-//
-//                FurnitureItemViewModel.UIState state = new FurnitureItemViewModel.UIState(
-//                        arg1Text,
-//                        arg2Text,
-//                        furnitureItem.getSwitchStatus(),
-//                        furnitureItem.getAcTemp(),
-//                        furnitureItem.getLightPercent()
-//                );
-//
-//                viewModel.saveUIState(furnitureItem.getDeviceId(), state);
-//            }
-//        }
-//        @Override
-//        public void onPause() {
-//            super.onPause();
-//            // 在Fragment暂停时保存UI状态
-//            saveUIToViewModel();
-//        }
 
         private void initialization(View view){
             TextView temp;
             temp = view.findViewById(R.id.Title);
             temp.setText(furnitureItem.getDeviceId());
-            //baseDdsManager.initialize();
-            //commandDdsManager.initialize(baseDdsManager);
 
 
             switch (furnitureItem.getDeviceType()) {
@@ -227,6 +168,11 @@
                     hideUnusedItems(view);
                     break;
             }
+
+            if(furnitureItem.getSwitchStatus().charAt(0) == '1'){
+                Switch mainSwitch = view.findViewById(R.id.switch_11);
+                mainSwitch.setChecked(true);
+            }
         }
 
         // 根据FurnitureItem中的switchStatus更新开关状态
@@ -275,7 +221,7 @@
                     SeekBar tempSeekBar = view.findViewById(R.id.seekbar_1);
                     if (tempSeekBar != null) {
                         // 移除监听器以避免在更新UI时触发事件
-                        tempSeekBar.setOnSeekBarChangeListener(null);
+                        // tempSeekBar.setOnSeekBarChangeListener(null);
 
                         // 将实际温度值(15-30)映射到滑块范围(0-100)
                         float acTemp = furnitureItem.getAcTemp();
@@ -298,7 +244,7 @@
                     SeekBar brightnessSeekBar = view.findViewById(R.id.seekbar_1);
                     if (brightnessSeekBar != null) {
                         // 移除监听器以避免在更新UI时触发事件
-                        brightnessSeekBar.setOnSeekBarChangeListener(null);
+                        // brightnessSeekBar.setOnSeekBarChangeListener(null);
 
                         // 将实际亮度值(10-100)映射到滑块范围(0-100)
                         float lightPercent = furnitureItem.getLightPercent();
@@ -326,12 +272,10 @@
             TextView arg1TextView = view.findViewById(R.id.arg1_item);
             Switch switch11 = view.findViewById(R.id.switch_11);
 
-
             // 根据FurnitureItem中的switchStatus更新开关状态
             updateUISwitchStatueFromObject(view);
             // 根据FurnitureItem中的参数更新滑块状态
             updateUISeekBarFromObject(view);
-
             // 根据主开关状态启用或禁用其他控件
             updateControlStates(view);
 
@@ -366,7 +310,7 @@
                     SeekBar tempSeekBar = view.findViewById(R.id.seekbar_1);
                     if (tempSeekBar != null) {
                         // 移除监听器以避免触发事件
-                        tempSeekBar.setOnSeekBarChangeListener(null);
+                        // tempSeekBar.setOnSeekBarChangeListener(null);
 
                         // 将实际温度值(15-30)映射到滑块范围(0-100)
                         float acTemp = furnitureItem.getAcTemp();

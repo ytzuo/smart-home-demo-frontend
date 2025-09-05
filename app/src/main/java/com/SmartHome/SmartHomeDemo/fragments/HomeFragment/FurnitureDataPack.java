@@ -1,15 +1,22 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class FurnitureDataPack {
     @Override
     public String toString() {
-        return "FurnitureDataPack{" +
-                "status=" + status.toString() +
-                ", params=" + params.toString() +
-                '}';
+        try{
+            return "FurnitureDataPack{" +
+                    "status=" + status.toString() +
+                    ", params=" + params.toString() +
+                    '}';
+        }catch (NullPointerException e){
+            Log.i("FurnitureDataPack", "NullPointerException");
+        }
+        return null;
     }
 
     private List<Integer> status;

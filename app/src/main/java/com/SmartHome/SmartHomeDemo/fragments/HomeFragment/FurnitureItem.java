@@ -193,6 +193,7 @@ public class FurnitureItem implements Serializable {
         this.acTemp = acTemp;
         this.switchStatus = switchStatus;
         this.lightPercent = lightPercent;
+        updateDataPack();
     }
 
     public String getDeviceId() {
