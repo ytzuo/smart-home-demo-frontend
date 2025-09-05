@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private boolean showFragment(Fragment fragment) {
+    public boolean showFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -190,6 +190,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+    public void hideAllFragmentsExcept(Fragment exception) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .hide(currentCarFragment)
+                .hide(currentHomeFragment)
+                .hide(currentLogFragment)
+                .hide(currentSettingFragment)
+                .commit();
     }
 
     // 提供获取数据库实例的方法
@@ -463,6 +472,10 @@ public class MainActivity extends AppCompatActivity {
 //        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
             furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
         //}
+    }
+
+    public HomeFragment getCurrentHomeFragment() {
+        return currentHomeFragment;
     }
 
 }

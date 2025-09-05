@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.SmartHome.SmartHomeDemo.MainActivity;
 import com.SmartHome.SmartHomeDemo.R;
 
 import java.util.ArrayList;
@@ -74,9 +75,18 @@ public class FurnitureListFragment extends Fragment {
 
                 // 使用FragmentTransaction显示Fragment
                 if (getActivity() != null) {
+                    // 隐藏HomeFragment中的内容
+                    if (getActivity() instanceof MainActivity) {
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        HomeFragment homeFragment = mainActivity.getCurrentHomeFragment();
+                        if (homeFragment != null) {
+                            homeFragment.hideAllFragments();
+                        }
+                    }
+
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragment_container, fragment)
+                            .add(R.id.fragment_container, fragment)
                             .addToBackStack(null)
                             .commit();
                 }
@@ -101,6 +111,29 @@ public class FurnitureListFragment extends Fragment {
                 }
                 getArguments().putSerializable("updated_list", (ArrayList<FurnitureItem>) newList);
             }
+        }
+    }
+    // 添加更新特定家具项的方法
+    public void updateSpecificFurnitureItem(FurnitureItem updatedItem) {
+        if (updatedItem != null && furnitureList != null && adapter != null) {
+            // 查找并更新匹配的家具项
+            for (int i = 0; i < furnitureList.size(); i++) {
+                FurnitureItem item = furnitureList.get(i);
+                if (item.getDeviceId().equals(updatedItem.getDeviceId())) {
+                    furnitureList.set(i, updatedItem);
+                    adapter.notifyItemChanged(i);  // 只更新特定项而不是整个列表
+                    break;
+                }
+            }
+        }
+    }
+
+    // 当从HomeFurnitureSpecific返回时，刷新整个列表
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
         }
     }
 }

@@ -18,6 +18,7 @@
     import android.view.ViewGroup;
     import android.widget.*;
 
+    import com.SmartHome.SmartHomeDemo.MainActivity;
     import com.SmartHome.SmartHomeDemo.R;
     import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
     import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
@@ -74,6 +75,16 @@
                         getActivity().findViewById(R.id.bottom_navigation);
                 if (bottomNav != null) {
                     bottomNav.setVisibility(View.VISIBLE);
+                }
+            }
+
+            // 恢复HomeFragment的显示
+            if (getActivity() instanceof MainActivity) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                // 通过MainActivity获取HomeFragment实例并恢复其显示
+                HomeFragment homeFragment = mainActivity.getCurrentHomeFragment();
+                if (homeFragment != null) {
+                    homeFragment.showAllFragments();
                 }
             }
         }
@@ -539,8 +550,8 @@
                 @Override
                 public void onClick(View v) {
                     Log.i("HomeFurnitureSpecific", "返回按钮被点击");
-                    if (getFragmentManager() != null) {
-                        getFragmentManager().popBackStack();
+                    if (getActivity() != null) {
+                        getActivity().getSupportFragmentManager().popBackStack();
                     }
                 }
             });

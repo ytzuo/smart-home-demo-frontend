@@ -306,8 +306,31 @@ public class HomeFragment extends Fragment {
     }
 
 
-
     public HomeViewModel getHomeViewModel() {
         return homeViewModel;
+    }
+
+    public void hideAllFragments() {
+        if (viewPager2 != null) {
+            viewPager2.setVisibility(View.GONE);
+        }
+        if (tabLayout != null) {
+            tabLayout.setVisibility(View.GONE);
+        }
+        if(test_btn != null) {
+            test_btn.setVisibility(View.GONE);
+        }
+    }
+
+    public void showAllFragments() {
+        if (viewPager2 != null) {
+            viewPager2.setVisibility(View.VISIBLE);
+        }
+        if (tabLayout != null) {
+            tabLayout.setVisibility(View.VISIBLE);
+        }
+        if(test_btn != null) {
+            test_btn.setVisibility(View.VISIBLE);
+        }
     }
 }

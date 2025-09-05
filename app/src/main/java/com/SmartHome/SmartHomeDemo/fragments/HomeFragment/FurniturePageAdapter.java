@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdapter.ViewHolder> {
@@ -80,16 +81,37 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
             itemImage.setImageResource(item.getImageResource());
             nameText.setText(item.getDeviceId());
 
-            // 使用FurnitureItem中的状态信息而不是直接访问pack
-            workingText.setText(item.getWorkingStatus());
-            statusText.setText(item.getStatus());
+//            // 使用FurnitureItem中的状态信息而不是直接访问pack
+//            workingText.setText(item.getWorkingStatus());
+//            statusText.setText(item.getStatus());
+
+            // 安全地处理pack和params
+            if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
+                if(pack.getStatus().get(0) == 1)
+                    workingText.setText("工作中");
+                else
+                    workingText.setText("已关机");
+                switch (type) {
+                    case "light" :
+                        float bright = pack.getParams().get(0);
+                        statusText.setText("亮度: "+bright+"%");
+                        break;
+                    case "air_conditioner" :
+                        float temp = pack.getParams().get(0);
+                        statusText.setText("温度: "+temp+"℃");
+                        break;
+                    default:
+                        statusText.setText(status);
+                        break;
+                }
+            }
 
             timeText.setText(item.getTime());
         }
     }
 
     public void updateData(List<FurnitureItem> newFurnitureList) {
-        this.furnitureList = newFurnitureList;
+        this.furnitureList = newFurnitureList != null ? newFurnitureList : new ArrayList<>();
         notifyDataSetChanged();
     }
 }
