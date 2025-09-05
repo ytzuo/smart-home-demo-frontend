@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
 import com.SmartHome.SmartHomeDemo.R;
 
 import java.util.List;
@@ -75,18 +76,26 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             // 安全地处理pack和params
             if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
-                if(pack.getStatus().get(0) == 1)
+                if(pack.getStatus().get(0) == 1){
                     workingText.setText("工作中");
-                else
+                } else{
                     workingText.setText("已关机");
+                }
+
                 switch (type) {
                     case "light" :
                         float bright = pack.getParams().get(0);
                         statusText.setText("亮度: "+bright+"%");
+                        if(pack.getStatus().get(0) == 1){
+                            itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.WARN_text));
+                        }
                         break;
                     case "air_conditioner" :
                         float temp = pack.getParams().get(0);
                         statusText.setText("温度: "+temp+"℃");
+                        if(pack.getStatus().get(0) == 1){
+                            itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.blue));
+                        }
                         break;
                     default:
                         statusText.setText(status);

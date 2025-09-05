@@ -28,7 +28,7 @@ public class HomeViewModel extends AndroidViewModel {
         super(application);
         furnitureList = new ArrayList<>();
         furnitureListLiveData = new MutableLiveData<>(furnitureList);
-//
+
 //        //初始化测试数据
 //        furnitureList.add(new FurnitureItem(
 //                "智能灯具1", "light", "工作中", "开启", "今天 14:30", R.drawable.icon_light,
@@ -101,10 +101,11 @@ public class HomeViewModel extends AndroidViewModel {
 
             for(Device device : devices) {
                 int icon = R.drawable.icon_air_conditioner;
-                if(Objects.equals(device.getDeviceType(), "light"))
+                if(Objects.equals(device.getDeviceType(), "light")){
                     icon = R.drawable.icon_light;
-                else if (Objects.equals(device.getDeviceType(), "air_conditioner"))
+                } else if (Objects.equals(device.getDeviceType(), "air_conditioner")){
                     icon = R.drawable.icon_air_conditioner;
+                }
                 FurnitureItem item = new FurnitureItem(
                         device.getDeviceId(),
                         device.getDeviceType(),

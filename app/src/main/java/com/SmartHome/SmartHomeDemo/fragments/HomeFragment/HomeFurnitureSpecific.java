@@ -4,6 +4,7 @@
 
     import androidx.annotation.Nullable;
     import androidx.appcompat.app.AlertDialog;
+    import androidx.appcompat.widget.PopupMenu;
     import androidx.fragment.app.Fragment;
     import androidx.lifecycle.ViewModelProvider;
 
@@ -12,6 +13,7 @@
     import android.os.Bundle;
     import android.util.Log;
     import android.view.LayoutInflater;
+    import android.view.MenuItem;
     import android.view.View;
     import android.view.ViewGroup;
     import android.widget.*;
@@ -98,6 +100,9 @@
             temp = view.findViewById(R.id.Title);
             temp.setText(furnitureItem.getDeviceId());
 
+
+            ImageButton menuButton = view.findViewById(R.id.menu_button);
+            menuButton.setOnClickListener(v -> showPopupMenu(v));
 
             switch (furnitureItem.getDeviceType()) {
                 case "air_conditioner":
@@ -557,6 +562,25 @@
             }
         }
 
+        private void showPopupMenu(View view) {
+            PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+            popupMenu.getMenuInflater().inflate(R.menu.furniture_specific_settings, popupMenu.getMenu());
+
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    if (item.getItemId() == R.id.action_unbind) {
+                        // 显示解绑确认对话框
+                        showUnbindDialog(null, getView());
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            popupMenu.show();
+        }
+
         private void handleSwitchChange(CompoundButton switchView, boolean isChecked) {
             // 处理开关状态变化
             String switchName = getResources().getResourceEntryName(switchView.getId());
@@ -792,11 +816,11 @@
             TextView deviceTypeText = dialogView.findViewById(R.id.unbind_device_type);
 
             if (deviceIdText != null) {
-                deviceIdText.setText(getString(R.string.device_id) + ": " + presence.deviceId);
+                deviceIdText.setText(getString(R.string.device_id) + ": " + furnitureItem.getDeviceId());
             }
 
             if (deviceTypeText != null) {
-                deviceTypeText.setText(getString(R.string.device_type) + ": " + presence.deviceType);
+                deviceTypeText.setText(getString(R.string.device_type) + ": " + furnitureItem.getDeviceType());
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());

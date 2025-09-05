@@ -40,12 +40,16 @@
             android:layout_gravity="center"
             android:gravity="center"/>
 
-        <View
-            android:id="@+id/btn_back2"
-            android:layout_width="50dp"
+        <!-- 三点菜单按钮 -->
+        <ImageButton
+            android:id="@+id/menu_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/transparent"
-            />
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_menu_overflow"
+            android:padding="12dp"
+            android:contentDescription="菜单" />
+
 
     </LinearLayout>
 
@@ -493,15 +497,6 @@
                     android:max="100" />
             </LinearLayout>
 
-
-            <Button
-                android:id="@+id/unbind_device"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/unbind_device"
-                android:backgroundTint="@color/Red_background"
-                android:onClick="unbind"/>
         </LinearLayout>
     </ScrollView>
 
