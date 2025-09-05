@@ -181,10 +181,16 @@ public class HomeFragment extends Fragment {
             Log.d("HomeFragment", "Category " + categories.get(i) + " has " + categorizedFurniture.get(i).size() + " items");
         }
 
-        // 通知适配器数据已更改
+        // 通知适配器数据已更改，使用post方法避免生命周期冲突
         if (viewPagerAdapter != null) {
-            viewPagerAdapter.updateData(categories, categorizedFurniture);
-            Log.d("HomeFragment", "Notified adapter of data change");
+            if (viewPager2 != null) {
+                viewPager2.post(() -> {
+                    if (viewPagerAdapter != null) {
+                        viewPagerAdapter.updateData(categories, categorizedFurniture);
+                        Log.d("HomeFragment", "Notified adapter of data change");
+                    }
+                });
+            }
         }
     }
 

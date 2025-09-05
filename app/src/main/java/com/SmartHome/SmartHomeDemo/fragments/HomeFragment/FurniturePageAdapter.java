@@ -16,6 +16,14 @@ import java.util.List;
 
 public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdapter.ViewHolder> {
     private List<FurnitureItem> furnitureList;
+    private OnItemClickLitener onItemClickLitener;
+    public interface OnItemClickLitener {
+        void onItemClick(FurnitureItem item);
+    }
+
+    public void setOnItemClickLitener(OnItemClickLitener onItemClickLitener) {
+        this.onItemClickLitener = onItemClickLitener;
+    }
 
     // 构造函数
     public FurniturePageAdapter(List<FurnitureItem> furnitureList) {
@@ -34,6 +42,13 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FurnitureItem item = furnitureList.get(position);
         holder.bind(item);
+
+        // 设置点击事件
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickLitener != null) {
+                onItemClickLitener.onItemClick(item);
+            }
+        });
     }
 
     @Override
@@ -65,26 +80,9 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
             itemImage.setImageResource(item.getImageResource());
             nameText.setText(item.getDeviceId());
 
-            // 安全地处理pack和params
-            if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
-                if(pack.getStatus().get(0) == 1)
-                    workingText.setText("工作中");
-                else
-                    workingText.setText("已关机");
-                switch (type) {
-                    case "light" :
-                        float bright = pack.getParams().get(0);
-                        statusText.setText("亮度: "+bright+"%");
-                        break;
-                    case "air_conditioner" :
-                        float temp = pack.getParams().get(0);
-                        statusText.setText("温度: "+temp+"℃");
-                        break;
-                    default:
-                        statusText.setText(status);
-                        break;
-                }
-            }
+            // 使用FurnitureItem中的状态信息而不是直接访问pack
+            workingText.setText(item.getWorkingStatus());
+            statusText.setText(item.getStatus());
 
             timeText.setText(item.getTime());
         }

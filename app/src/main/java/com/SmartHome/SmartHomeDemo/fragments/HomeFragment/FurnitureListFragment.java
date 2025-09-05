@@ -1,6 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,18 +51,55 @@ public class FurnitureListFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // 检查是否有更新的数据
+        if (getArguments() != null && getArguments().containsKey("updated_list")) {
+            furnitureList = (List<FurnitureItem>) getArguments().getSerializable("updated_list");
+            getArguments().remove("updated_list"); // 移除已使用的数据
+        }
         adapter = new FurniturePageAdapter(furnitureList);
+
+        // 设置点击事件监听器
+        adapter.setOnItemClickLitener(new FurniturePageAdapter.OnItemClickLitener() {
+            @Override
+            public void onItemClick(FurnitureItem item) {
+                Log.i("FurnitureListFragment", "onItemClick");
+                // 使用FragmentTransaction显示HomeFurnitureSpecific Fragment
+                HomeFurnitureSpecific fragment = new HomeFurnitureSpecific();
+
+                // 传递参数
+                Bundle args = new Bundle();
+                args.putSerializable("furniture_item", item);
+                fragment.setArguments(args);
+
+                // 使用FragmentTransaction显示Fragment
+                if (getActivity() != null) {
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         return view;
     }
 
     // 添加更新数据的方法
+    // 添加更新数据的方法
     public void updateFurnitureList(List<FurnitureItem> newList) {
         if (newList != null) {
             this.furnitureList = newList;
             if (adapter != null) {
                 adapter.updateData(furnitureList);
+            } else {
+                // 如果adapter为null，说明Fragment还没有创建视图，保存数据以便在onCreateView中使用
+                if (getArguments() == null) {
+                    setArguments(new Bundle());
+                }
+                getArguments().putSerializable("updated_list", (ArrayList<FurnitureItem>) newList);
             }
         }
     }
