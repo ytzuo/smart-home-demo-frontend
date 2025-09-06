@@ -15,4 +15,6 @@
     <color name="blue">#2196F3</color>
     <color name="card_background_light">#FFFFFF</color>
     <color name="card_background_dark">#1E1E1E</color>
+    <!-- 添加较浅的紫色 -->
+    <color name="light_purple">#CE93D8</color>
 </resources>

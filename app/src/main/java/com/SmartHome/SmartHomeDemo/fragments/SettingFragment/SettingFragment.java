@@ -1,6 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.SettingFragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,8 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
@@ -130,5 +136,64 @@ public class SettingFragment extends Fragment {
                 }
             });
         }
+    }
+    // 在 Fragment 或 Activity 中添加以下代码
+    private void setupDoubleClickToEdit(TextView textView) {
+        textView.setOnClickListener(new View.OnClickListener() {
+            private long lastClickTime = 0;
+            private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 双击时间间隔阈值（毫秒）
+
+            @Override
+            public void onClick(View v) {
+                long clickTime = System.currentTimeMillis();
+                if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                    // 双击事件处理
+                    enableEditMode(textView);
+                    lastClickTime = 0; // 重置时间，避免连续点击触发多次
+                } else {
+                    lastClickTime = clickTime;
+                }
+            }
+        });
+    }
+
+    private void enableEditMode(TextView textView) {
+        // 创建一个 EditText 对话框或替换 TextView 为 EditText
+        final EditText editText = new EditText(this.getContext());
+        editText.setText(textView.getText());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setTitle("修改情景模式名称");
+        builder.setView(editText);
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = editText.getText().toString();
+                if (!newName.isEmpty()) {
+                    textView.setText(newName);
+                }
+            }
+        });
+
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    // 在 onViewCreated 或 onCreate 方法中调用
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // 为三个情景模式名称 TextView 设置双击编辑功能
+        TextView sceneMode1Name = view.findViewById(R.id.scene_mode_1_name);
+        TextView sceneMode2Name = view.findViewById(R.id.scene_mode_2_name);
+        TextView sceneMode3Name = view.findViewById(R.id.scene_mode_3_name);
+
+        setupDoubleClickToEdit(sceneMode1Name);
+        setupDoubleClickToEdit(sceneMode2Name);
+        setupDoubleClickToEdit(sceneMode3Name);
+
+        // 其他初始化代码...
     }
 }
