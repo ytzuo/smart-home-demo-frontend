@@ -19,10 +19,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
+import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingFragment extends Fragment {
     private String TAG = "SettingFragment";
@@ -49,14 +59,26 @@ public class SettingFragment extends Fragment {
     private static final String SCENE_MODE_1_KEY = "scene_mode_1_name";
     private static final String SCENE_MODE_2_KEY = "scene_mode_2_name";
     private static final String SCENE_MODE_3_KEY = "scene_mode_3_name";
-//    // 情景模式开关状态的键名
-//    private static final String SCENE_MODE_1_SWITCH_KEY = "scene_mode_1_switch";
-//    private static final String SCENE_MODE_2_SWITCH_KEY = "scene_mode_2_switch";
-//    private static final String SCENE_MODE_3_SWITCH_KEY = "scene_mode_3_switch";
+    // 情景模式设备选择的键名
+    private static final String SCENE_MODE_1_DEVICES_KEY = "scene_mode_1_devices";
+    private static final String SCENE_MODE_2_DEVICES_KEY = "scene_mode_2_devices";
+    private static final String SCENE_MODE_3_DEVICES_KEY = "scene_mode_3_devices";
+
+    private AppDatabase database;
 
 
     public SettingFragment(){}
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // 获取数据库实例
+        if (getActivity() != null) {
+            SmartHomeApplication app = (SmartHomeApplication) getActivity().getApplication();
+            database = app.getDatabase();
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -225,6 +247,85 @@ public class SettingFragment extends Fragment {
         sceneMode3Name.setText(prefs.getString(SCENE_MODE_3_KEY, "情景模式3"));
     }
 
+    private void showSceneModeCustomizeDialog(String sceneModeName, String sceneModeKey) {
+        // 创建自定义对话框
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.window_scenemode_customize, null);
+        builder.setView(dialogView);
+
+        // 设置情景模式名称
+        TextView titleText = dialogView.findViewById(R.id.scene_mode_name);
+        titleText.setText(sceneModeName);
+
+        // 初始化设备列表
+        RecyclerView deviceRecyclerView = dialogView.findViewById(R.id.customize_device_recyclerView);
+        deviceRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        // 设置按钮点击事件
+        Button cancelButton = dialogView.findViewById(R.id.customize_cancel);
+        Button doneButton = dialogView.findViewById(R.id.customize_done);
+
+        AlertDialog dialog = builder.create();
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        // 先显示对话框
+        dialog.show();
+
+        // 显示加载进度指示
+        TextView loadingText = new TextView(requireContext());
+        loadingText.setText("正在加载设备列表...");
+        loadingText.setPadding(16, 16, 16, 16);
+        deviceRecyclerView.setAdapter(new RecyclerView.Adapter() {
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return new RecyclerView.ViewHolder(loadingText) {};
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                // 不需要实现
+            }
+
+            @Override
+            public int getItemCount() {
+                return 1;
+            }
+        });
+
+        // 在后台线程中获取设备列表
+        if (database != null) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                // 在后台线程中查询数据库
+                List<Device> deviceList = getDevicesFromDatabase();
+
+                // 切换到主线程更新UI
+                requireActivity().runOnUiThread(() -> {
+                    SceneModeFurnitureAdapter adapter = new SceneModeFurnitureAdapter(requireContext(), deviceList, sceneModeKey);
+                    deviceRecyclerView.setAdapter(adapter);
+
+                    doneButton.setOnClickListener(v -> {
+                        // 保存选中的设备
+                        adapter.saveSelectedDevices();
+                        dialog.dismiss();
+                    });
+                });
+            });
+        } else {
+            // 如果数据库不可用，使用示例数据
+            List<Device> deviceList = createSampleDeviceList();
+            SceneModeFurnitureAdapter adapter = new SceneModeFurnitureAdapter(requireContext(), deviceList, sceneModeKey);
+            deviceRecyclerView.setAdapter(adapter);
+
+            doneButton.setOnClickListener(v -> {
+                // 保存选中的设备
+                adapter.saveSelectedDevices();
+                dialog.dismiss();
+            });
+        }
+    }
     // 情景模式1开关状态变化处理接口
     private void onSceneMode1SwitchChanged(boolean isChecked) {
         // TODO: 在这里处理情景模式1开关状态变化
@@ -247,13 +348,13 @@ public class SettingFragment extends Fragment {
     }
 
     private void onSceneMode1Customize() {
-        // TODO: 在这里写点击情景模式1自定义按钮的逻辑
+        showSceneModeCustomizeDialog("情景模式1", SCENE_MODE_1_DEVICES_KEY);
     }
     private void onSceneMode2Customize() {
-        // TODO: 在这里写点击情景模式2自定义按钮的逻辑
+        showSceneModeCustomizeDialog("情景模式2", SCENE_MODE_2_DEVICES_KEY);
     }
     private void onSceneMode3Customize() {
-        // TODO: 在这里写点击情景模式3自定义按钮的逻辑
+        showSceneModeCustomizeDialog("情景模式3", SCENE_MODE_3_DEVICES_KEY);
     }
     // 在 onViewCreated 或 onCreate 方法中调用
     @Override
@@ -332,5 +433,44 @@ public class SettingFragment extends Fragment {
         restoreSceneModeNames();
 
         // 其他初始化代码...
+    }
+
+    // 从数据库获取设备列表
+    private List<Device> getDevicesFromDatabase() {
+        List<Device> deviceList = new ArrayList<>();
+
+        if (database != null) {
+            // 在后台线程中查询数据库
+            List<Device> devices = database.deviceDao().getAllDevices();
+
+            // 筛选出家具类型的设备（light和air_conditioner）
+            for (Device device : devices) {
+                if ("light".equals(device.getDeviceType()) || "air_conditioner".equals(device.getDeviceType())) {
+                    deviceList.add(device);
+                }
+            }
+        }
+
+        // 如果数据库不可用或没有设备，返回示例数据
+        if (deviceList.isEmpty()) {
+            deviceList = createSampleDeviceList();
+        }
+
+        return deviceList;
+    }
+    // 创建示例设备列表用于演示
+    private List<Device> createSampleDeviceList() {
+        List<Device> deviceList = new ArrayList<>();
+
+        // 在实际应用中，这些数据应该从主活动中获取
+        // 这里只是创建一些示例数据用于演示
+        for (int i = 1; i <= 5; i++) {
+            Device device = new Device();
+            device.setDeviceId("设备" + i);
+            device.setDeviceType(i % 2 == 0 ? "light" : "air_conditioner");
+            deviceList.add(device);
+        }
+
+        return deviceList;
     }
 }
