@@ -25,6 +25,9 @@ public class FurnitureItem implements Serializable {
     public FurnitureDataPack getFurnitureDataPack() {
         return furnitureDataPack;
     }
+    public void setFurnitureDataPack(FurnitureDataPack dp) {
+        this.furnitureDataPack = dp;
+    }
 
     private FurnitureDataPack furnitureDataPack;
 
