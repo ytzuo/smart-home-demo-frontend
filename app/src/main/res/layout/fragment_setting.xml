@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical"
-                android:background="@drawable/param_background"
+                android:background="@drawable/rounded_border"
                 android:padding="10dp">
 
                 <LinearLayout
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical"
-                android:background="@drawable/param_background"
+                android:background="@drawable/rounded_border"
                 android:padding="10dp">
 
                 <LinearLayout
@@ -184,7 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:orientation="vertical"
-                android:background="@drawable/param_background"
+                android:background="@drawable/rounded_border"
                 android:padding="10dp">
 
                 <LinearLayout

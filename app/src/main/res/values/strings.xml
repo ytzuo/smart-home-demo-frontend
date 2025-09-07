@@ -46,4 +46,6 @@
     <string name="alert_message">报警信息：</string>
     <string name="alert_label">设备报警！</string>
     <string name="confirm">确定</string>
+    <string name="scene_mode_name">默认情景模式</string>
+    <string name="scene_mode_select">为本情景选择家具</string>
 </resources>
