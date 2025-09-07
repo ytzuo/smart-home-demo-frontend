@@ -21,12 +21,15 @@
     import com.SmartHome.SmartHomeDemo.MainActivity;
     import com.SmartHome.SmartHomeDemo.R;
     import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+    import com.SmartHome.SmartHomeDemo.database.AppDatabase;
     import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
     import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
     import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
     import com.google.android.material.button.MaterialButton;
 
     import java.time.LocalDateTime;
+    import java.util.ArrayList;
+    import java.util.List;
 
     import idl.SmartDemo03.Presence;
 
@@ -826,8 +829,42 @@
             // 设置按钮点击事件
             if (dialogView.findViewById(R.id.unbind_done) != null) {
                 dialogView.findViewById(R.id.unbind_done).setOnClickListener(v -> {
-                    //TODO 用户点击确认，将设备从数据库删除
-                    dialog.dismiss();
+                    // 用户点击确认，将设备从数据库删除
+                    SmartHomeApplication app = (SmartHomeApplication) requireActivity().getApplication();
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        // 从数据库中删除设备
+                        app.getDatabase().deviceDao().deleteByDeviceId(furnitureItem.getDeviceId());
+
+                        // 从UI中删除设备
+                        if (getActivity() instanceof MainActivity) {
+                            MainActivity mainActivity = (MainActivity) getActivity();
+                            HomeFragment homeFragment = mainActivity.getCurrentHomeFragment();
+                            if (homeFragment != null) {
+                                HomeViewModel viewModel = homeFragment.getHomeViewModel();
+                                if (viewModel != null) {
+                                    // 在主线程中更新UI
+                                    requireActivity().runOnUiThread(() -> {
+                                        // 创建新的列表，移除当前设备
+                                        List<FurnitureItem> currentList = viewModel.getFurnitureLiveData().getValue();
+                                        List<FurnitureItem> newList = new ArrayList<>();
+                                        for (FurnitureItem item : currentList) {
+                                            if (!item.getDeviceId().equals(furnitureItem.getDeviceId())) {
+                                                newList.add(item);
+                                            }
+                                        }
+                                        // 使用ViewModel的公共方法更新数据
+                                        viewModel.updateFurnitureList(newList);
+                                    });
+                                }
+                            }
+                        }
+
+                        // 在主线程中关闭对话框并返回上一个fragment
+                        requireActivity().runOnUiThread(() -> {
+                            dialog.dismiss();
+                            requireActivity().getSupportFragmentManager().popBackStack();
+                        });
+                    });
                 });
             }
 

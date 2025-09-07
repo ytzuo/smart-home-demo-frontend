@@ -28,6 +28,9 @@ public interface DeviceDao {
     @Query("DELETE FROM devices")
     void deleteAll();
 
+    @Query("DELETE FROM devices WHERE device_id = :deviceId")
+    void deleteByDeviceId(String deviceId);
+
     @Query("UPDATE devices SET device_group = :newGroup WHERE device_group = :oldGroup")
     void updateGroup(String oldGroup, String newGroup);
 
