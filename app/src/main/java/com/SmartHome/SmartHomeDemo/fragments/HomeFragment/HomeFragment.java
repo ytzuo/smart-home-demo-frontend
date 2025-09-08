@@ -1,14 +1,19 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
@@ -16,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
+import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 import com.google.android.material.tabs.TabLayout;
@@ -35,6 +41,11 @@ import idl.SmartDemo03.HomeStatus;
 
 public class HomeFragment extends Fragment {
     public HomeFragment(){}
+    // SharedPreferences的键名
+    private static final String GROUP_PREFS_NAME = "GroupNames";
+    private static final String GROUP_1_KEY = "group_1_name";
+    private static final String GROUP_2_KEY = "group_2_name";
+    private static final String GROUP_3_KEY = "group_3_name";
     private ViewPager2 viewPager2;
     private TabLayout tabLayout;
     private FurnitureViewPagerAdapter viewPagerAdapter;
@@ -76,6 +87,9 @@ public class HomeFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager2,
                 (tab, position) -> tab.setText(viewPagerAdapter.getPageTitle(position))
         ).attach();
+
+        // 为TabLayout中的标签设置双击编辑功能
+        setupTabDoubleClickEdit();
 
         //测试用按钮, 用于清空数据库
         test_btn = view.findViewById(R.id.btn_test_del_all);
@@ -152,6 +166,18 @@ public class HomeFragment extends Fragment {
         // 将家具项按组分类到对应的分组
         if (furnitureItems != null) {
             for (FurnitureItem item : furnitureItems) {
+                String type = item.getDeviceType();
+                switch (type) {
+                    case "light" :
+                        item.setImageResource(R.drawable.icon_light);
+                        break;
+                    case "air_conditioner" :
+                        item.setImageResource(R.drawable.icon_air_conditioner);
+                        break;
+                    case "ac" :
+                        item.setImageResource(R.drawable.icon_air_conditioner);
+                        break;
+                }
                 String itemGroup = item.getDeviceGroup();
                 Log.d("HomeFragment", "Processing item: " + item.getDeviceId() + " with group: " + itemGroup);
 
@@ -166,11 +192,14 @@ public class HomeFragment extends Fragment {
                     categorizedFurniture.get(categoryIndex).add(item);
                     Log.d("HomeFragment", "Added item to category: " + categories.get(categoryIndex));
                 } else {
-                    // 如果没有找到分组或者分组为空，默认添加到默认分组1
-                    int defaultGroupIndex = categories.indexOf("默认分组1");
+                    // 如果没有找到分组或者分组为空，默认添加到第一个默认分组
+                    // 从SharedPreferences获取第一个默认分组的名称
+                    SharedPreferences prefs = getActivity().getSharedPreferences(GROUP_PREFS_NAME, Context.MODE_PRIVATE);
+                    String firstGroupName = prefs.getString(GROUP_1_KEY, "默认分组1");
+                    int defaultGroupIndex = categories.indexOf(firstGroupName);
                     if (defaultGroupIndex >= 0 && defaultGroupIndex < categorizedFurniture.size()) {
                         categorizedFurniture.get(defaultGroupIndex).add(item);
-                        Log.d("HomeFragment", "Added item to default group: 默认分组1");
+                        Log.d("HomeFragment", "Added item to default group: " + firstGroupName);
                     }
                 }
             }
@@ -210,15 +239,8 @@ public class HomeFragment extends Fragment {
                 Log.d("HomeFragment", "Added '全部' to beginning of categories");
             }
 
-            // 确保默认分组存在且在正确位置
-            if (categories.size() < 2) categories.add("默认分组1");
-            else categories.set(1, "默认分组1");
-
-            if (categories.size() < 3) categories.add("默认分组2");
-            else categories.set(2, "默认分组2");
-
-            if (categories.size() < 4) categories.add("默认分组3");
-            else categories.set(3, "默认分组3");
+            // 确保默认分组存在且在正确位置，并从SharedPreferences恢复名称
+            restoreGroupNames();
 
             Log.d("HomeFragment", "Ensured default categories are in place");
         }
@@ -229,6 +251,7 @@ public class HomeFragment extends Fragment {
     // 添加更新HomeStatus的方法
     public void handleHomeStatus(HomeStatus homeStatus) {
         if (homeViewModel != null) {
+            Log.i("HomeFragment", "handleHomeStatus");
             // 在后台线程中处理数据库操作
             Executors.newSingleThreadExecutor().execute(() -> {
                 try {
@@ -370,6 +393,115 @@ public class HomeFragment extends Fragment {
         }
         if(test_btn != null) {
             test_btn.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setupTabDoubleClickEdit() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // 不需要实现
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // 不需要实现
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // 当重新选择标签时（可以视为双击），启用编辑模式
+                int position = tab.getPosition();
+                // 只有默认分组（位置1, 2, 3）可以编辑
+                if (position >= 1 && position <= 3) {
+                    enableGroupEditMode(position);
+                }
+            }
+        });
+    }
+
+    private void enableGroupEditMode(final int position) {
+        // 保存修改前的分组名
+        final String oldGroupName = categories.get(position);
+        // 创建一个 EditText 对话框
+        final EditText editText = new EditText(this.getContext());
+        editText.setText(categories.get(position));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setTitle("修改分组名称");
+        builder.setView(editText);
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = editText.getText().toString();
+                if (!newName.isEmpty()) {
+                    // 更新UI
+                    categories.set(position, newName);
+                    // 通知适配器数据已更改
+                    if (viewPagerAdapter != null) {
+                        viewPagerAdapter.notifyDataSetChanged();
+                    }
+                    // 保存到SharedPreferences
+                    saveGroupName(position, newName);
+                    // 更新数据库中对应设备的分组名
+                    updateDeviceGroupInDatabase(oldGroupName, newName);
+                }
+            }
+        });
+
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+    // 保存分组名称到SharedPreferences
+    private void saveGroupName(int position, String name) {
+        SharedPreferences prefs = getActivity().getSharedPreferences(GROUP_PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        String key = "";
+        switch (position) {
+            case 1:
+                key = GROUP_1_KEY;
+                break;
+            case 2:
+                key = GROUP_2_KEY;
+                break;
+            case 3:
+                key = GROUP_3_KEY;
+                break;
+        }
+        if (!key.isEmpty()) {
+            editor.putString(key, name);
+            editor.apply();
+        }
+    }
+
+    // 从SharedPreferences恢复分组名称
+    private void restoreGroupNames() {
+        SharedPreferences prefs = getActivity().getSharedPreferences(GROUP_PREFS_NAME, Context.MODE_PRIVATE);
+        // 恢复默认分组名称，如果没有保存的名称则使用默认值
+        if (categories.size() > 1) {
+            categories.set(1, prefs.getString(GROUP_1_KEY, "默认分组1"));
+        }
+        if (categories.size() > 2) {
+            categories.set(2, prefs.getString(GROUP_2_KEY, "默认分组2"));
+        }
+        if (categories.size() > 3) {
+            categories.set(3, prefs.getString(GROUP_3_KEY, "默认分组3"));
+        }
+    }
+
+    private void updateDeviceGroupInDatabase(String oldGroupName, String newGroupName) {
+        if (app != null && app.getDatabase() != null) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                try {
+                    // 更新数据库中所有属于旧分组名的设备
+                    app.getDatabase().deviceDao().updateGroup(oldGroupName, newGroupName);
+
+                    Log.i("HomeFragment", "已更新数据库中分组名: " + oldGroupName + " -> " + newGroupName);
+                } catch (Exception e) {
+                    Log.e("HomeFragment", "更新数据库分组名时出错", e);
+                }
+            });
         }
     }
 }

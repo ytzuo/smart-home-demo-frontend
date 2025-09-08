@@ -117,6 +117,8 @@ public class HomeViewModel extends AndroidViewModel {
                         "00000000",
                         0
                 );
+                // 添加设备分组信息
+                item.setDeviceGroup(device.getDeviceGroup());
                 FurnitureItems.add(item);
             }
             furnitureListLiveData.postValue(FurnitureItems);
