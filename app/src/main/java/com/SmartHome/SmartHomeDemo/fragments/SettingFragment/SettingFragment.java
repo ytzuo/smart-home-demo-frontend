@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import idl.SmartDemo03.Command;
@@ -70,9 +73,9 @@ public class SettingFragment extends Fragment {
     private static final String SCENE_MODE_2_DEVICES_KEY = "scene_mode_2_devices";
     private static final String SCENE_MODE_3_DEVICES_KEY = "scene_mode_3_devices";
     // 新增：情景模式设备类型选择的键名
-    private static final String SCENE_MODE_1_DEVICE_TYPES_KEY = "scene_mode_1_device_types";
-    private static final String SCENE_MODE_2_DEVICE_TYPES_KEY = "scene_mode_2_device_types";
-    private static final String SCENE_MODE_3_DEVICE_TYPES_KEY = "scene_mode_3_device_types";
+    private static final String SCENE_MODE_1_DEVICE_TYPES_KEY = "scene_mode_1_devices_types";
+    private static final String SCENE_MODE_2_DEVICE_TYPES_KEY = "scene_mode_2_devices_types";
+    private static final String SCENE_MODE_3_DEVICE_TYPES_KEY = "scene_mode_3_devices_types";
 
 
     private AppDatabase database;
@@ -353,70 +356,93 @@ public class SettingFragment extends Fragment {
     // 情景模式1开关状态变化处理接口
     private void onSceneMode1SwitchChanged(boolean isChecked) {
         Log.i(TAG, "SceneMode1SwitchChanged " + isChecked);
+        List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_1_DEVICES_KEY);
+        List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_1_DEVICE_TYPES_KEY);
+        Log.i(TAG, "情景模式1选中的设备ID: " + selectedDeviceIds);
+        Log.i(TAG, "情景模式1选中的设备类型: " + selectedDeviceTypes);
+        int len = selectedDeviceIds.size();
         // 例如：发送指令到设备、更新UI等
-        if (isChecked) {
-            // TODO: 在这里处理情景模式1开启
-            // 获取情景模式1中选中的设备ID列表
-            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_1_DEVICES_KEY);
-            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_1_DEVICE_TYPES_KEY);
-            int len = selectedDeviceIds.size();
-            for(int i = 0; i < len; i++) {
-                Command command    = new Command();
-                command.deviceId   = selectedDeviceIds.get(i);
-                command.deviceType = selectedDeviceTypes.get(i);
-                //if(command.deviceType)
-            }
-            Log.i(TAG, "情景模式1选中的设备ID: " + selectedDeviceIds);
-            Log.i(TAG, "情景模式1选中的设备类型: " + selectedDeviceTypes);
-        } else {
-            //TODO: 在这里处理情景模式1关闭
+        // 使用Handler实现延迟发送命令
+        Handler handler = new Handler(Looper.getMainLooper());
+        for(int i = 0; i < selectedDeviceIds.size(); i++) {
+            final int index = i;
+            handler.postDelayed(() -> {
+                Command command = new Command();
+                command.deviceId = selectedDeviceIds.get(index);
+                command.deviceType = selectedDeviceTypes.get(index);
+                command.action = "switch_" + command.deviceId + (isChecked ? "_on" : "_off");
+                commandDdsManager.sendCommand(command);
+            }, i * 100); // 每个命令间隔100毫秒
         }
     }
 
     // 情景模式2开关状态变化处理接口
     private void onSceneMode2SwitchChanged(boolean isChecked) {
         Log.i(TAG, "SceneMode2SwitchChanged " + isChecked);
+        List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_2_DEVICES_KEY);
+        List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_2_DEVICE_TYPES_KEY);
+        Log.i(TAG, "情景模式2选中的设备ID: " + selectedDeviceIds);
+        Log.i(TAG, "情景模式2选中的设备类型: " + selectedDeviceTypes);
+        int len = selectedDeviceIds.size();
         // 例如：发送指令到设备、更新UI等
-        if (isChecked) {
-            // TODO: 在这里处理情景模式2开启
-            // 获取情景模式2中选中的设备ID列表
-            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_2_DEVICES_KEY);
-            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_2_DEVICE_TYPES_KEY);
-            Log.i(TAG, "情景模式2选中的设备ID: " + selectedDeviceIds);
-            Log.i(TAG, "情景模式2选中的设备类型: " + selectedDeviceTypes);
-        } else {
-            // TODO: 在这里处理情景模式2关闭
+        // 使用Handler实现延迟发送命令
+        Handler handler = new Handler(Looper.getMainLooper());
+        for(int i = 0; i < selectedDeviceIds.size(); i++) {
+            final int index = i;
+            handler.postDelayed(() -> {
+                Command command = new Command();
+                command.deviceId = selectedDeviceIds.get(index);
+                command.deviceType = selectedDeviceTypes.get(index);
+                command.action = "switch_" + command.deviceId + (isChecked ? "_on" : "_off");
+                commandDdsManager.sendCommand(command);
+            }, i * 100); // 每个命令间隔100毫秒
         }
     }
 
     // 情景模式3开关状态变化处理接口
     private void onSceneMode3SwitchChanged(boolean isChecked) {
         Log.i(TAG, "SceneMode3SwitchChanged " + isChecked);
+        List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_3_DEVICES_KEY);
+        List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_3_DEVICE_TYPES_KEY);
+        Log.i(TAG, "情景模式3选中的设备ID: " + selectedDeviceIds);
+        Log.i(TAG, "情景模式3选中的设备类型: " + selectedDeviceTypes);
+        int len = selectedDeviceIds.size();
         // 例如：发送指令到设备、更新UI等
-        if (isChecked) {
-            // TODO: 在这里处理情景模式3开启
-            // 获取情景模式3中选中的设备ID列表
-            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_3_DEVICES_KEY);
-            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_3_DEVICE_TYPES_KEY);
-            Log.i(TAG, "情景模式3选中的设备ID: " + selectedDeviceIds);
-            Log.i(TAG, "情景模式3选中的设备类型: " + selectedDeviceTypes);
-        } else {
-            // TODO: 在这里处理情景模式3关闭
+        // 使用Handler实现延迟发送命令
+        Handler handler = new Handler(Looper.getMainLooper());
+        for(int i = 0; i < selectedDeviceIds.size(); i++) {
+            final int index = i;
+            handler.postDelayed(() -> {
+                Command command = new Command();
+                command.deviceId = selectedDeviceIds.get(index);
+                command.deviceType = selectedDeviceTypes.get(index);
+                command.action = "switch_" + command.deviceId + (isChecked ? "_on" : "_off");
+                commandDdsManager.sendCommand(command);
+            }, i * 100); // 每个命令间隔100毫秒
         }
     }
 
     // 根据情景模式键名获取选中的设备ID集合
     private List<String> getSelectedDevicesForSceneMode(String sceneModeKey) {
         SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
-        String IdsString = prefs.getString(sceneModeKey, "");
-        List<String> IdList = new ArrayList<>();
-        if(!IdList.isEmpty()) {
-            String[] IdsArray = IdsString.split(",");
-            IdList = new ArrayList<>(Arrays.asList(IdsArray));
+        List<String> idList = new ArrayList<>();
+
+        // 先尝试以字符串形式读取（新格式）
+        String idsString = prefs.getString(sceneModeKey, "");
+        if (!idsString.isEmpty()) {
+            String[] idsArray = idsString.split(",");
+            idList = new ArrayList<>(Arrays.asList(idsArray));
+        } else {
+            // 如果没有字符串格式的数据，尝试以Set形式读取（旧格式）
+            Set<String> idSet = prefs.getStringSet(sceneModeKey, new HashSet<>());
+            idList = new ArrayList<>(idSet);
         }
-        return IdList;
+
+        // 移除空字符串
+        idList.removeIf(String::isEmpty);
+        return idList;
     }
-    // 新增：根据情景模式键名获取选中的设备类型列表
+    // 根据情景模式键名获取选中的设备类型列表
     private List<String> getSelectedDeviceTypesForSceneMode(String sceneModeTypesKey) {
         SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
         String typesString = prefs.getString(sceneModeTypesKey, "");
@@ -425,6 +451,7 @@ public class SettingFragment extends Fragment {
             String[] typesArray = typesString.split(",");
             typesList = new ArrayList<>(Arrays.asList(typesArray));
         }
+        typesList.removeIf(String::isEmpty);
         return typesList;
     }
 
@@ -558,7 +585,10 @@ public class SettingFragment extends Fragment {
     private void clearSceneModeDevices(String sceneModeKey) {
         SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet(sceneModeKey, new HashSet<>());
+        editor.putString(sceneModeKey, ""); // 清空设备ID列表
+        editor.putString(sceneModeKey + "_types", ""); // 清空设备类型列表
+        // 同时清除旧格式的数据
+        editor.remove(sceneModeKey);
         editor.apply();
     }
 }

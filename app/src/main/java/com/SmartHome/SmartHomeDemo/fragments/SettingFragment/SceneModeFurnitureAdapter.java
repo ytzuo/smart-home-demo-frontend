@@ -2,6 +2,7 @@ package com.SmartHome.SmartHomeDemo.fragments.SettingFragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,23 +16,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.database.Device;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFurnitureAdapter.ViewHolder> {
     private List<Device> deviceList;
-    private Set<String> selectedDeviceIds;
+    private List<String> selectedDeviceIds;  // 修改：使用List而不是Set
+    private List<String> selectedDeviceTypes; // 保持：存储选中设备的类型
     private String sceneModeKey;
     private Context context;
-    private List<String> selectedDeviceTypes; // 新增：存储选中设备的类型
+
+    // 设备类型存储的键名
     private static final String SCENE_MODE_DEVICE_TYPES_SUFFIX = "_types";
 
     public SceneModeFurnitureAdapter(Context context, List<Device> deviceList, String sceneModeKey) {
         this.context = context;
         this.deviceList = deviceList;
         this.sceneModeKey = sceneModeKey;
-        this.selectedDeviceIds = new HashSet<>();
+        this.selectedDeviceIds = new ArrayList<>();  // 修改：初始化为ArrayList
+        this.selectedDeviceTypes = new ArrayList<>(); // 初始化设备类型列表
 
         // 从SharedPreferences加载已选中的设备
         loadSelectedDevices();
@@ -56,26 +61,40 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
         return deviceList.size();
     }
 
-    public Set<String> getSelectedDeviceIds() {
-        return selectedDeviceIds;
+    public List<String> getSelectedDeviceIds() {  // 修改：返回List而不是Set
+        return new ArrayList<>(selectedDeviceIds);
     }
 
     public void saveSelectedDevices() {
+        Log.i(sceneModeKey, selectedDeviceIds.toString());
         SharedPreferences prefs = context.getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
-        // 将选中的设备ID集合转换为字符串集合进行存储
-        Set<String> selectedIds = new HashSet<>(selectedDeviceIds);
-        editor.putStringSet(sceneModeKey, selectedIds);
-        // 将设备类型列表转换为字符串集合进行存储
+        // 修改：将选中的设备ID列表转换为逗号分隔的字符串进行存储
+        editor.putString(sceneModeKey, String.join(",", selectedDeviceIds));
+        Log.i(sceneModeKey, String.join(",", selectedDeviceIds));
+        // 保存选中设备的类型列表，与ID列表顺序一一对应
         editor.putString(sceneModeKey + SCENE_MODE_DEVICE_TYPES_SUFFIX, String.join(",", selectedDeviceTypes));
+        Log.i(sceneModeKey, String.join(",", selectedDeviceTypes));
         editor.apply();
     }
 
     private void loadSelectedDevices() {
         SharedPreferences prefs = context.getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
-        Set<String> savedIds = prefs.getStringSet(sceneModeKey, new HashSet<>());
-        selectedDeviceIds.addAll(savedIds);
+
+        // 加载设备ID列表（只使用新格式：逗号分隔的字符串）
+        selectedDeviceIds.clear();
+        String savedIdsString = prefs.getString(sceneModeKey, "");
+        if (!savedIdsString.isEmpty()) {
+            // 新格式：逗号分隔的字符串
+            String[] idsArray = savedIdsString.split(",");
+            for (String id : idsArray) {
+                if (!id.isEmpty()) {  // 避免添加空字符串
+                    selectedDeviceIds.add(id);
+                }
+            }
+        }
+        // 不再尝试读取旧的Set格式，完全使用字符串格式
 
         // 加载设备类型列表
         String savedTypesString = prefs.getString(sceneModeKey + SCENE_MODE_DEVICE_TYPES_SUFFIX, "");
@@ -83,15 +102,38 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
         if (!savedTypesString.isEmpty()) {
             String[] typesArray = savedTypesString.split(",");
             for (String type : typesArray) {
-                selectedDeviceTypes.add(type);
+                if (!type.isEmpty()) {  // 避免添加空字符串
+                    selectedDeviceTypes.add(type);
+                }
             }
         }
 
         // 确保ID和类型列表长度一致（数据完整性保护）
         if (selectedDeviceIds.size() != selectedDeviceTypes.size()) {
-            selectedDeviceTypes.clear();
-            for (int i = 0; i < selectedDeviceIds.size(); i++) {
-                selectedDeviceTypes.add(""); // 添加空字符串占位
+            // 如果长度不一致，以ID列表为准截断或补充类型列表
+            if (selectedDeviceTypes.size() > selectedDeviceIds.size()) {
+                // 截断类型列表
+                selectedDeviceTypes = new ArrayList<>(selectedDeviceTypes.subList(0, selectedDeviceIds.size()));
+            } else {
+                // 补充类型列表
+                while (selectedDeviceTypes.size() < selectedDeviceIds.size()) {
+                    selectedDeviceTypes.add("");
+                }
+            }
+        }
+
+
+        // 确保ID和类型列表长度一致（数据完整性保护）
+        if (selectedDeviceIds.size() != selectedDeviceTypes.size()) {
+            // 如果长度不一致，以ID列表为准截断或补充类型列表
+            if (selectedDeviceTypes.size() > selectedDeviceIds.size()) {
+                // 截断类型列表
+                selectedDeviceTypes = new ArrayList<>(selectedDeviceTypes.subList(0, selectedDeviceIds.size()));
+            } else {
+                // 补充类型列表
+                while (selectedDeviceTypes.size() < selectedDeviceIds.size()) {
+                    selectedDeviceTypes.add("");
+                }
             }
         }
     }
@@ -127,9 +169,19 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
             // 设置复选框点击事件
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    selectedDeviceIds.add(device.getDeviceId());
+                    // 修改：检查是否已存在，避免重复添加
+                    if (!selectedDeviceIds.contains(device.getDeviceId())) {
+                        selectedDeviceIds.add(device.getDeviceId());
+                        // 同时添加设备类型
+                        selectedDeviceTypes.add(device.getDeviceType());
+                    }
                 } else {
-                    selectedDeviceIds.remove(device.getDeviceId());
+                    // 修改：移除指定的设备ID和对应的设备类型
+                    int index = selectedDeviceIds.indexOf(device.getDeviceId());
+                    if (index != -1) {
+                        selectedDeviceIds.remove(index);
+                        selectedDeviceTypes.remove(index);
+                    }
                 }
             });
 
@@ -138,5 +190,10 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
                 checkBox.setChecked(!checkBox.isChecked());
             });
         }
+    }
+
+    // 获取选中的设备类型列表
+    public List<String> getSelectedDeviceTypes() {
+        return new ArrayList<>(selectedDeviceTypes);
     }
 }
