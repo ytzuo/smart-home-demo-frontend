@@ -370,6 +370,8 @@ public class SettingFragment extends Fragment {
                 Command command = new Command();
                 command.deviceId = selectedDeviceIds.get(index);
                 command.deviceType = selectedDeviceTypes.get(index);
+                if(selectedDeviceTypes.get(index).equals("air_conditioner"))
+                    command.deviceType = "ac";
                 command.action = "switch_" + command.deviceId + (isChecked ? "_on" : "_off");
                 commandDdsManager.sendCommand(command);
             }, i * 100); // 每个命令间隔100毫秒
