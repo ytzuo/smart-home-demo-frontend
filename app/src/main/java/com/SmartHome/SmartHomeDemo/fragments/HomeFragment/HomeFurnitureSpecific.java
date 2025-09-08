@@ -30,6 +30,7 @@
     import java.time.LocalDateTime;
     import java.util.ArrayList;
     import java.util.List;
+    import java.util.Objects;
 
     import idl.SmartDemo03.Presence;
 
@@ -117,7 +118,10 @@
 
             ImageButton menuButton = view.findViewById(R.id.menu_button);
             menuButton.setOnClickListener(v -> showPopupMenu(v));
-
+            Log.i(TAG, furnitureItem.getDeviceType());
+            if(Objects.equals(furnitureItem.getDeviceType(), "ac")){
+                furnitureItem.setDeviceType("air_conditioner");
+            }
             switch (furnitureItem.getDeviceType()) {
                 case "air_conditioner":
                     //设置图标

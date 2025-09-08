@@ -110,6 +110,15 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
                             itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
                         }
                         break;
+                    case "ac" :
+                        temp = pack.getParams().get(0);
+                        statusText.setText("温度: "+temp+"℃");
+                        if(pack.getStatus().get(0) == 1) {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.blue));
+                        } else {
+                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
+                        }
+                        break;
                     default:
                         statusText.setText(status);
                         break;

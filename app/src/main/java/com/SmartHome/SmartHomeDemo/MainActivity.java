@@ -60,7 +60,10 @@ import idl.SmartDemo03.VehicleStatus;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String GROUP_PREFS_NAME = "GroupNames";
+    private static final String GROUP_1_KEY = "group_1_name";
+    private static final String GROUP_2_KEY = "group_2_name";
+    private static final String GROUP_3_KEY = "group_3_name";
     private AppDatabase database;
     private SmartHomeApplication app;
     private CarFragment currentCarFragment;
@@ -274,10 +277,10 @@ public class MainActivity extends AppCompatActivity {
         List<String> groups = new ArrayList<>(Arrays.asList("默认分组1", "默认分组2", "默认分组3"));
 
         // 从SharedPreferences获取用户自定义的分组名称
-        SharedPreferences prefs = getSharedPreferences("device_groups", MODE_PRIVATE);
-        String group1 = prefs.getString("group1", "默认分组1");
-        String group2 = prefs.getString("group2", "默认分组2");
-        String group3 = prefs.getString("group3", "默认分组3");
+        SharedPreferences prefs = getSharedPreferences("GroupNames", MODE_PRIVATE);
+        String group1 = prefs.getString(GROUP_1_KEY, "默认分组1");
+        String group2 = prefs.getString(GROUP_2_KEY, "默认分组2");
+        String group3 = prefs.getString(GROUP_3_KEY, "默认分组3");
 
         groups.set(0, group1);
         groups.set(1, group2);
@@ -299,11 +302,13 @@ public class MainActivity extends AppCompatActivity {
                 // 获取选中的分组
                 String selectedGroup = (String) groupSpinner.getSelectedItem();
                 if (selectedGroup == null) {
-                    selectedGroup = "默认分组1"; // 默认分组
+                    // 如果没有选中任何分组，使用第一个默认分组
+                    selectedGroup = group1;
                 }
 
                 // 用户点击确认，将设备插入数据库
                 addDeviceToDatabase(presence, selectedGroup);
+                //Log.i("MainActivity", "设备存入数据库: "+);
                 dialog.dismiss();
             });
         }

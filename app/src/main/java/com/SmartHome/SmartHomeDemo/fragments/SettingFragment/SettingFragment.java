@@ -327,6 +327,7 @@ public class SettingFragment extends Fragment {
             AppDatabase.databaseWriteExecutor.execute(() -> {
                 // 在后台线程中查询数据库
                 List<Device> deviceList = getDevicesFromDatabase();
+                Log.i(TAG, deviceList.toString());
 
                 // 切换到主线程更新UI
                 requireActivity().runOnUiThread(() -> {
@@ -555,7 +556,9 @@ public class SettingFragment extends Fragment {
 
             // 筛选出家具类型的设备（light和air_conditioner）
             for (Device device : devices) {
-                if ("light".equals(device.getDeviceType()) || "air_conditioner".equals(device.getDeviceType())) {
+                if ("light".equals(device.getDeviceType())
+                        || "air_conditioner".equals(device.getDeviceType())
+                        || "ac".equals(device.getDeviceType())) {
                     deviceList.add(device);
                 }
             }
