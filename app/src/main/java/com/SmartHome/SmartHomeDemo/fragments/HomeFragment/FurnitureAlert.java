@@ -1,9 +1,11 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
@@ -17,11 +19,12 @@ public class FurnitureAlert extends DialogFragment {
     private TextView deviceIdTextView;
     private TextView deviceTypeTextView;
     private TextView deviceDescriptionTextView;
+    private ImageView deviceImageView;
 
     private String deviceId = "";
     private String deviceType = "";
     private String deviceDescription = "";
-
+    private Bitmap alertImageBitmap; // 添加Bitmap字段用于存储图片
 
     // 按钮点击监听器
     public interface OnButtonClickListener {
@@ -64,6 +67,7 @@ public class FurnitureAlert extends DialogFragment {
         deviceIdTextView          = view.findViewById(R.id.alert_device_id);
         deviceTypeTextView        = view.findViewById(R.id.alert_device_type);
         deviceDescriptionTextView = view.findViewById(R.id.alert_device_description);
+        deviceImageView           = view.findViewById(R.id.alert_device_image);
         MaterialButton confirmButton   = view.findViewById(R.id.alert_confirm);
         MaterialButton viewAlertButton = view.findViewById(R.id.view_alert);
 
@@ -146,4 +150,18 @@ public class FurnitureAlert extends DialogFragment {
             deviceDescriptionTextView.setText("报警信息: " + deviceDescription);
         }
     }
+
+    /**
+     * 更新设备图片显示
+     */
+    public void updateDeviceImage(Bitmap bitmap) {
+        this.alertImageBitmap = bitmap;
+        if (deviceImageView != null && alertImageBitmap != null) {
+            deviceImageView.setImageBitmap(alertImageBitmap);
+            deviceImageView.setVisibility(View.VISIBLE);
+        } else if (deviceImageView != null) {
+            deviceImageView.setVisibility(View.GONE);
+        }
+    }
+
 }

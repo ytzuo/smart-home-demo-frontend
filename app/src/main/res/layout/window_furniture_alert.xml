@@ -32,13 +32,13 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"/>
 
-        <TextView
-            android:id="@+id/alert_device_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alert_message"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/alert_device_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/alert_message"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
@@ -60,6 +60,19 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="15dp"/>
+
+    <ImageView
+        android:id="@+id/alert_device_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="传入异常图片"
+        android:src="@drawable/ic_launcher_background"
+        android:scaleType="centerCrop"
+        android:visibility="gone"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="15dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,8 +85,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/confirm"
-            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/confirm"            style="?android:attr/buttonBarButtonStyle"
             android:layout_gravity="start"
             android:textSize="18sp"/>
 
@@ -82,8 +94,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="查看设备"
-            style="?android:attr/buttonBarButtonStyle"
+            android:text="查看设备"            style="?android:attr/buttonBarButtonStyle"
             android:layout_gravity="end"
             android:textSize="18sp"/>
 

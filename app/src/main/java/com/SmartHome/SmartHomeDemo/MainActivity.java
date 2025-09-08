@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment currentHomeFragment;
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
+    FurnitureAlert currentFurnitureAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -472,18 +473,18 @@ public class MainActivity extends AppCompatActivity {
         // 发送通知到状态栏
         sendFurnitureAlertNotification(alert);
 
-        FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
-        furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
+        currentFurnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
+        currentFurnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
             @Override
             public void onConfirmClick() {
                 // 处理确认按钮点击事件
-                furnitureAlert.dismiss();
+                currentFurnitureAlert.dismiss();
             }
 
             @Override
             public void onViewAlertClick() {
                 // 处理查看设备按钮点击事件
-                furnitureAlert.dismiss();
+                currentFurnitureAlert.dismiss();
                 // 切换到HomeFragment查看设备
                 showFragment(currentHomeFragment);
                 BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -491,8 +492,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //currentFurnitureAlert.updateDeviceImage();
 //        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
-        furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
+        currentFurnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
         //}
     }
 
@@ -552,15 +554,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 处理接收到的媒体数据
     private void handleReceivedMedia(int alertId, Bitmap bitmap) {
-        Log.i("MainActivity", "handleReceivedMedia");
-        // 在主线程中处理
         runOnUiThread(() -> {
-            // 可以在这里实现显示图片的逻辑
-            // 例如显示通知，或者更新UI等
-            Log.i("MainActivity", "接收到图片，alertId: " + alertId + "，尺寸: " + bitmap.getWidth() + "x" + bitmap.getHeight());
-
-            // 示例：显示通知
-            showMediaNotification(alertId, bitmap);
+            Log.i("MainActivity", "已接受到图片并更新至家具警报窗口，alertId: " + alertId);
+            currentFurnitureAlert.updateDeviceImage(bitmap);
         });
     }
 

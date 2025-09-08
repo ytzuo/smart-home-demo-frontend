@@ -794,7 +794,7 @@
                     case "air_conditioner":
                         TextView arg2TextView = this.getView().findViewById(R.id.arg2_item);
                         if (arg2TextView != null) {
-                            arg2TextView.setText(furnitureItem.getAcTemp() + "℃");
+                            arg2TextView.setText((int)furnitureItem.getAcTemp() + "℃");
                         }
                         break;
                     case "light":
