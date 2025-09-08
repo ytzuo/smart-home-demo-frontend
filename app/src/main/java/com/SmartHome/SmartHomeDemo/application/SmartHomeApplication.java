@@ -2,6 +2,7 @@ package com.SmartHome.SmartHomeDemo.application;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -14,6 +15,7 @@ import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.MediaDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.PresenceDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
@@ -21,6 +23,7 @@ import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 import com.zrdds.infrastructure.FloatSeq;
 import com.zrdds.infrastructure.StringSeq;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +49,7 @@ public class SmartHomeApplication extends Application {
     private HomeStatusDdsManager homeStatusDdsManager;
     private PresenceDdsManager presenceDdsManager;
     private VehicleStatusDdsManager vehicleStatusDdsManager;
+    private MediaDdsManager mediaDdsManager; // 添加这一行
 
     private ConnectivityManager.NetworkCallback networkCallback;
     private String deviceId;
@@ -131,6 +135,19 @@ public class SmartHomeApplication extends Application {
 
         vehicleStatusDdsManager = new VehicleStatusDdsManager();
         vehicleStatusDdsManager.initialize(baseDdsManager);
+
+        // 初始化媒体管理器
+        mediaDdsManager = new MediaDdsManager();
+        // 获取应用内部存储路径
+        String savePath = getFilesDir().getAbsolutePath() + "/media";
+        File mediaDir = new File(savePath);
+        if (!mediaDir.exists()) {
+            mediaDir.mkdirs();
+        }
+        mediaDdsManager.initialize(baseDdsManager, savePath);
+
+        // 设置媒体接收监听器
+        setupMediaListener();
     }
 
     private void startNetworkMonitoring() {
@@ -397,5 +414,30 @@ public class SmartHomeApplication extends Application {
         }
 
         super.onTerminate();
+    }
+
+    // 添加媒体接收监听器接口
+    public interface OnMediaReceivedListener {
+        void onMediaReceived(int alertId, Bitmap bitmap);
+    }
+
+    private OnMediaReceivedListener mediaReceivedListener;
+
+    public void setOnMediaReceivedListener(OnMediaReceivedListener listener) {
+        this.mediaReceivedListener = listener;
+    }
+
+    private void setupMediaListener() {
+        mediaDdsManager.setOnMediaReceivedListener(new MediaDdsManager.OnMediaReceivedListener() {
+            @Override
+            public void onMediaReceived(int alertId, Bitmap bitmap) {
+                Log.d(TAG, "收到媒体数据: alertId=" + alertId);
+
+                // 通知监听器
+                if (mediaReceivedListener != null) {
+                    mediaReceivedListener.onMediaReceived(alertId, bitmap);
+                }
+            }
+        });
     }
 }

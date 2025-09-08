@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -118,6 +119,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onVehicleStatusReceived(VehicleStatus vehicleStatus) {
                 updateCarFragmentUI(vehicleStatus);
+            }
+        });
+
+        // 设置媒体接收监听器
+        app.setOnMediaReceivedListener(new SmartHomeApplication.OnMediaReceivedListener() {
+            @Override
+            public void onMediaReceived(int alertId, Bitmap bitmap) {
+                handleReceivedMedia(alertId, bitmap);
             }
         });
 
@@ -536,6 +545,67 @@ public class MainActivity extends AppCompatActivity {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         try {
             notificationManager.notify(alert.deviceId.hashCode(), builder.build());
+        } catch (SecurityException e) {
+            Log.e("MainActivity", "发送通知失败: " + e.getMessage());
+        }
+    }
+
+    // 处理接收到的媒体数据
+    private void handleReceivedMedia(int alertId, Bitmap bitmap) {
+        Log.i("MainActivity", "handleReceivedMedia");
+        // 在主线程中处理
+        runOnUiThread(() -> {
+            // 可以在这里实现显示图片的逻辑
+            // 例如显示通知，或者更新UI等
+            Log.i("MainActivity", "接收到图片，alertId: " + alertId + "，尺寸: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+
+            // 示例：显示通知
+            showMediaNotification(alertId, bitmap);
+        });
+    }
+
+    // 显示媒体通知
+    private void showMediaNotification(int alertId, Bitmap bitmap) {
+        // 检查是否允许发送通知
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        boolean isNoticeEnabled = prefs.getBoolean("notice_enabled", true);
+
+        if (!isNoticeEnabled) {
+            return; // 如果通知被禁用，则不发送通知
+        }
+
+        // 创建通知渠道 (Android 8.0+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "媒体警报";
+            String description = "设备发送的图片或视频通知";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("media_alert_channel", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // 创建通知
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "media_alert_channel")
+                .setSmallIcon(android.R.drawable.ic_menu_gallery)
+                .setContentTitle("收到新图片")
+                .setContentText("设备发送了新的图片，alertId: " + alertId)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setLargeIcon(bitmap); // 设置大图标为接收到的图片
+
+        // 创建点击通知时的意图
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        builder.setContentIntent(pendingIntent);
+
+        // 发送通知
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        try {
+            notificationManager.notify(alertId, builder.build());
         } catch (SecurityException e) {
             Log.e("MainActivity", "发送通知失败: " + e.getMessage());
         }
