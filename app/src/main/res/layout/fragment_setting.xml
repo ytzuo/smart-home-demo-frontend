@@ -247,6 +247,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="测试车辆报警"/>
+            <Button
+                android:id="@+id/test_del_scene"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="删除已保存的情景"/>
 
         </LinearLayout>
     </ScrollView>

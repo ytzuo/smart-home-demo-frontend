@@ -26,21 +26,27 @@ import com.SmartHome.SmartHomeDemo.R;
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.Device;
+import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import idl.SmartDemo03.Command;
 
 public class SettingFragment extends Fragment {
     private String TAG = "SettingFragment";
     private Switch darkModeSwitch;
     private Switch NoticeSwitch;
     private Button testAlertFurniture;
-
     private Button testAlertCar;
+    private Button testSceneMode;
 
     // 添加三个情景模式TextView的引用
     private TextView sceneMode1Name;
@@ -63,8 +69,14 @@ public class SettingFragment extends Fragment {
     private static final String SCENE_MODE_1_DEVICES_KEY = "scene_mode_1_devices";
     private static final String SCENE_MODE_2_DEVICES_KEY = "scene_mode_2_devices";
     private static final String SCENE_MODE_3_DEVICES_KEY = "scene_mode_3_devices";
+    // 新增：情景模式设备类型选择的键名
+    private static final String SCENE_MODE_1_DEVICE_TYPES_KEY = "scene_mode_1_device_types";
+    private static final String SCENE_MODE_2_DEVICE_TYPES_KEY = "scene_mode_2_device_types";
+    private static final String SCENE_MODE_3_DEVICE_TYPES_KEY = "scene_mode_3_device_types";
+
 
     private AppDatabase database;
+    private CommandDdsManager commandDdsManager;
 
 
     public SettingFragment(){}
@@ -77,6 +89,7 @@ public class SettingFragment extends Fragment {
         if (getActivity() != null) {
             SmartHomeApplication app = (SmartHomeApplication) getActivity().getApplication();
             database = app.getDatabase();
+            commandDdsManager = app.getCommandDdsManager();
         }
     }
     @Override
@@ -88,10 +101,11 @@ public class SettingFragment extends Fragment {
     }
 
     private void initialization(View view){
-        darkModeSwitch = view.findViewById(R.id.dark_mode_switch);
-        NoticeSwitch = view.findViewById(R.id.notification_allow_switch);
+        darkModeSwitch     = view.findViewById(R.id.dark_mode_switch);
+        NoticeSwitch       = view.findViewById(R.id.notification_allow_switch);
         testAlertFurniture = view.findViewById(R.id.test_alert_furniture);
-        testAlertCar = view.findViewById(R.id.test_alert_car);
+        testAlertCar       = view.findViewById(R.id.test_alert_car);
+        testSceneMode      = view.findViewById(R.id.test_del_scene);
 
         if(darkModeSwitch != null) {
             // 设置开关的初始状态
@@ -181,6 +195,16 @@ public class SettingFragment extends Fragment {
                             carAlert.show(getChildFragmentManager(), "car_alert_test");
                         }
                     });
+                }
+            });
+        }
+        if(testSceneMode != null) {
+            testSceneMode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clearSceneModeDevices(SCENE_MODE_1_DEVICES_KEY);
+                    clearSceneModeDevices(SCENE_MODE_2_DEVICES_KEY);
+                    clearSceneModeDevices(SCENE_MODE_3_DEVICES_KEY);
                 }
             });
         }
@@ -314,11 +338,11 @@ public class SettingFragment extends Fragment {
                 });
             });
         } else {
+            Log.e(TAG, "数据库不可用!");
             // 如果数据库不可用，使用示例数据
             List<Device> deviceList = createSampleDeviceList();
             SceneModeFurnitureAdapter adapter = new SceneModeFurnitureAdapter(requireContext(), deviceList, sceneModeKey);
             deviceRecyclerView.setAdapter(adapter);
-
             doneButton.setOnClickListener(v -> {
                 // 保存选中的设备
                 adapter.saveSelectedDevices();
@@ -328,23 +352,80 @@ public class SettingFragment extends Fragment {
     }
     // 情景模式1开关状态变化处理接口
     private void onSceneMode1SwitchChanged(boolean isChecked) {
-        // TODO: 在这里处理情景模式1开关状态变化
         Log.i(TAG, "SceneMode1SwitchChanged " + isChecked);
         // 例如：发送指令到设备、更新UI等
+        if (isChecked) {
+            // TODO: 在这里处理情景模式1开启
+            // 获取情景模式1中选中的设备ID列表
+            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_1_DEVICES_KEY);
+            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_1_DEVICE_TYPES_KEY);
+            int len = selectedDeviceIds.size();
+            for(int i = 0; i < len; i++) {
+                Command command    = new Command();
+                command.deviceId   = selectedDeviceIds.get(i);
+                command.deviceType = selectedDeviceTypes.get(i);
+                //if(command.deviceType)
+            }
+            Log.i(TAG, "情景模式1选中的设备ID: " + selectedDeviceIds);
+            Log.i(TAG, "情景模式1选中的设备类型: " + selectedDeviceTypes);
+        } else {
+            //TODO: 在这里处理情景模式1关闭
+        }
     }
 
     // 情景模式2开关状态变化处理接口
     private void onSceneMode2SwitchChanged(boolean isChecked) {
-        // TODO: 在这里处理情景模式2开关状态变化
         Log.i(TAG, "SceneMode2SwitchChanged " + isChecked);
         // 例如：发送指令到设备、更新UI等
+        if (isChecked) {
+            // TODO: 在这里处理情景模式2开启
+            // 获取情景模式2中选中的设备ID列表
+            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_2_DEVICES_KEY);
+            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_2_DEVICE_TYPES_KEY);
+            Log.i(TAG, "情景模式2选中的设备ID: " + selectedDeviceIds);
+            Log.i(TAG, "情景模式2选中的设备类型: " + selectedDeviceTypes);
+        } else {
+            // TODO: 在这里处理情景模式2关闭
+        }
     }
 
     // 情景模式3开关状态变化处理接口
     private void onSceneMode3SwitchChanged(boolean isChecked) {
-        // TODO: 在这里处理情景模式3开关状态变化
         Log.i(TAG, "SceneMode3SwitchChanged " + isChecked);
         // 例如：发送指令到设备、更新UI等
+        if (isChecked) {
+            // TODO: 在这里处理情景模式3开启
+            // 获取情景模式3中选中的设备ID列表
+            List<String> selectedDeviceIds = getSelectedDevicesForSceneMode(SCENE_MODE_3_DEVICES_KEY);
+            List<String> selectedDeviceTypes = getSelectedDeviceTypesForSceneMode(SCENE_MODE_3_DEVICE_TYPES_KEY);
+            Log.i(TAG, "情景模式3选中的设备ID: " + selectedDeviceIds);
+            Log.i(TAG, "情景模式3选中的设备类型: " + selectedDeviceTypes);
+        } else {
+            // TODO: 在这里处理情景模式3关闭
+        }
+    }
+
+    // 根据情景模式键名获取选中的设备ID集合
+    private List<String> getSelectedDevicesForSceneMode(String sceneModeKey) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
+        String IdsString = prefs.getString(sceneModeKey, "");
+        List<String> IdList = new ArrayList<>();
+        if(!IdList.isEmpty()) {
+            String[] IdsArray = IdsString.split(",");
+            IdList = new ArrayList<>(Arrays.asList(IdsArray));
+        }
+        return IdList;
+    }
+    // 新增：根据情景模式键名获取选中的设备类型列表
+    private List<String> getSelectedDeviceTypesForSceneMode(String sceneModeTypesKey) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
+        String typesString = prefs.getString(sceneModeTypesKey, "");
+        List<String> typesList = new ArrayList<>();
+        if (!typesString.isEmpty()) {
+            String[] typesArray = typesString.split(",");
+            typesList = new ArrayList<>(Arrays.asList(typesArray));
+        }
+        return typesList;
     }
 
     private void onSceneMode1Customize() {
@@ -453,7 +534,7 @@ public class SettingFragment extends Fragment {
 
         // 如果数据库不可用或没有设备，返回示例数据
         if (deviceList.isEmpty()) {
-            deviceList = createSampleDeviceList();
+            //deviceList = createSampleDeviceList();
         }
 
         return deviceList;
@@ -472,5 +553,12 @@ public class SettingFragment extends Fragment {
         }
 
         return deviceList;
+    }
+
+    private void clearSceneModeDevices(String sceneModeKey) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet(sceneModeKey, new HashSet<>());
+        editor.apply();
     }
 }

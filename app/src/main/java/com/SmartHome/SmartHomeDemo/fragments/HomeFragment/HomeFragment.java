@@ -244,10 +244,20 @@ public class HomeFragment extends Fragment {
                         deviceMap.put(device.getDeviceId(), device);
                     }
 
-                    // 处理HomeStatus数据
-                    List<FurnitureItem> items = new ArrayList<>();
-                    int len = homeStatus.deviceIds.length();
+                    // 获取当前家具列表的副本
+                    List<FurnitureItem> currentItems = new ArrayList<>();
+                    if (homeViewModel.getFurnitureLiveData().getValue() != null) {
+                        currentItems.addAll(homeViewModel.getFurnitureLiveData().getValue());
+                    }
 
+                    // 创建deviceId到FurnitureItem的映射，便于快速查找和更新
+                    Map<String, FurnitureItem> currentItemMap = new HashMap<>();
+                    for (FurnitureItem item : currentItems) {
+                        currentItemMap.put(item.getDeviceId(), item);
+                    }
+
+                    // 处理HomeStatus数据，只更新相关家具项
+                    int len = homeStatus.deviceIds.length();
                     for(int i = 0; i < len; i++) {
                         String deviceId = homeStatus.deviceIds.get_at(i);
 
@@ -256,21 +266,46 @@ public class HomeFragment extends Fragment {
 
                         // 只处理数据库中存在的设备
                         if (existingDevice != null) {
-                            FurnitureItem newItem = new FurnitureItem();
-                            newItem.setDeviceId(deviceId);
-                            newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
-                            newItem.setTime(homeStatus.timeStamp);
-                            newItem.setDeviceGroup(existingDevice.getDeviceGroup()); // 从数据库获取分组信息
+                            // 检查此设备是否已经在当前列表中
+                            FurnitureItem existingItem = currentItemMap.get(deviceId);
+                            FurnitureItem newItem;
 
-                            switch(newItem.getDeviceType()) {
-                                case "light":
-                                    newItem.setImageResource(R.drawable.icon_light);
-                                    break;
-                                case "air_conditioner":
-                                    newItem.setImageResource(R.drawable.icon_air_conditioner);
-                                    break;
+                            if (existingItem != null) {
+                                // 如果已存在，创建一个副本进行更新
+                                newItem = new FurnitureItem(
+                                        existingItem.getDeviceId(),
+                                        existingItem.getDeviceType(),
+                                        existingItem.getWorkingStatus(),
+                                        existingItem.getStatus(),
+                                        existingItem.getTime(),
+                                        existingItem.getImageResource(),
+                                        existingItem.getAcTemp(),
+                                        existingItem.getSwitchStatus(),
+                                        existingItem.getLightPercent()
+                                );
+                                newItem.setDeviceGroup(existingItem.getDeviceGroup());
+                                newItem.setFurnitureDataPack(existingItem.getFurnitureDataPack());
+                            } else {
+                                // 如果不存在，创建新项目
+                                newItem = new FurnitureItem();
+                                newItem.setDeviceId(deviceId);
+                                newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
+                                newItem.setDeviceGroup(existingDevice.getDeviceGroup()); // 从数据库获取分组信息
+
+                                switch(newItem.getDeviceType()) {
+                                    case "light":
+                                        newItem.setImageResource(R.drawable.icon_light);
+                                        break;
+                                    case "air_conditioner":
+                                        newItem.setImageResource(R.drawable.icon_air_conditioner);
+                                        break;
+                                }
                             }
 
+                            // 更新时间戳
+                            newItem.setTime(homeStatus.timeStamp);
+
+                            // 更新数据
                             Log.i("newItem", "开始读取JSON");
                             if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
                                 Log.i("newItem", newItem.getFurnitureDataPack().toString());
@@ -278,15 +313,20 @@ public class HomeFragment extends Fragment {
                                 Log.i("newItem", "JSON转换失败/更新失败 "
                                         + homeStatus.deviceStatus.get_at(i));
                             }
-                            items.add(newItem);
+
+                            // 更新映射中的项目
+                            currentItemMap.put(deviceId, newItem);
                         }
                     }
+
+                    // 将更新后的项目转换为列表
+                    List<FurnitureItem> updatedItems = new ArrayList<>(currentItemMap.values());
 
                     // 在主线程中更新UI
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             if (homeViewModel != null) {
-                                homeViewModel.updateFurnitureList(items);
+                                homeViewModel.updateFurnitureList(updatedItems);
                             }
                         });
                     }
@@ -295,9 +335,8 @@ public class HomeFragment extends Fragment {
                     // 在主线程中处理错误情况
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            if (homeViewModel != null) {
-                                homeViewModel.updateFurnitureList(new ArrayList<>());
-                            }
+                            // 不要清空列表，保持现有数据
+                            // 如果需要错误提示可以在这里添加
                         });
                     }
                 }

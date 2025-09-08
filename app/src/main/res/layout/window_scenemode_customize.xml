@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="?android:attr/buttonBarButtonStyle"
-            android:text="@string/match_done"
+            android:text="@string/customize_done"
             android:textSize="18sp"
             android:layout_weight="1"/>
     </LinearLayout>

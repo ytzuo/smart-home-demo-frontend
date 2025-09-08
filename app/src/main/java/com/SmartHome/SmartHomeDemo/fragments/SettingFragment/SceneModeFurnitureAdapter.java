@@ -24,6 +24,8 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
     private Set<String> selectedDeviceIds;
     private String sceneModeKey;
     private Context context;
+    private List<String> selectedDeviceTypes; // 新增：存储选中设备的类型
+    private static final String SCENE_MODE_DEVICE_TYPES_SUFFIX = "_types";
 
     public SceneModeFurnitureAdapter(Context context, List<Device> deviceList, String sceneModeKey) {
         this.context = context;
@@ -65,6 +67,8 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
         // 将选中的设备ID集合转换为字符串集合进行存储
         Set<String> selectedIds = new HashSet<>(selectedDeviceIds);
         editor.putStringSet(sceneModeKey, selectedIds);
+        // 将设备类型列表转换为字符串集合进行存储
+        editor.putString(sceneModeKey + SCENE_MODE_DEVICE_TYPES_SUFFIX, String.join(",", selectedDeviceTypes));
         editor.apply();
     }
 
@@ -72,6 +76,24 @@ public class SceneModeFurnitureAdapter extends RecyclerView.Adapter<SceneModeFur
         SharedPreferences prefs = context.getSharedPreferences("SceneModes", Context.MODE_PRIVATE);
         Set<String> savedIds = prefs.getStringSet(sceneModeKey, new HashSet<>());
         selectedDeviceIds.addAll(savedIds);
+
+        // 加载设备类型列表
+        String savedTypesString = prefs.getString(sceneModeKey + SCENE_MODE_DEVICE_TYPES_SUFFIX, "");
+        selectedDeviceTypes.clear();
+        if (!savedTypesString.isEmpty()) {
+            String[] typesArray = savedTypesString.split(",");
+            for (String type : typesArray) {
+                selectedDeviceTypes.add(type);
+            }
+        }
+
+        // 确保ID和类型列表长度一致（数据完整性保护）
+        if (selectedDeviceIds.size() != selectedDeviceTypes.size()) {
+            selectedDeviceTypes.clear();
+            for (int i = 0; i < selectedDeviceIds.size(); i++) {
+                selectedDeviceTypes.add(""); // 添加空字符串占位
+            }
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
