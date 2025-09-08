@@ -29,7 +29,7 @@ public class HomeViewModel extends AndroidViewModel {
         furnitureList = new ArrayList<>();
         furnitureListLiveData = new MutableLiveData<>(furnitureList);
 
-//        //初始化测试数据
+        //初始化测试数据
 //        furnitureList.add(new FurnitureItem(
 //                "智能灯具1", "light", "工作中", "开启", "今天 14:30", R.drawable.icon_light,
 //                0, "0000", 80));

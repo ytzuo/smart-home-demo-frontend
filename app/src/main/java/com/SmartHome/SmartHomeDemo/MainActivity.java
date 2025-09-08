@@ -2,7 +2,13 @@
 package com.SmartHome.SmartHomeDemo;
 
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +24,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
@@ -59,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment currentHomeFragment;
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
-
-    // 添加一个线程处理所有警报
-    private Thread alertHandlingThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -450,6 +455,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 显示家具警报弹窗
     private void showFurnitureAlert(Alert alert) {
+        // 发送通知到状态栏
+        sendFurnitureAlertNotification(alert);
+
         FurnitureAlert furnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
         furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
             @Override
@@ -470,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 //        if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
-            furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
+        furnitureAlert.show(getSupportFragmentManager(), "furniture_alert");
         //}
     }
 
@@ -478,4 +486,53 @@ public class MainActivity extends AppCompatActivity {
         return currentHomeFragment;
     }
 
+    /**
+     * 发送家具警报通知到状态栏
+     * @param alert 警报信息
+     */
+    private void sendFurnitureAlertNotification(Alert alert) {
+        // 检查是否允许发送通知
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        boolean isNoticeEnabled = prefs.getBoolean("notice_enabled", true);
+
+        if (!isNoticeEnabled) {
+            return; // 如果通知被禁用，则不发送通知
+        }
+
+        // 创建通知渠道 (Android 8.0+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "家具警报";
+            String description = "家具设备警报通知";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("furniture_alert_channel", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // 创建通知
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "furniture_alert_channel")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert) // 使用默认图标
+                .setColor(getResources().getColor(android.R.color.holo_red_dark))
+                .setContentTitle("家具警报: " + alert.deviceType)
+                .setContentText("设备ID: " + alert.deviceId + " - " + alert.description)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL);
+
+        // 创建点击通知时的意图
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        builder.setContentIntent(pendingIntent);
+
+        // 发送通知
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        try {
+            notificationManager.notify(alert.deviceId.hashCode(), builder.build());
+        } catch (SecurityException e) {
+            Log.e("MainActivity", "发送通知失败: " + e.getMessage());
+        }
+    }
 }
