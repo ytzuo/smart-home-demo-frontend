@@ -21,6 +21,9 @@ public class Log {
     @ColumnInfo(name = "description")
     private String description;
 
+    @ColumnInfo(name = "image_path")
+    private String imagePath;
+
     // 无参构造函数
     public Log() {}
 
@@ -70,5 +73,13 @@ public class Log {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

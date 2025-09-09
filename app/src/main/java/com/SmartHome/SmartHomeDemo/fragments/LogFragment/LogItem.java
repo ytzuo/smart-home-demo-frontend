@@ -5,6 +5,7 @@ public class LogItem {
     private String logTime;
     private String logID;
     private String logMsg;
+    private String imagePath;
 
     public LogItem(String logType, String logTime, String logID, String logMsg) {
         this.logType = logType;
@@ -44,5 +45,13 @@ public class LogItem {
 
     public void setLogMsg(String logMsg) {
         this.logMsg = logMsg;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

@@ -234,7 +234,8 @@ public class CarFragment extends Fragment {
                 commandDdsManager.sendCommand(command);
 
                 Log.i(TAG, "发送命令" + command.action);
-                Toast.makeText(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT);
             }
         });
     }

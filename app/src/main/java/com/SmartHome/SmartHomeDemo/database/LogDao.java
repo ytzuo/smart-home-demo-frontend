@@ -36,4 +36,10 @@ public interface LogDao {
 
     @Query("DELETE FROM logs")
     void deleteAllLogs();
+
+    @Query("UPDATE logs SET image_path = :imagePath WHERE log_id = :logId")
+    void updateImagePathByLogId(String logId, String imagePath);
+
+    @Query("SELECT image_path FROM logs WHERE log_id = :logId")
+    String getImagePathByLogId(String logId);
 }

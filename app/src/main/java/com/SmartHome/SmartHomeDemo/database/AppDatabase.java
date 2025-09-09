@@ -9,7 +9,7 @@ import android.content.Context;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Device.class, Log.class}, version = 4, exportSchema = false)
+@Database(entities = {Device.class, Log.class}, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     //

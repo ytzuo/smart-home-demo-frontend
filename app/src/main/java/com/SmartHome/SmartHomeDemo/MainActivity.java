@@ -44,14 +44,21 @@ import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.HomeFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 import com.SmartHome.SmartHomeDemo.fragments.SettingFragment.SettingFragment;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
 import idl.SmartDemo03.Alert;
@@ -72,6 +79,22 @@ public class MainActivity extends AppCompatActivity {
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
     FurnitureAlert currentFurnitureAlert;
+    // 用于暂存收到的媒体数据，直到对应的alert记录被插入数据库
+    private Queue<PendingMediaData> pendingMediaQueue = new ConcurrentLinkedQueue<>();
+    // 内部类：用于存储待处理的媒体数据
+    private static class PendingMediaData {
+        int alertId;
+        Bitmap bitmap;
+        long timestamp;
+
+        PendingMediaData(int alertId, Bitmap bitmap) {
+            this.alertId = alertId;
+            this.bitmap = bitmap;
+            this.timestamp = System.currentTimeMillis();
+        }
+    }
+    // 用于跟踪已插入数据库的alert ID
+    private Map<Integer, Boolean> insertedAlerts = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -241,7 +264,8 @@ public class MainActivity extends AppCompatActivity {
 
         // 直接通过FragmentManager找到当前的LogFragment（如果存在）
         LogFragment logFragment = (LogFragment) getSupportFragmentManager().findFragmentByTag("LogFragment");
-        if (logFragment != null && logFragment.isVisible()) {
+        if (logFragment != null) {
+            // 不管是否可见都尝试更新数据
             logFragment.addLogItem(logItem);
         }
 
@@ -258,6 +282,14 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 app.getDatabase().logDao().insertLog(newLog);
                 Log.i("MainActivity", newLog.getLogId() + "已插入数据库");
+
+                // 标记该alert已插入数据库
+                synchronized (insertedAlerts) {
+                    insertedAlerts.put(alert.alert_id, true);
+                }
+
+                // 检查是否有待处理的媒体数据
+                processPendingMediaData();
             }
         });
         Log.i("MainActivity", "插入Alert数据");
@@ -376,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // 如果需要更新UI，切换到主线程
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "设备已添加: " + presence.deviceId + " 分组: " + deviceGroup, Toast.LENGTH_SHORT).show();
+                    ToastUtil.showToast(this, "设备已添加: " + presence.deviceId + " 分组: " + deviceGroup, Toast.LENGTH_SHORT);
 
                     // 更新HomeFragment中的设备列表
                     if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
@@ -390,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("MainActivity", "插入数据库时出错", e);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "添加设备失败", Toast.LENGTH_SHORT).show();
+                    ToastUtil.showToast(this, "添加设备失败", Toast.LENGTH_SHORT);
                 });
             }
         });
@@ -403,6 +435,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 清理资源
+        pendingMediaQueue.clear();
+        insertedAlerts.clear();
+
         // 注意：Activity的onDestroy()也不一定总被调用
         if (isFinishing()) {
             // 如果是正常结束，执行清理操作
@@ -446,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
         if ("car".equals(alert.deviceType)) {
             // 在主线程中显示车辆警报弹窗
             runOnUiThread(() -> showCarAlert(alert));
-        } else if ("light".equals(alert.deviceType) || "air_conditioner".equals(alert.deviceType)) {
+        } else if ("light".equals(alert.deviceType) || "air_conditioner".equals(alert.deviceType) || "ac".equals(alert.deviceType)) {
             // 家具类设备（灯或空调）在主线程中显示家具警报弹窗
             runOnUiThread(() -> showFurnitureAlert(alert));
         }
@@ -556,8 +592,51 @@ public class MainActivity extends AppCompatActivity {
     private void handleReceivedMedia(int alertId, Bitmap bitmap) {
         runOnUiThread(() -> {
             Log.i("MainActivity", "已接受到图片并更新至家具警报窗口，alertId: " + alertId);
-            currentFurnitureAlert.updateDeviceImage(bitmap);
+            if (currentFurnitureAlert != null) {
+                currentFurnitureAlert.updateDeviceImage(bitmap);
+            }
+
+            // 将媒体数据加入队列等待处理
+            pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
+
+            // 尝试处理队列中的媒体数据
+            processPendingMediaData();
         });
+    }
+    // 保存媒体文件并与对应的Log记录关联
+    private void saveMediaAndLinkToLog(int alertId, Bitmap bitmap) {
+        try {
+            // 创建文件名
+            String fileName = "alert_" + alertId + "_" + System.currentTimeMillis() + ".jpg";
+            String directoryPath = getExternalFilesDir(null) + "/media/";
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            String filePath = directoryPath + fileName;
+
+            // 保存图片到文件系统
+            FileOutputStream out = new FileOutputStream(filePath);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+
+            Log.i("MainActivity", "图片已保存到: " + filePath);
+
+            // 更新数据库中对应的Log记录
+            Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    // 根据alertId查找对应的Log记录并更新image_path字段
+                    String logId = String.valueOf(alertId); // 假设logId与alertId相同
+                    database.logDao().updateImagePathByLogId(logId, filePath);
+                    Log.i("MainActivity", "已更新Log记录的图片路径: " + logId);
+                } catch (Exception e) {
+                    Log.e("MainActivity", "更新Log记录图片路径失败", e);
+                }
+            });
+        } catch (Exception e) {
+            Log.e("MainActivity", "保存媒体文件失败", e);
+        }
     }
 
     // 显示媒体通知
@@ -606,4 +685,30 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", "发送通知失败: " + e.getMessage());
         }
     }
+
+    // 处理待处理的媒体数据
+    private void processPendingMediaData() {
+        PendingMediaData mediaData;
+        while ((mediaData = pendingMediaQueue.peek()) != null) {
+            boolean isAlertInserted;
+            synchronized (insertedAlerts) {
+                isAlertInserted = insertedAlerts.getOrDefault(mediaData.alertId, false);
+            }
+
+            // 如果对应的alert已经插入数据库，或者等待时间超过5秒（可能是孤儿数据），则处理该媒体数据
+            if (isAlertInserted || (System.currentTimeMillis() - mediaData.timestamp) > 5000) {
+                // 从队列中移除
+                pendingMediaQueue.poll();
+
+                // 如果alert已插入数据库，则更新图片路径
+                if (isAlertInserted) {
+                    saveMediaAndLinkToLog(mediaData.alertId, mediaData.bitmap);
+                }
+            } else {
+                // 如果对应的alert还未插入数据库，则等待下次处理
+                break;
+            }
+        }
+    }
+
 }
