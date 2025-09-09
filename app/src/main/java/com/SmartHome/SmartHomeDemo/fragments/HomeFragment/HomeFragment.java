@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -502,6 +504,43 @@ public class HomeFragment extends Fragment {
                     Log.e("HomeFragment", "更新数据库分组名时出错", e);
                 }
             });
+        }
+    }
+
+    // 添加处理夜间模式切换的方法
+    public void updateGroupBarTheme() {
+        if (tabLayout != null && getActivity() != null) {
+            boolean isNightMode = (getActivity().getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+
+            // 设置TabLayout背景颜色
+            int backgroundColor = isNightMode ?
+                    R.color.card_background_dark : R.color.card_background_light;
+            tabLayout.setBackgroundColor(getActivity().getResources().getColor(backgroundColor));
+
+            // 设置Tab文本颜色
+            int textColor = isNightMode ?
+                    R.color.text_color_dark : R.color.text_color_light;
+
+            // 使用ColorStateList设置Tab文本颜色（适用于选中和未选中状态）
+            ColorStateList colorStateList = ColorStateList.valueOf(
+                    getActivity().getResources().getColor(textColor)
+            );
+            tabLayout.setTabTextColors(colorStateList);
+        }
+    }
+    // 重写onConfigurationChanged方法
+    @Override
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // 更新分组栏主题
+        updateGroupBarTheme();
+
+        // 更新ViewPager中的内容
+        if (viewPagerAdapter != null) {
+            viewPagerAdapter.notifyDataSetChanged();
         }
     }
 }

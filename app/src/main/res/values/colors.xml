@@ -17,4 +17,7 @@
     <color name="card_background_dark">#1E1E1E</color>
     <!-- 添加较浅的紫色 -->
     <color name="light_purple">#CE93D8</color>
+    <!-- 字体颜色定义 -->
+    <color name="text_color_light">#FF000000</color>
+    <color name="text_color_dark">#FFCCCCCC</color>
 </resources>

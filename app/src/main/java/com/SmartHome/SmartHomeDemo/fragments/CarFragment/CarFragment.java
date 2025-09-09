@@ -30,6 +30,7 @@ public class CarFragment extends Fragment {
     private TextView acStatusText;
     private TextView fuelStatusText;
     private TextView mileStatusText;
+    private TextView ctrlText;
     private MaterialButton engineButton;
     private MaterialButton lockButton;
     private MaterialButton acButton;
@@ -64,6 +65,7 @@ public class CarFragment extends Fragment {
         engineButton     = view.findViewById(R.id.control_car_engine);
         lockButton       = view.findViewById(R.id.control_car_lock);
         acButton         = view.findViewById(R.id.control_car_ac);
+        ctrlText         = view.findViewById(R.id.control_car_text);
 
         // 观察LiveData变化并更新UI
         LiveData<CarItem> carLiveData = carViewModel.getCarLiveData();
@@ -240,4 +242,45 @@ public class CarFragment extends Fragment {
         });
     }
 
+    // 添加处理夜间模式切换的方法
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 在这里可以添加特定于CarFragment的夜间模式处理逻辑
+        updateTextColors();
+    }
+
+    // 更新文本颜色的方法
+    private void updateTextColors() {
+        if (getActivity() != null) {
+            boolean isNightMode = (getActivity().getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+
+            int textColor = isNightMode ?
+                    R.color.text_color_dark : R.color.text_color_light;
+
+            // 更新所有TextView的颜色
+            if (carNameText != null) {
+                carNameText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (engineStatusText != null) {
+                engineStatusText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (lockStatusText != null) {
+                lockStatusText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (acStatusText != null) {
+                acStatusText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (fuelStatusText != null) {
+                fuelStatusText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (mileStatusText != null) {
+                mileStatusText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if(ctrlText != null) {
+                ctrlText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+        }
+    }
 }

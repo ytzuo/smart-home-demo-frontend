@@ -5,6 +5,11 @@
         <item name="colorPrimary">@color/light_purple</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="cardBackgroundColor">@color/card_background_light</item>
+        <!-- 设置文本颜色 -->
+        <item name="android:textColorPrimary">@color/text_color_light</item>
+        <item name="android:textColor">@color/text_color_light</item>
+        <item name="android:textColorSecondary">@color/text_color_light</item>
+        <item name="android:textColorTertiary">@color/text_color_light</item>
     </style>
 
     <style name="Theme.SmartHomeDemo" parent="Base.Theme.SmartHomeDemo" />

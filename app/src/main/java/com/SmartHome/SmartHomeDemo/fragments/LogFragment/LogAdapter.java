@@ -1,5 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.LogFragment;
 
+import android.content.res.Configuration;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +73,16 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
             logTime.setText(item.getLogTime());
             logID.setText(item.getLogID());
             logMsg.setText(item.getLogMsg());
+
+            // 检查当前是否为夜间模式
+            boolean isNightMode = (itemView.getContext().getResources().getConfiguration().uiMode
+                    & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+            Log.i("LogAdapter", "bind" + isNightMode);
+            // 设置文本颜色
+            int textColor = isNightMode ? R.color.text_color_dark : R.color.text_color_light;
+            logTime.setTextColor(ContextCompat.getColor(logTime.getContext(), textColor));
+            logID.setTextColor(ContextCompat.getColor(logID.getContext(), textColor));
+            logMsg.setTextColor(ContextCompat.getColor(logMsg.getContext(), textColor));
 
             String log_type = item.getLogType();
             if ("INFO".equals(log_type)) {

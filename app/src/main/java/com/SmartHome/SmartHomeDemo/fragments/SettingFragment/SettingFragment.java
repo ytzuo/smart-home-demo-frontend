@@ -3,6 +3,7 @@ package com.SmartHome.SmartHomeDemo.fragments.SettingFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -45,6 +46,8 @@ import idl.SmartDemo03.Command;
 
 public class SettingFragment extends Fragment {
     private String TAG = "SettingFragment";
+    private TextView darkText;
+    private TextView notificationText;
     private Switch darkModeSwitch;
     private Switch NoticeSwitch;
     private Button testAlertFurniture;
@@ -109,6 +112,8 @@ public class SettingFragment extends Fragment {
         testAlertFurniture = view.findViewById(R.id.test_alert_furniture);
         testAlertCar       = view.findViewById(R.id.test_alert_car);
         testSceneMode      = view.findViewById(R.id.test_del_scene);
+        darkText           = view.findViewById(R.id.dark_mode_text);
+        notificationText   = view.findViewById(R.id.notification_allow_text);
 
         if(darkModeSwitch != null) {
             // 设置开关的初始状态
@@ -119,11 +124,21 @@ public class SettingFragment extends Fragment {
             darkModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    // 应用夜间模式
                     if (isChecked) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                     } else {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     }
+
+//                    // 通知Activity更新UI而不重建
+//                    if (getActivity() != null) {
+//                        // 通过Configuration更新UI，避免recreate()
+//                        Configuration newConfig = new Configuration(getActivity().getResources().getConfiguration());
+//                        newConfig.uiMode &= ~Configuration.UI_MODE_NIGHT_MASK;
+//                        newConfig.uiMode |= isChecked ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO;
+//                        getActivity().getResources().updateConfiguration(newConfig, getActivity().getResources().getDisplayMetrics());
+//                    }
                 }
             });
         }
@@ -595,5 +610,41 @@ public class SettingFragment extends Fragment {
         // 同时清除旧格式的数据
         editor.remove(sceneModeKey);
         editor.apply();
+    }
+
+    // 添加处理夜间模式切换的方法
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 在这里可以添加特定于SettingFragment的夜间模式处理逻辑
+        updateTextColors();
+    }
+
+    // 更新文本颜色的方法
+    private void updateTextColors() {
+        if (getActivity() != null) {
+            boolean isNightMode = (getActivity().getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+
+            int textColor = isNightMode ?
+                    R.color.text_color_dark : R.color.text_color_light;
+
+            // 更新所有TextView的颜色
+            if (sceneMode1Name != null) {
+                sceneMode1Name.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (sceneMode2Name != null) {
+                sceneMode2Name.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (sceneMode3Name != null) {
+                sceneMode3Name.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (darkText != null) {
+                darkText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+            if (notificationText != null) {
+                notificationText.setTextColor(getActivity().getResources().getColor(textColor));
+            }
+        }
     }
 }
