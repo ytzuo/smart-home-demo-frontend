@@ -258,7 +258,8 @@ public class MainActivity extends AppCompatActivity {
                 alert.level,                    // 日志类型 (INFO/WARN/ALERT)
                 currentTime,                    // 当前时间
                 "ID: " + alert.alert_id,        // Alert ID
-                alert.description               // Alert 描述
+                alert.description,               // Alert 描述
+                alert.deviceType
         );
         Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
@@ -292,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 processPendingMediaData();
             }
         });
-        Log.i("MainActivity", "插入Alert数据");
+        Log.i("MainActivity", "插入Alert数据, alertId: " +alert.alert_id);
     }
 
     private void showNewDeviceDialog(Presence presence) {
@@ -628,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // 根据alertId查找对应的Log记录并更新image_path字段
                     String logId = String.valueOf(alertId); // 假设logId与alertId相同
+                    Log.i("MainActivity", logId + "更新报警图片为: "+filePath);
                     database.logDao().updateImagePathByLogId(logId, filePath);
                     Log.i("MainActivity", "已更新Log记录的图片路径: " + logId);
                 } catch (Exception e) {
@@ -706,6 +708,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 // 如果对应的alert还未插入数据库，则等待下次处理
+                Log.i("MainActivity", "对应的alert还未插入数据库");
                 break;
             }
         }

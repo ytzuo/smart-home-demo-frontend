@@ -12,6 +12,17 @@ public class Log {
     @ColumnInfo(name = "log_type")
     private String logType;
 
+    public String getLogDevice() {
+        return logDevice;
+    }
+
+    public void setLogDevice(String logDevice) {
+        this.logDevice = logDevice;
+    }
+
+    @ColumnInfo(name = "log_device")
+    private String logDevice;
+
     @ColumnInfo(name = "timestamp")
     private String timestamp;
 

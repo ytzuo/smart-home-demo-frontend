@@ -113,7 +113,8 @@ public class LogViewModel extends AndroidViewModel {
                         log.getLogType(),
                         time,
                         log.getLogId(),
-                        log.getDescription()
+                        log.getDescription(),
+                        log.getLogDevice()
                 );
                 logItems.add(item);
             }
