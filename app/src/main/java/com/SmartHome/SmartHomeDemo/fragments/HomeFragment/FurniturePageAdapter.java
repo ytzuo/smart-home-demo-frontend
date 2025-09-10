@@ -1,5 +1,6 @@
 package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,18 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
             FurnitureDataPack pack = item.getFurnitureDataPack();
             itemImage.setImageResource(item.getImageResource());
             nameText.setText(item.getDeviceId());
+
+            // 检查当前是否为夜间模式
+            boolean isNightMode = (itemImage.getContext().getResources().getConfiguration().uiMode
+                    & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+            // 设置文本颜色
+            int textColor = isNightMode ? R.color.text_color_dark : R.color.text_color_light;
+            nameText.setTextColor(ContextCompat.getColor(nameText.getContext(), textColor));
+            workingText.setTextColor(ContextCompat.getColor(workingText.getContext(), textColor));
+            statusText.setTextColor(ContextCompat.getColor(statusText.getContext(), textColor));
+            timeText.setTextColor(ContextCompat.getColor(timeText.getContext(), textColor));
+
 
 //            // 使用FurnitureItem中的状态信息而不是直接访问pack
 //            workingText.setText(item.getWorkingStatus());

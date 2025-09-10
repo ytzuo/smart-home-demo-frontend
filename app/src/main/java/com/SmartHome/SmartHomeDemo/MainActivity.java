@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.UiThread;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -258,9 +260,9 @@ public class MainActivity extends AppCompatActivity {
         LogItem logItem = new LogItem(
                 alert.level,                    // 日志类型 (INFO/WARN/ALERT)
                 currentTime,                    // 当前时间
-                "ID: " + alert.alert_id,        // Alert ID
+                ""+alert.alert_id,                 // Alert ID
                 alert.description,              // Alert 描述
-                alert.deviceId                  // 设备ID
+                alert.deviceType
         );
         Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
@@ -387,7 +389,9 @@ public class MainActivity extends AppCompatActivity {
                 // 转换为FurnitureItem列表
                 List<FurnitureItem> furnitureItems = new ArrayList<>();
                 for (Device dev : devices) {
-                    if ("light".equals(dev.getDeviceType()) || "air_conditioner".equals(dev.getDeviceType())) {
+                    if ("light".equals(dev.getDeviceType())
+                            || "air_conditioner".equals(dev.getDeviceType())
+                            || "ac".equals(dev.getDeviceType())) {
                         FurnitureItem item = new FurnitureItem();
                         item.setDeviceId(dev.getDeviceId());
                         item.setDeviceType(dev.getDeviceType());
@@ -743,6 +747,77 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("MainActivity", "对应的alert还未插入数据库");
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 处理夜间模式切换
+        Log.i("MainActivity", "onConfigurationChanged " + newConfig.toString());
+        getDelegate().applyDayNight();
+
+        // 手动更新所有视图的主题
+        updateViewsTheme();
+
+        // 更新所有Fragment的UI
+        if (currentCarFragment != null) {
+            currentCarFragment.onConfigurationChanged(newConfig);
+        }
+        if (currentHomeFragment != null) {
+            currentHomeFragment.onConfigurationChanged(newConfig);
+        }
+        if (currentLogFragment != null) {
+            currentLogFragment.onConfigurationChanged(newConfig);
+        }
+        if (currentSettingFragment != null) {
+            currentSettingFragment.onConfigurationChanged(newConfig);
+        }
+        Log.i("MainActivity", "finishOnConfigurationChanged");
+    }
+
+    // 手动更新视图主题的方法
+    private void updateViewsTheme() {
+        // 更新根视图主题
+        View rootView = findViewById(R.id.fragment_container);
+        if (rootView != null) {
+            int backgroundColor = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
+                    R.color.card_background_dark : R.color.card_background_light;
+            rootView.setBackgroundColor(getResources().getColor(backgroundColor));
+        }
+
+        // 更新底部导航栏主题
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        if (bottomNav != null) {
+            // 设置背景颜色
+            int backgroundColor = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
+                    R.color.card_background_dark : R.color.card_background_light;
+            bottomNav.setBackgroundColor(getResources().getColor(backgroundColor));
+
+            // 更新菜单项颜色
+            int textColor = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES ?
+                    R.color.text_color_dark : R.color.text_color_light;
+
+            // 更新所有Tab的文本和图标颜色
+            for (int i = 0; i < bottomNav.getMenu().size(); i++) {
+                bottomNav.getMenu().getItem(i).getIcon().setTintList(
+                        getResources().getColorStateList(textColor));
+            }
+        }
+
+        // 通知HomeFragment更新分组栏主题
+        if (currentHomeFragment != null) {
+            currentHomeFragment.updateGroupBarTheme();
+        }
+    }
+
+    // 添加异常处理
+    @Override
+    protected void onResume() {
+        try {
+            super.onResume();
+        } catch (Exception e) {
+            Log.e("Lifecycle", "Error in MainActivity.onResume", e);
         }
     }
 
