@@ -589,4 +589,25 @@ public class SettingFragment extends Fragment {
             }
         }
     }
+
+    /**
+     * 刷新数据的方法
+     * 重新加载设置选项的状态
+     */
+    public void refreshData() {
+        if (getActivity() != null) {
+            // 刷新夜间模式开关状态
+            if (darkModeSwitch != null) {
+                int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                darkModeSwitch.setChecked(currentNightMode == Configuration.UI_MODE_NIGHT_YES);
+            }
+
+            // 刷新通知开关状态
+            if (NoticeSwitch != null) {
+                SharedPreferences prefs = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+                boolean isNoticeEnabled = prefs.getBoolean("notice_enabled", true);
+                NoticeSwitch.setChecked(isNoticeEnabled);
+            }
+        }
+    }
 }

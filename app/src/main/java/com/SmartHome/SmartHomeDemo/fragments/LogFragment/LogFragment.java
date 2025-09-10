@@ -360,4 +360,41 @@ public class LogFragment extends Fragment {
         // 触发日志列表更新以应用筛选条件
         logViewModel.refreshLogs();
     }
+
+    /**
+     * 刷新数据的方法
+     * 从数据库重新加载日志数据
+     */
+    public void refreshData() {
+        if (logViewModel != null && database != null) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                try {
+                    // 从数据库获取最新的日志数据
+                    List<com.SmartHome.SmartHomeDemo.database.Log> logs = database.logDao().getAllLogs();
+                    List<LogItem> logItems = new ArrayList<>();
+
+                    // 转换为LogItem列表
+                    for (com.SmartHome.SmartHomeDemo.database.Log log : logs) {
+                        LogItem item = new LogItem(
+                                log.getLogType(),
+                                log.getTimestamp(),
+                                log.getLogId(),
+                                log.getDescription(),
+                                log.getLogDevice()
+                        );
+                        logItems.add(item);
+                    }
+
+                    // 在主线程中更新UI
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            logViewModel.updateLogList(logItems);
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e("LogFragment", "刷新数据时出错", e);
+                }
+            });
+        }
+    }
 }

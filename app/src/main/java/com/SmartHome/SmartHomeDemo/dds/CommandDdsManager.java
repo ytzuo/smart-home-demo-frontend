@@ -5,7 +5,9 @@ import android.util.Log;
 import com.zrdds.domain.DomainParticipant;
 import com.zrdds.infrastructure.DurabilityQosPolicyKind;
 import com.zrdds.infrastructure.HistoryQosPolicyKind;
+import com.zrdds.infrastructure.InstanceHandleSeq;
 import com.zrdds.infrastructure.InstanceHandle_t;
+import com.zrdds.infrastructure.PublicationMatchedStatus;
 import com.zrdds.infrastructure.ReliabilityQosPolicyKind;
 import com.zrdds.infrastructure.ReturnCode_t;
 import com.zrdds.infrastructure.StatusKind;
@@ -24,6 +26,11 @@ public class CommandDdsManager {
 
     private Topic topic;
     private Publisher publisher;
+
+    public DataWriter getDataWriter() {
+        return dataWriter;
+    }
+
     private DataWriter dataWriter;
 
     private static final String TOPIC_NAME = "Command";
@@ -95,6 +102,12 @@ public class CommandDdsManager {
                 Log.e(TAG, "创建Command DateWriter失败");
                 return;
             }
+            PublicationMatchedStatus status = new PublicationMatchedStatus();
+            ReturnCode_t ret =  dataWriter.get_publication_matched_status(status);
+            if(status != null)
+                Log.i("CommandDdsManager", "get_publication_matched_status = "+status.toString()+" "+ ret);
+            else
+                Log.i("CommandDdsManager", "get_publication_matched_status = null");
 
             Log.i(TAG, "✓ Command Publisher和DataWriter创建成功");
         } catch(Exception e) {

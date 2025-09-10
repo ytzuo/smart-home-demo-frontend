@@ -17,6 +17,8 @@ import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 import com.google.android.material.button.MaterialButton;
+import com.zrdds.infrastructure.InstanceHandleSeq;
+import com.zrdds.infrastructure.ReturnCode_t;
 
 import idl.SmartDemo03.Command;
 import idl.SmartDemo03.VehicleStatus;
@@ -214,7 +216,16 @@ public class CarFragment extends Fragment {
             public void onClick(View v) {
                 // 直接使用成员变量app
                 //CommandDdsManager commandDdsManager = app.getCommandDdsManager();
-
+                InstanceHandleSeq seq = new InstanceHandleSeq();
+                ReturnCode_t ret = commandDdsManager.getDataWriter().get_matched_subscriptions(seq);
+                if(ret == ReturnCode_t.RETCODE_OK) {
+                    int len = seq.length();
+                    Log.i(TAG, ""+len);
+                    for(int i = 0; i < len; i++)
+                        Log.i(TAG, "get_matched_subscriptions = "+seq.get_at(i)+" "+ret);
+                } else {
+                    Log.i(TAG, ""+ret);
+                }
                 Command command = new Command();
                 command.deviceId = "My Car";
                 command.deviceType = "car";
@@ -281,6 +292,23 @@ public class CarFragment extends Fragment {
             if(ctrlText != null) {
                 ctrlText.setTextColor(getActivity().getResources().getColor(textColor));
             }
+        }
+    }
+
+    /**
+     * 刷新数据的方法
+     * 请求最新的车辆状态
+     */
+    public void refreshData() {
+        // 发送请求获取最新车辆状态的命令
+        if (commandDdsManager != null && app != null) {
+            Command command = new Command();
+            command.deviceId = "My Car";
+            command.deviceType = "car";
+            command.action = "get_status";
+            command.value = 0;
+            command.timeStamp = String.valueOf(System.currentTimeMillis());
+            commandDdsManager.sendCommand(command);
         }
     }
 }

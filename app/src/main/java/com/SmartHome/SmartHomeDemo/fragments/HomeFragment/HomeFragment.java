@@ -542,4 +542,50 @@ public class HomeFragment extends Fragment {
             viewPagerAdapter.notifyDataSetChanged();
         }
     }
+
+    public void refreshData() {
+        Log.i("refresh", "开始刷新数据");
+        if (getActivity() != null && homeViewModel != null) {
+            AppDatabase database = ((SmartHomeApplication) getActivity().getApplication()).getDatabase();
+            if (database != null) {
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        List<Device> devices = database.deviceDao().getAllDevices();
+                        List<FurnitureItem> furnitureItems = new ArrayList<>();
+
+                        for (Device dev : devices) {
+                            if ("light".equals(dev.getDeviceType())
+                                    || "air_conditioner".equals(dev.getDeviceType())
+                                    || "ac".equals(dev.getDeviceType())) {
+                                FurnitureItem item = new FurnitureItem();
+                                item.setDeviceId(dev.getDeviceId());
+                                item.setDeviceType(dev.getDeviceType());
+                                item.setDeviceGroup(dev.getDeviceGroup());
+                                item.setWorkingStatus("未连接");
+                                item.setStatus("未连接");
+                                item.setTime("默认时间");
+
+                                // 设置图片资源
+                                if ("light".equals(dev.getDeviceType())) {
+                                    item.setImageResource(R.drawable.icon_light);
+                                } else if ("air_conditioner".equals(dev.getDeviceType()) || "ac".equals(dev.getDeviceType())) {
+                                    item.setImageResource(R.drawable.icon_air_conditioner);
+                                }
+
+                                furnitureItems.add(item);
+                            }
+                        }
+
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                homeViewModel.updateFurnitureList(furnitureItems);
+                            });
+                        }
+                    } catch (Exception e) {
+                        Log.e("HomeFragment", "刷新数据时出错", e);
+                    }
+                });
+            }
+        }
+    }
 }

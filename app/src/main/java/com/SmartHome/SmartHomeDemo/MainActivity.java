@@ -200,12 +200,36 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_setting) {
                 selected = currentSettingFragment;
             }
+            // 启动时刷新初始Fragment
+            refreshFragmentUI(currentCarFragment);
             return showFragment(selected);
         });
-
         // 启动处理警报的线程
         //startAlertHandlingThread();
     }
+    /**
+     * 刷新Fragment UI的方法
+     * @param fragment 需要刷新的Fragment
+     */
+    private void refreshFragmentUI(Fragment fragment) {
+        Log.i("refresh", "调用refreshFragmentUI");
+        if (fragment == null) return;
+
+        if (fragment instanceof HomeFragment) {
+            // 刷新HomeFragment，重新从数据库加载家具数据
+            ((HomeFragment) fragment).refreshData();
+        } else if (fragment instanceof CarFragment) {
+            // 刷新CarFragment，请求最新的车辆状态
+            ((CarFragment) fragment).refreshData();
+        } else if (fragment instanceof LogFragment) {
+            // 刷新LogFragment，重新加载日志数据
+            ((LogFragment) fragment).refreshData();
+        } else if (fragment instanceof SettingFragment) {
+            // 刷新SettingFragment
+            ((SettingFragment) fragment).refreshData();
+        }
+    }
+
 
     private void updateCarFragmentUI(VehicleStatus newStatus) {
         // 更新CarFragment UI
