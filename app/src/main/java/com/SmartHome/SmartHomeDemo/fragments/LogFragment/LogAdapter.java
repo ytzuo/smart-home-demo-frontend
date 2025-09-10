@@ -1,5 +1,6 @@
 package com.SmartHome.SmartHomeDemo.fragments.LogFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,12 @@ import com.SmartHome.SmartHomeDemo.R;
 import com.google.android.material.button.MaterialButton;
 import androidx.core.content.ContextCompat;
 import java.util.List;
+import java.util.ArrayList;
 
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     private List<LogItem> logList;
+    private List<LogItem> filteredLogList; // 用于存储过滤后的日志列表
+    private List<String> filterDeviceIds; // 用于存储过滤设备ID
     private LogAdapter.OnItemClickListener listener;
 
     // 定义点击监听器接口
@@ -30,6 +34,8 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     // 构造函数
     public LogAdapter(List<LogItem> logList) {
         this.logList = logList;
+        this.filteredLogList = new ArrayList<>(logList);
+        this.filterDeviceIds = new ArrayList<>();
     }
 
     @NonNull
@@ -42,13 +48,13 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull LogAdapter.ViewHolder holder, int position) {
-        LogItem item = logList.get(position);
+        LogItem item = filteredLogList.get(position);
         holder.bind(item, listener, position);
     }
 
     @Override
     public int getItemCount() {
-        return logList.size();
+        return filteredLogList.size();
     }
 
     // ViewHolder类
@@ -97,6 +103,32 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     public void updateData(List<LogItem> newLogList) {
         this.logList = newLogList;
+        applyFilter(); // 应用当前过滤器
+    }
+
+    // 设置过滤设备ID并应用过滤
+    public void setFilterDeviceIds(List<String> filterDeviceIds) {
+        this.filterDeviceIds = filterDeviceIds != null ? new ArrayList<>(filterDeviceIds) : new ArrayList<>();
+        applyFilter();
+    }
+
+    // 应用过滤器
+    private void applyFilter() {
+        filteredLogList.clear();
+
+        // 如果没有过滤条件，则显示所有日志
+        if (filterDeviceIds.isEmpty()) {
+            filteredLogList.addAll(logList);
+        } else {
+            // 根据设备ID过滤日志
+            for (LogItem logItem : logList) {
+                Log.i("LogAdapter", "LogId: " + logItem.getLogID() + " LogDevice: " + logItem.getLogDevice());
+                if (filterDeviceIds.contains(logItem.getLogDevice())) {
+                    filteredLogList.add(logItem);
+                }
+            }
+        }
+
         notifyDataSetChanged();
     }
 }

@@ -179,7 +179,7 @@ public class HomeFragment extends Fragment {
                         break;
                 }
                 String itemGroup = item.getDeviceGroup();
-                Log.d("HomeFragment", "Processing item: " + item.getDeviceId() + " with group: " + itemGroup);
+                //Log.d("HomeFragment", "Processing item: " + item.getDeviceId() + " with group: " + itemGroup);
 
                 // 查找设备组在分类列表中的索引
                 int categoryIndex = -1;
@@ -190,7 +190,7 @@ public class HomeFragment extends Fragment {
                 // 如果找到了对应的分组，就添加到该分组中
                 if (categoryIndex >= 0) {
                     categorizedFurniture.get(categoryIndex).add(item);
-                    Log.d("HomeFragment", "Added item to category: " + categories.get(categoryIndex));
+                    //Log.d("HomeFragment", "Added item to category: " + categories.get(categoryIndex));
                 } else {
                     // 如果没有找到分组或者分组为空，默认添加到第一个默认分组
                     // 从SharedPreferences获取第一个默认分组的名称
@@ -199,7 +199,7 @@ public class HomeFragment extends Fragment {
                     int defaultGroupIndex = categories.indexOf(firstGroupName);
                     if (defaultGroupIndex >= 0 && defaultGroupIndex < categorizedFurniture.size()) {
                         categorizedFurniture.get(defaultGroupIndex).add(item);
-                        Log.d("HomeFragment", "Added item to default group: " + firstGroupName);
+                        //Log.d("HomeFragment", "Added item to default group: " + firstGroupName);
                     }
                 }
             }
@@ -207,7 +207,7 @@ public class HomeFragment extends Fragment {
 
         // 记录每个分类的项目数量
         for (int i = 0; i < categories.size() && i < categorizedFurniture.size(); i++) {
-            Log.d("HomeFragment", "Category " + categories.get(i) + " has " + categorizedFurniture.get(i).size() + " items");
+            //og.d("HomeFragment", "Category " + categories.get(i) + " has " + categorizedFurniture.get(i).size() + " items");
         }
 
         // 通知适配器数据已更改，使用post方法避免生命周期冲突
@@ -216,7 +216,7 @@ public class HomeFragment extends Fragment {
                 viewPager2.post(() -> {
                     if (viewPagerAdapter != null) {
                         viewPagerAdapter.updateData(categories, categorizedFurniture);
-                        Log.d("HomeFragment", "Notified adapter of data change");
+                        //Log.d("HomeFragment", "Notified adapter of data change");
                     }
                 });
             }
@@ -251,7 +251,7 @@ public class HomeFragment extends Fragment {
     // 添加更新HomeStatus的方法
     public void handleHomeStatus(HomeStatus homeStatus) {
         if (homeViewModel != null) {
-            Log.i("HomeFragment", "handleHomeStatus");
+            //Log.i("HomeFragment", "handleHomeStatus");
             // 在后台线程中处理数据库操作
             Executors.newSingleThreadExecutor().execute(() -> {
                 try {
@@ -329,13 +329,12 @@ public class HomeFragment extends Fragment {
                             newItem.setTime(homeStatus.timeStamp);
 
                             // 更新数据
-                            Log.i("newItem", "开始读取JSON");
-                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
-                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
-                            } else {
-                                Log.i("newItem", "JSON转换失败/更新失败 "
-                                        + homeStatus.deviceStatus.get_at(i));
-                            }
+                            //Log.i("newItem", "开始读取JSON");
+//                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
+//                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
+//                            } else {
+//                                Log.i("newItem", "JSON转换失败/更新失败 " + homeStatus.deviceStatus.get_at(i));
+//                            }
 
                             // 更新映射中的项目
                             currentItemMap.put(deviceId, newItem);

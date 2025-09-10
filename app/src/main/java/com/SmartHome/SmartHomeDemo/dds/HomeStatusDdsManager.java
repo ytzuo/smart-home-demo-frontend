@@ -98,13 +98,13 @@ public class HomeStatusDdsManager {
             DataReaderListener readerListener = new DataReaderListener() {
                 @Override
                 public void on_data_available(DataReader reader) {
-                    Log.i(TAG, "📨 收到新的HomeStatus数据！");
+                    //Log.i(TAG, "📨 收到新的HomeStatus数据！");
                     readHomeStatusData(reader);
                 }
 
                 @Override
                 public void on_data_arrived(DataReader reader, Object obj, SampleInfo sampleInfo) {
-                    Log.i(TAG, "📨 收到新的HomeStatus数据！");
+                    //Log.i(TAG, "📨 收到新的HomeStatus数据！");
                     readHomeStatusData(reader);
                 }
 

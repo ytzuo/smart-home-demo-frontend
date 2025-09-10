@@ -294,8 +294,8 @@ public class SmartHomeApplication extends Application {
         homeStatusDdsManager.setOnHomeStatusReceivedListener(new HomeStatusDdsManager.OnHomeStatusReceivedListener() {
             @Override
             public void onHomeStatusReceived(idl.SmartDemo03.HomeStatus homeStatus) {
-                Log.d(TAG, "收到HomeStatus消息: " + homeStatus.deviceIds.toString() +
-                        ", " + homeStatus.deviceTypes.toString() + homeStatus.deviceStatus.get_at(0));
+//                Log.d(TAG, "收到HomeStatus消息: " + homeStatus.deviceIds.toString() +
+//                        ", " + homeStatus.deviceTypes.toString() + homeStatus.deviceStatus.get_at(0));
 
                 // 通知监听器
                 if (homeStatusListener != null) {

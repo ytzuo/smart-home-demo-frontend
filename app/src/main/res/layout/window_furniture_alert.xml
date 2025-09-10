@@ -20,6 +20,7 @@
             app:tint="@android:color/holo_red_dark" />
 
         <TextView
+            android:id="@+id/alert_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/alert_label"

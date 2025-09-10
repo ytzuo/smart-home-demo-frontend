@@ -2,6 +2,7 @@ package com.SmartHome.SmartHomeDemo.fragments.HomeFragment;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,6 +162,7 @@ public class FurnitureAlert extends DialogFragment {
             deviceImageView.setVisibility(View.VISIBLE);
         } else if (deviceImageView != null) {
             deviceImageView.setVisibility(View.GONE);
+            Log.i("FurnitureAlert", "设备图片为空");
         }
     }
 

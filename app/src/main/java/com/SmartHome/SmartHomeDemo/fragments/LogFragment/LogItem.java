@@ -1,5 +1,7 @@
 package com.SmartHome.SmartHomeDemo.fragments.LogFragment;
 
+import androidx.annotation.NonNull;
+
 public class LogItem {
     private String logType;
     private String logTime;
@@ -15,7 +17,6 @@ public class LogItem {
         this.logMsg = logMsg;
         this.logDevice = device;
     }
-
 
     public String getLogType() {
         return logType;

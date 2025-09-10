@@ -47,8 +47,6 @@ public class SettingFragment extends Fragment {
     private String TAG = "SettingFragment";
     private Switch darkModeSwitch;
     private Switch NoticeSwitch;
-    private Button testAlertFurniture;
-    private Button testAlertCar;
     private Button testSceneMode;
 
     // 添加三个情景模式TextView的引用
@@ -106,8 +104,6 @@ public class SettingFragment extends Fragment {
     private void initialization(View view){
         darkModeSwitch     = view.findViewById(R.id.dark_mode_switch);
         NoticeSwitch       = view.findViewById(R.id.notification_allow_switch);
-        testAlertFurniture = view.findViewById(R.id.test_alert_furniture);
-        testAlertCar       = view.findViewById(R.id.test_alert_car);
         testSceneMode      = view.findViewById(R.id.test_del_scene);
 
         if(darkModeSwitch != null) {
@@ -146,61 +142,7 @@ public class SettingFragment extends Fragment {
             });
         }
 
-        if(testAlertFurniture != null){
-            testAlertFurniture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 创建一个测试的报警对话框
-                    testAlertFurniture.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // 创建一个测试的报警对话框
-                            FurnitureAlert furnitureAlert = FurnitureAlert.newInstance("TEST001", "AC", "");
-                            furnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
-                                @Override
-                                public void onConfirmClick() {
-                                    // 处理确认按钮点击事件
-                                    furnitureAlert.dismiss();
-                                }
 
-                                @Override
-                                public void onViewAlertClick() {
-                                    // 处理查看设备按钮点击事件
-                                    furnitureAlert.dismiss();
-                                }
-                            });
-
-                            furnitureAlert.show(getChildFragmentManager(), "furniture_alert_test");
-                        }
-                    });
-                }
-            });
-        }
-
-        if(testAlertCar != null){
-            testAlertCar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 创建一个测试的报警对话框
-                    testAlertCar.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // 创建一个测试的报警对话框
-                            CarAlert carAlert = CarAlert.newInstance("TEST002", "100100", "");
-                            carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
-                                @Override
-                                public void onConfirmClick() {
-                                    // 处理确认按钮点击事件
-                                    carAlert.dismiss();
-                                }
-                            });
-
-                            carAlert.show(getChildFragmentManager(), "car_alert_test");
-                        }
-                    });
-                }
-            });
-        }
         if(testSceneMode != null) {
             testSceneMode.setOnClickListener(new View.OnClickListener() {
                 @Override

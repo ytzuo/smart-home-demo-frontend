@@ -3,4 +3,7 @@
     <item
         android:id="@+id/action_unbind"
         android:title="@string/unbind_device" />
+    <item
+        android:id="@+id/action_view_device"
+        android:title="查看家具日志" />
 </menu>

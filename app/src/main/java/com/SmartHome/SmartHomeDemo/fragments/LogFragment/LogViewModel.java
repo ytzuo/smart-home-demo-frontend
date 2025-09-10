@@ -124,4 +124,27 @@ public class LogViewModel extends AndroidViewModel {
             isDataLoaded.set(true);
         });
     }
+
+    public void refreshLogs() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Log> logs = database.logDao().getAllLogs();
+            List<LogItem> logItems = new ArrayList<>();
+
+            for (Log log : logs) {
+                String time = log.getTimestamp();
+                LogItem item = new LogItem(
+                        log.getLogType(),
+                        time,
+                        log.getLogId(),
+                        log.getDescription(),
+                        log.getLogDevice()
+                );
+                logItems.add(item);
+            }
+
+            logList.clear();
+            logList.addAll(logItems);
+            logListLiveData.postValue(logList);
+        });
+    }
 }

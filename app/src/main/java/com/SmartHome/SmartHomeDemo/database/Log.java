@@ -12,6 +12,7 @@ public class Log {
     @ColumnInfo(name = "log_type")
     private String logType;
 
+
     public String getLogDevice() {
         return logDevice;
     }

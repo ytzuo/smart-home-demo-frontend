@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.UiThread;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment currentHomeFragment;
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
-    FurnitureAlert currentFurnitureAlert;
+    volatile FurnitureAlert currentFurnitureAlert;
     // 用于暂存收到的媒体数据，直到对应的alert记录被插入数据库
     private Queue<PendingMediaData> pendingMediaQueue = new ConcurrentLinkedQueue<>();
     // 内部类：用于存储待处理的媒体数据
@@ -258,8 +259,8 @@ public class MainActivity extends AppCompatActivity {
                 alert.level,                    // 日志类型 (INFO/WARN/ALERT)
                 currentTime,                    // 当前时间
                 "ID: " + alert.alert_id,        // Alert ID
-                alert.description,               // Alert 描述
-                alert.deviceType
+                alert.description,              // Alert 描述
+                alert.deviceId                  // 设备ID
         );
         Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
@@ -277,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         newLog.setLogId(""+alert.alert_id);
         newLog.setDescription(alert.description);
         newLog.setTimestamp(alert.timeStamp);
+        newLog.setLogDevice(alert.deviceId);  // 设置设备ID
         // 在后台线程中执行数据库操作
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
@@ -509,6 +511,11 @@ public class MainActivity extends AppCompatActivity {
     private void showFurnitureAlert(Alert alert) {
         // 发送通知到状态栏
         sendFurnitureAlertNotification(alert);
+        // 显示家具警报弹窗
+        if (currentFurnitureAlert != null) {
+            currentFurnitureAlert.dismiss();
+            currentFurnitureAlert = null;
+        }
 
         currentFurnitureAlert = FurnitureAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
         currentFurnitureAlert.setOnButtonClickListener(new FurnitureAlert.OnButtonClickListener() {
@@ -516,6 +523,8 @@ public class MainActivity extends AppCompatActivity {
             public void onConfirmClick() {
                 // 处理确认按钮点击事件
                 currentFurnitureAlert.dismiss();
+                currentFurnitureAlert = null;
+
             }
 
             @Override
@@ -524,6 +533,7 @@ public class MainActivity extends AppCompatActivity {
                 currentFurnitureAlert.dismiss();
                 // 切换到HomeFragment查看设备
                 showFragment(currentHomeFragment);
+                currentFurnitureAlert = null;
                 BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
                 bottomNav.setSelectedItemId(R.id.nav_home);
             }
@@ -591,18 +601,40 @@ public class MainActivity extends AppCompatActivity {
 
     // 处理接收到的媒体数据
     private void handleReceivedMedia(int alertId, Bitmap bitmap) {
-        runOnUiThread(() -> {
-            Log.i("MainActivity", "已接受到图片并更新至家具警报窗口，alertId: " + alertId);
-            if (currentFurnitureAlert != null) {
-                currentFurnitureAlert.updateDeviceImage(bitmap);
+        Log.i("MainActivity", "已接受到图片并更新至家具警报窗口，alertId: " + alertId);
+        // 将媒体数据加入队列等待处理
+        pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
+        // 尝试处理队列中的媒体数据
+        processPendingMediaData();
+        // 在后台线程等待currentFurnitureAlert创建完成
+        Log.i("MainActivity", "MainPlace0");
+        new Thread(() -> {
+            Log.i("MainActivity", "MainPlace1");
+            int attempts = 0;
+            final int maxAttempts = 30; // 最多等待30秒
+            while (currentFurnitureAlert == null && attempts < maxAttempts) {
+                try {
+                    Thread.sleep(1000);
+                    attempts++;
+                    Log.i("MainActivity", "等待家具警报窗口创建完成 (" + attempts + "/" + maxAttempts + ")");
+                } catch (InterruptedException e) {
+                    Log.e("MainActivity", "等待过程中被中断", e);
+                    return;
+                }
             }
+            Log.i("MainActivity", "MainPlace2");
+            // 切换到主线程更新UI
+            runOnUiThread(() -> {
+                if (bitmap != null) {
+                    Log.i("MainActivity", "更新家具警报图片");
+                    currentFurnitureAlert.updateDeviceImage(bitmap);
+                } else {
+                    Log.i("MainActivity", "家具警报图片为空");
+                }
+                Log.i("MainActivity", "MainPlace3");
+            });
 
-            // 将媒体数据加入队列等待处理
-            pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
-
-            // 尝试处理队列中的媒体数据
-            processPendingMediaData();
-        });
+        }).start();
     }
     // 保存媒体文件并与对应的Log记录关联
     private void saveMediaAndLinkToLog(int alertId, Bitmap bitmap) {
@@ -628,7 +660,7 @@ public class MainActivity extends AppCompatActivity {
             Executors.newSingleThreadExecutor().execute(() -> {
                 try {
                     // 根据alertId查找对应的Log记录并更新image_path字段
-                    String logId = String.valueOf(alertId); // 假设logId与alertId相同
+                    String logId = String.valueOf(alertId); // 使用alertId作为logId
                     Log.i("MainActivity", logId + "更新报警图片为: "+filePath);
                     database.logDao().updateImagePathByLogId(logId, filePath);
                     Log.i("MainActivity", "已更新Log记录的图片路径: " + logId);
