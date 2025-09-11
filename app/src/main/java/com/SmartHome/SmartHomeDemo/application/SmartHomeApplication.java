@@ -60,7 +60,7 @@ public class SmartHomeApplication extends Application {
         @Override
         public void run() {
             checkDeviceTimeouts();
-            deviceTimeoutHandler.postDelayed(this, 30000); // 每30秒检查一次
+            deviceTimeoutHandler.postDelayed(this, 10000); // 每10秒检查一次
         }
     };
 
@@ -140,6 +140,12 @@ public class SmartHomeApplication extends Application {
 
         // 设置VehicleStatus消息监听器
         setupVehicleStatusListener();
+
+        // 从数据库初始化已配对设备
+        initializePairedDevices();
+
+        // 启动设备超时检测
+        startDeviceTimeoutDetection();
     }
 
     private void initializeDDS() {
@@ -219,11 +225,12 @@ public class SmartHomeApplication extends Application {
     }
 
     private void handleDevicePresence(Presence presence) {
+        Log.i(TAG, "handleDevicePresence");
         // 更新设备Presence信息
         updateDevicePresence(presence);
 
         // 检查是否是本设备发送的消息，避免处理自己的消息
-        if (deviceId.equals(presence.deviceId)) {
+        if (this.deviceId.equals(presence.deviceId)) {
             return;
         }
 
@@ -498,6 +505,7 @@ public class SmartHomeApplication extends Application {
      * 检查设备是否超时
      */
     private void checkDeviceTimeouts() {
+        Log.i(TAG, "checkDeviceTimeouts");
         long currentTime = System.currentTimeMillis();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -544,4 +552,25 @@ public class SmartHomeApplication extends Application {
     *SmartHomeApplication app = (SmartHomeApplication) getApplication();
      * boolean isInLan = app.isDeviceInLan(deviceId);
      * */
+
+
+    /**
+     * 从数据库初始化已配对的设备
+     */
+    private void initializePairedDevices() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                List<Device> pairedDevices = database.deviceDao().getAllDevices();
+                for (Device device : pairedDevices) {
+                    String deviceId = device.getDeviceId();
+                    // 初始化两个哈希表，初始值设为默认值
+                    devicePresenceMap.put(deviceId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(0))); // 设置为初始时间
+                    deviceLanStatusMap.put(deviceId, false); // 默认设置为不在线
+                }
+                Log.i(TAG, "从数据库初始化了 " + pairedDevices.size() + " 个已配对设备");
+            } catch (Exception e) {
+                Log.e(TAG, "从数据库初始化已配对设备时出错", e);
+            }
+        });
+    }
 }
