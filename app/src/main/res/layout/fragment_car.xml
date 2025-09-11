@@ -22,13 +22,14 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_car"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="0dp"
             android:layout_margin="10dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/ic_launcher_background"
-            android:contentDescription="汽车图片"
+            android:background="@drawable/ic_no_signal"
+            android:contentDescription="汽车摄像头照片"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toBottomOf="@id/top_view"
+            app:layout_constraintDimensionRatio="16:9"
             app:shapeAppearanceOverlay="@style/RoundedImage"
             tools:layout_editor_absoluteX="9dp" />
 
@@ -53,7 +54,7 @@
                     android:id="@+id/car_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+
                     android:layout_marginBottom="8dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/name_car"
