@@ -7,7 +7,11 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+
+import androidx.core.net.ParseException;
 
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.Device;
@@ -24,8 +28,13 @@ import com.zrdds.infrastructure.FloatSeq;
 import com.zrdds.infrastructure.StringSeq;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.function.ToDoubleBiFunction;
@@ -41,6 +50,22 @@ import idl.SmartDemo03.VehicleStatus;
  */
 public class SmartHomeApplication extends Application {
     private static final String TAG = "SmartHomeApplication";
+
+    private Map<String, String> devicePresenceMap = new HashMap<>(); // 存储设备ID和最后收到presence的时间戳
+    private Map<String, Boolean> deviceLanStatusMap = new HashMap<>(); // 存储设备ID和是否处于同一局域网的状态
+
+    // 定时检测设备超时的Handler
+    private Handler deviceTimeoutHandler = new Handler(Looper.getMainLooper());
+    private Runnable deviceTimeoutRunnable = new Runnable() {
+        @Override
+        public void run() {
+            checkDeviceTimeouts();
+            deviceTimeoutHandler.postDelayed(this, 30000); // 每30秒检查一次
+        }
+    };
+
+    // 设备超时时间（毫秒）
+    private static final long DEVICE_TIMEOUT = 30000; // 30秒
 
     private AppDatabase database;
     private BaseDdsManager baseDdsManager;
@@ -194,6 +219,9 @@ public class SmartHomeApplication extends Application {
     }
 
     private void handleDevicePresence(Presence presence) {
+        // 更新设备Presence信息
+        updateDevicePresence(presence);
+
         // 检查是否是本设备发送的消息，避免处理自己的消息
         if (deviceId.equals(presence.deviceId)) {
             return;
@@ -440,4 +468,80 @@ public class SmartHomeApplication extends Application {
             }
         });
     }
+
+    /**
+     * 更新设备Presence信息和局域网状态
+     * @param presence 设备Presence信息
+     */
+    private void updateDevicePresence(Presence presence) {
+        if (presence.inRange) {
+            // 设备在线，更新最后收到presence的时间和局域网状态
+            devicePresenceMap.put(presence.deviceId, presence.timeStamp);
+            deviceLanStatusMap.put(presence.deviceId, true);
+            Log.d(TAG, "更新设备状态 - 设备在线: " + presence.deviceId + ", 时间戳: " + presence.timeStamp);
+        } else {
+            // 设备离线，更新局域网状态为false，但保留最后收到presence的时间用于超时检测
+            deviceLanStatusMap.put(presence.deviceId, false);
+            Log.d(TAG, "更新设备状态 - 设备离线: " + presence.deviceId);
+        }
+    }
+
+    /**
+     * 启动设备超时检测
+     */
+    private void startDeviceTimeoutDetection() {
+        deviceTimeoutHandler.postDelayed(deviceTimeoutRunnable, 30000); // 30秒后开始检测
+        Log.d(TAG, "启动设备超时检测");
+    }
+
+    /**
+     * 检查设备是否超时
+     */
+    private void checkDeviceTimeouts() {
+        long currentTime = System.currentTimeMillis();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Iterator<Map.Entry<String, String>> iterator = devicePresenceMap.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            String deviceId = entry.getKey();
+            String presenceTimeStr = entry.getValue();
+
+            try {
+                // 将时间戳字符串转换为毫秒数
+                Date presenceTime = format.parse(presenceTimeStr);
+
+                // 如果距离上次收到presence消息超过30秒，则将局域网状态设为false
+                if (currentTime - presenceTime.getTime() > DEVICE_TIMEOUT) {
+                    deviceLanStatusMap.put(deviceId, false);
+                    Log.d(TAG, "设备超时，局域网状态设为false: " + deviceId);
+                }
+            } catch (java.text.ParseException e) {
+                Log.e(TAG, "解析时间戳失败: " + presenceTimeStr, e);
+            }
+        }
+    }
+
+    /**
+     * 获取设备的局域网状态
+     * @param deviceId 设备ID
+     * @return 是否处于同一局域网
+     */
+    public boolean isDeviceInLan(String deviceId) {
+        return deviceLanStatusMap.getOrDefault(deviceId, false);
+    }
+
+    /**
+     * 获取所有配对设备的列表
+     * @return 配对设备ID列表
+     */
+    public List<String> getPairedDevices() {
+        return new ArrayList<>(devicePresenceMap.keySet());
+    }
+    /**
+    * 在需要检查设备局域网状态的地方，可以通过以下方式获取：
+    *SmartHomeApplication app = (SmartHomeApplication) getApplication();
+     * boolean isInLan = app.isDeviceInLan(deviceId);
+     * */
 }
