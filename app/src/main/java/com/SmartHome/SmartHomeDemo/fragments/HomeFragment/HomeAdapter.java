@@ -73,37 +73,43 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             FurnitureDataPack pack = item.getFurnitureDataPack();
             itemImage.setImageResource(item.getImageResource());
             nameText.setText(item.getDeviceId());
-
-            // 安全地处理pack和params
-            if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
-                if(pack.getStatus().get(0) == 1){
-                    workingText.setText("工作中");
-                } else{
-                    workingText.setText("已关机");
-                }
-
-                switch (type) {
-                    case "light" :
-                        float bright = pack.getParams().get(0);
-                        statusText.setText("亮度: "+bright+"%");
-                        if(pack.getStatus().get(0) == 1){
-                            itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.WARN_text));
-                        }
-                        break;
-                    case "air_conditioner" :
-                        float temp = pack.getParams().get(0);
-                        statusText.setText("温度: "+temp+"℃");
-                        if(pack.getStatus().get(0) == 1){
-                            itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.blue));
-                        }
-                        break;
-                    default:
-                        statusText.setText(status);
-                        break;
-                }
+            if(!item.isOnline()) {
+                statusText.setText("连接设备以查看数据");
+                itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.gray));
+                timeText.setText("--:--");
             }
+            else {
+                // 安全地处理pack和params
+                if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
+                    if (pack.getStatus().get(0) == 1) {
+                        workingText.setText("工作中");
+                    } else {
+                        workingText.setText("已关机");
+                    }
 
-            timeText.setText(item.getTime());
+                    switch (type) {
+                        case "light":
+                            float bright = pack.getParams().get(0);
+                            statusText.setText("亮度: " + bright + "%");
+                            if (pack.getStatus().get(0) == 1) {
+                                itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.WARN_text));
+                            }
+                            break;
+                        case "air_conditioner":
+                            float temp = pack.getParams().get(0);
+                            statusText.setText("温度: " + temp + "℃");
+                            if (pack.getStatus().get(0) == 1) {
+                                itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.blue));
+                            }
+                            break;
+                        default:
+                            statusText.setText(status);
+                            break;
+                    }
+                }
+
+                timeText.setText(item.getTime());
+            }
 
             // 设置点击事件
             itemView.setOnClickListener(new View.OnClickListener() {

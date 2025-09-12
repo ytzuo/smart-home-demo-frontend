@@ -584,6 +584,11 @@
         }
 
         private void handleSwitchChange(CompoundButton switchView, boolean isChecked) {
+            if(!furnitureItem.isOnline()){
+                ToastUtil.showToast(app, "设备不在线！", Toast.LENGTH_SHORT);
+                switchView.setChecked(false);
+                return;
+            }
             // 处理开关状态变化
             String switchName = getResources().getResourceEntryName(switchView.getId());
             // 这里可以添加实际的设备控制逻辑

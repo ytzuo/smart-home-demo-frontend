@@ -21,6 +21,7 @@ public class FurnitureItem implements Serializable {
     private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
     private float lightPercent;
     private String deviceGroup; // 新增设备组字段
+    private boolean onLineStatus;
 
     public FurnitureDataPack getFurnitureDataPack() {
         return furnitureDataPack;
@@ -74,6 +75,28 @@ public class FurnitureItem implements Serializable {
         List<Integer> receivedStatus = furnitureDataPack.getStatus();
         if (receivedStatus == null) {
             return false;
+        }
+
+        if(!this.onLineStatus) {
+            workingStatus = "未连接";
+            // 根据设备类型更新相应参数
+            try {
+                switch (deviceType){
+                    case "air_conditioner":
+                        status = "连接设备以查看数据";
+                        imageResource = R.drawable.icon_air_conditioner;
+                        break;
+                    case "light":
+                        status = "连接设备以查看数据";
+                        imageResource = R.drawable.icon_light;
+                        break;
+                }
+            } catch (IndexOutOfBoundsException e) {
+                // 处理索引越界异常
+                e.printStackTrace();
+                return false;
+            }
+            return true;
         }
 
         // 重新构建switchStatus而不是追加
@@ -254,4 +277,14 @@ public class FurnitureItem implements Serializable {
     public void setDeviceGroup(String deviceGroup) {
         this.deviceGroup = deviceGroup;
     }
+
+
+    public boolean isOnline() {
+        return onLineStatus;
+    }
+
+    public void setOnlineStatus(boolean onLineStatus) {
+        this.onLineStatus = onLineStatus;
+    }
+
 }

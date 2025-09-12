@@ -98,47 +98,55 @@ public class FurniturePageAdapter extends RecyclerView.Adapter<FurniturePageAdap
 //            workingText.setText(item.getWorkingStatus());
 //            statusText.setText(item.getStatus());
 
-            // 安全地处理pack和params
-            if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
-                if(pack.getStatus().get(0) == 1)
-                    workingText.setText("工作中");
-                else
-                    workingText.setText("已关机");
-                switch (type) {
-                    case "light" :
-                        float bright = pack.getParams().get(0);
-                        statusText.setText("亮度: "+bright+"%");
-                        if(pack.getStatus().get(0) == 1) {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.WARN_text));
-                        } else {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
-                        }
-                        break;
-                    case "air_conditioner" :
-                        float temp = pack.getParams().get(0);
-                        statusText.setText("温度: "+temp+"℃");
-                        if(pack.getStatus().get(0) == 1) {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.blue));
-                        } else {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
-                        }
-                        break;
-                    case "ac" :
-                        temp = pack.getParams().get(0);
-                        statusText.setText("温度: "+temp+"℃");
-                        if(pack.getStatus().get(0) == 1) {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.blue));
-                        } else {
-                            itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(),R.color.gray));
-                        }
-                        break;
-                    default:
-                        statusText.setText(status);
-                        break;
-                }
+            if(!item.isOnline()) {
+                workingText.setText("未连接设备");
+                statusText.setText("连接设备以查看数据");
+                itemImage.setColorFilter(itemView.getContext().getResources().getColor(R.color.gray));
+                timeText.setText("--:--");
             }
+            else {
+                // 安全地处理pack和params
+                if (pack != null && pack.getParams() != null && !pack.getParams().isEmpty()) {
+                    if (pack.getStatus().get(0) == 1)
+                        workingText.setText("工作中");
+                    else
+                        workingText.setText("已关机");
+                    switch (type) {
+                        case "light":
+                            float bright = pack.getParams().get(0);
+                            statusText.setText("亮度: " + bright + "%");
+                            if (pack.getStatus().get(0) == 1) {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.WARN_text));
+                            } else {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.gray));
+                            }
+                            break;
+                        case "air_conditioner":
+                            float temp = pack.getParams().get(0);
+                            statusText.setText("温度: " + temp + "℃");
+                            if (pack.getStatus().get(0) == 1) {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.blue));
+                            } else {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.gray));
+                            }
+                            break;
+                        case "ac":
+                            temp = pack.getParams().get(0);
+                            statusText.setText("温度: " + temp + "℃");
+                            if (pack.getStatus().get(0) == 1) {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.blue));
+                            } else {
+                                itemImage.setColorFilter(ContextCompat.getColor(itemImage.getContext(), R.color.gray));
+                            }
+                            break;
+                        default:
+                            statusText.setText(status);
+                            break;
+                    }
+                }
 
-            timeText.setText(item.getTime());
+                timeText.setText(item.getTime());
+            }
         }
     }
 
