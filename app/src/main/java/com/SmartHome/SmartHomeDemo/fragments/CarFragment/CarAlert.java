@@ -1,9 +1,12 @@
 package com.SmartHome.SmartHomeDemo.fragments.CarFragment;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
@@ -17,11 +20,12 @@ public class CarAlert extends DialogFragment {
     private TextView carPartTextView;
     private TextView carLocationTextView;
     private TextView carDescriptionTextView;
-
+    private ImageView deviceImageView;
     private String carPart = "";
     private String carLocation = "";
     private String carDescription = "";
 
+    private Bitmap alertImageBitmap;
 
     // 按钮点击监听器
     public interface OnButtonClickListener {
@@ -62,6 +66,7 @@ public class CarAlert extends DialogFragment {
         carPartTextView        = view.findViewById(R.id.alert_car_part);
         carLocationTextView    = view.findViewById(R.id.alert_car_location);
         carDescriptionTextView = view.findViewById(R.id.alert_car_description);
+        deviceImageView           = view.findViewById(R.id.alert_car_image);
         MaterialButton confirmButton = view.findViewById(R.id.alert_car_confirm);
 
         // 设置按钮点击事件
@@ -130,6 +135,17 @@ public class CarAlert extends DialogFragment {
         this.carDescription = carDescription;
         if(carDescriptionTextView != null) {
             carDescriptionTextView.setText("报警信息: " + carDescription);
+        }
+    }
+
+    public void updateDeviceImage(Bitmap bitmap) {
+        this.alertImageBitmap = bitmap;
+        if (deviceImageView != null && alertImageBitmap != null) {
+            deviceImageView.setImageBitmap(alertImageBitmap);
+            deviceImageView.setVisibility(View.VISIBLE);
+        } else if (deviceImageView != null) {
+            deviceImageView.setVisibility(View.GONE);
+            Log.i("FurnitureAlert", "设备图片为空");
         }
     }
 }

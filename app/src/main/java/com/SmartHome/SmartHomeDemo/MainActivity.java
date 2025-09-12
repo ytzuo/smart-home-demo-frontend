@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private LogFragment currentLogFragment;
     private SettingFragment currentSettingFragment;
     volatile FurnitureAlert currentFurnitureAlert;
+    volatile CarAlert currentCarAlert;
     // 用于暂存收到的媒体数据，直到对应的alert记录被插入数据库
     private Queue<PendingMediaData> pendingMediaQueue = new ConcurrentLinkedQueue<>();
     // 内部类：用于存储待处理的媒体数据
@@ -162,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         app.setOnMediaReceivedListener(new SmartHomeApplication.OnMediaReceivedListener() {
             @Override
             public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+                Log.i("MainActivity", "媒体监听器被触发");
                 handleReceivedMedia(alertId, bitmap, deviceId, deviceType);
             }
         });
@@ -169,10 +171,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        // 只有在savedInstanceState为null时才加载初始Fragment
-        // 避免旋转屏幕等配置更改时重复加载
-        // 只有在savedInstanceState为null时才加载初始Fragment
-        // 避免旋转屏幕等配置更改时重复加载
         if (savedInstanceState == null) {
             currentCarFragment = new CarFragment();
             currentHomeFragment = new HomeFragment();
@@ -519,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 根据设备类型分发警报到相应处理逻辑
     private void handleAlertByType(Alert alert) {
-        Log.i("MainActivity", "handleAlertByType");
+        Log.i("MainActivity", " 开始处理警报类型: "+alert.deviceType);
         if ("car".equals(alert.deviceType)) {
             // 在主线程中显示车辆警报弹窗
             runOnUiThread(() -> showCarAlert(alert));
@@ -533,20 +531,26 @@ public class MainActivity extends AppCompatActivity {
 
     // 显示车辆警报弹窗
     private void showCarAlert(Alert alert) {
-        CarAlert carAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
-        carAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
+        // 显示车辆警报弹窗
+        if (currentCarAlert != null) {
+            currentCarAlert.dismiss();
+            currentCarAlert = null;
+        }
+
+        currentCarAlert = CarAlert.newInstance(alert.deviceId, alert.deviceType, alert.description);
+        currentCarAlert.setOnButtonClickListener(new CarAlert.OnButtonClickListener() {
             @Override
             public void onConfirmClick() {
                 // 处理确认按钮点击事件
-                carAlert.dismiss();
+                currentCarAlert.dismiss();
+                currentCarAlert = null;
             }
         });
 
         //if (!isFinishing() && !getSupportFragmentManager().isStateSaved()) {
-            carAlert.show(getSupportFragmentManager(), "car_alert");
+        currentCarAlert.show(getSupportFragmentManager(), "car_alert");
         //}
     }
-
     // 显示家具警报弹窗
     private void showFurnitureAlert(Alert alert) {
         // 发送通知到状态栏
@@ -650,10 +654,12 @@ public class MainActivity extends AppCompatActivity {
         // 尝试处理队列中的媒体数据
         processPendingMediaData();
 
-        Log.i("MainActivity", "alertId: " + alertId + ", deviceId: " + deviceId + ", deviceType: " + deviceType);
+        //Log.i("MainActivity", "alertId: " + alertId + ", deviceId: " + deviceId + ", deviceType: " + deviceType);
 
         if(deviceType.equals("light") || deviceType.equals("air_conditioner") || deviceType.equals("ac")) {
             handleReceivedFurnitureMedia(alertId, bitmap);
+        } else if (deviceType.equals("car")) {
+            handleReceivedCarMedia(alertId, bitmap);
         }
 
     }
@@ -689,6 +695,41 @@ public class MainActivity extends AppCompatActivity {
 
         }).start();
     }
+
+    // 处理接收到的车辆媒体数据
+    private void handleReceivedCarMedia(int alertId, Bitmap bitmap) {
+        Log.i("MainActivity", "handleReceiveCarMedia");
+        // 将媒体数据加入队列等待处理
+        pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
+        // 尝试处理队列中的媒体数据
+        processPendingMediaData();
+        // 在后台线程等待currentCarAlert创建完成
+        new Thread(() -> {
+            int attempts = 0;
+            final int maxAttempts = 30; // 最多等待30秒
+            while (currentCarAlert == null && attempts < maxAttempts) {
+                try {
+                    Thread.sleep(1000);
+                    attempts++;
+                    Log.i("MainActivity", "等待车辆警报窗口创建完成 (" + attempts + "/" + maxAttempts + ")");
+                } catch (InterruptedException e) {
+                    Log.e("MainActivity", "等待过程中被中断", e);
+                    return;
+                }
+            }
+            // 切换到主线程更新UI
+            runOnUiThread(() -> {
+                if (bitmap != null) {
+                    Log.i("MainActivity", "更新车辆警报图片");
+                    currentCarAlert.updateDeviceImage(bitmap);
+                } else {
+                    Log.i("MainActivity", "车辆警报图片为空");
+                }
+            });
+
+        }).start();
+    }
+
     // 保存媒体文件并与对应的Log记录关联
     private void saveMediaAndLinkToLog(int alertId, Bitmap bitmap) {
         try {
