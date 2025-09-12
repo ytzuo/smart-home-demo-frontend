@@ -589,6 +589,8 @@
                         command.action    = "get_energy_data_" + command.deviceId;
                         command.value     = 0;
                         command.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                        commandDdsManager.sendCommand(command);
+                        Log.i(TAG, "已发送获取能耗报告的命令");
                     }
                     return false;
                 }

@@ -1,10 +1,12 @@
 package com.SmartHome.SmartHomeDemo.fragments.CarFragment;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class CarFragment extends Fragment {
     private MaterialButton engineButton;
     private MaterialButton lockButton;
     private MaterialButton acButton;
+    private ImageView carImageView;
 
     private SmartHomeApplication app;
     private CommandDdsManager commandDdsManager;
@@ -68,6 +71,7 @@ public class CarFragment extends Fragment {
         lockButton       = view.findViewById(R.id.control_car_lock);
         acButton         = view.findViewById(R.id.control_car_ac);
         ctrlText         = view.findViewById(R.id.control_car_text);
+        carImageView     = view.findViewById(R.id.iv_car); // 获取汽车图像视图的引用
 
         // 观察LiveData变化并更新UI
         LiveData<CarItem> carLiveData = carViewModel.getCarLiveData();
@@ -309,6 +313,21 @@ public class CarFragment extends Fragment {
             command.value = 0;
             command.timeStamp = String.valueOf(System.currentTimeMillis());
             commandDdsManager.sendCommand(command);
+        }
+    }
+
+    /**
+     * 更新汽车图像
+     * @param bitmap 接收到的汽车图像
+     */
+    public void updateCarImage(Bitmap bitmap) {
+        Log.i(TAG, "updateCarImage");
+        if (carImageView != null && bitmap != null) {
+            Log.d(TAG, "更新汽车图像，尺寸: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+            carImageView.setImageBitmap(bitmap);
+            carImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        } else {
+            Log.w(TAG, "无法更新汽车图像，ImageView或Bitmap为空");
         }
     }
 }

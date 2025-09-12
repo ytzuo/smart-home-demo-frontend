@@ -283,7 +283,7 @@ public class ReportMediaDdsManager {
 
         // 显示进度
         double progress = receiver.getProgress();
-        Log.i(TAG, String.format("接收进度: alertId=%d, %.1f%% (块 #%d/%d)",
+        Log.i(TAG, String.format("接收进度: reportId=%s, %.1f%% (块 #%d/%d)",
                 reportId, progress * 100, media.chunk_seq + 1, receiver.getTotalChunks()));
 
         // 如果接收完成，处理完整媒体

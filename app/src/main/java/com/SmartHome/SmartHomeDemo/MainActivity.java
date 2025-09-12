@@ -165,6 +165,14 @@ public class MainActivity extends AppCompatActivity {
                 handleReceivedMedia(alertId, bitmap, deviceId, deviceType);
             }
         });
+        // 设置ReportMedia接收监听器
+        app.setOnReportMediaReceivedListener(new SmartHomeApplication.OnReportMediaReceivedListener() {
+            @Override
+            public void onReportMediaReceived(String reportId, Bitmap bitmap, String deviceId, String deviceType) {
+                Log.i("MainActivity", "收到ReportMedia: reportId=" + reportId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
+                handleReceivedReportMedia(reportId, bitmap, deviceId, deviceType);
+            }
+        });
 
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -877,5 +885,16 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Lifecycle", "Error in MainActivity.onResume", e);
         }
     }
+    private void handleReceivedReportMedia(String reportId, Bitmap bitmap, String deviceId, String deviceType) {
+        // 如果是汽车相关的ReportMedia，更新CarFragment中的图片
+        //if ("car".equals(deviceType)) {
+            runOnUiThread(() -> {
+                if (currentCarFragment != null && bitmap != null) {
+                    currentCarFragment.updateCarImage(bitmap);
+                }
+            });
+        //}
+    }
+
 
 }

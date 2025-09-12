@@ -21,6 +21,7 @@ import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.MediaDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.PresenceDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.ReportMediaDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
@@ -75,6 +76,7 @@ public class SmartHomeApplication extends Application {
     private PresenceDdsManager presenceDdsManager;
     private VehicleStatusDdsManager vehicleStatusDdsManager;
     private MediaDdsManager mediaDdsManager; // 添加这一行
+    private ReportMediaDdsManager reportMediaDdsManager;
 
     private ConnectivityManager.NetworkCallback networkCallback;
     private String deviceId;
@@ -177,8 +179,12 @@ public class SmartHomeApplication extends Application {
         }
         mediaDdsManager.initialize(baseDdsManager, savePath);
 
+        reportMediaDdsManager = new ReportMediaDdsManager();
+        reportMediaDdsManager.initialize(baseDdsManager, "");
+
         // 设置媒体接收监听器
         setupMediaListener();
+        setupReportMediaListener();
     }
 
     private void startNetworkMonitoring() {
@@ -462,6 +468,14 @@ public class SmartHomeApplication extends Application {
         this.mediaReceivedListener = listener;
     }
 
+    public interface OnReportMediaReceivedListener {
+        void onReportMediaReceived(String reportId, Bitmap bitmap, String deviceId, String deviceType);
+    }
+    private OnReportMediaReceivedListener reportMediaReceivedListener;
+    public void setOnReportMediaReceivedListener(OnReportMediaReceivedListener listener) {
+        this.reportMediaReceivedListener = listener;
+    }
+
     private void setupMediaListener() {
         mediaDdsManager.setOnMediaReceivedListener(new MediaDdsManager.OnMediaReceivedListener() {
             @Override
@@ -475,6 +489,18 @@ public class SmartHomeApplication extends Application {
             }
         });
     }
+    public void setupReportMediaListener() {
+        reportMediaDdsManager.setOnMediaReceivedListener(new ReportMediaDdsManager.OnMediaReceivedListener() {
+            @Override
+            public void onMediaReceived(String reportId, Bitmap bitmap, String deviceId, String deviceType) {
+                Log.d(TAG, "收到媒体数据: reportId: "+reportId+", deviceId= "+deviceId + ", deviceType=" + deviceType);
+                if(reportMediaReceivedListener != null) {
+                    reportMediaReceivedListener.onReportMediaReceived(reportId, bitmap, deviceId, deviceType);
+                }
+            }
+        });
+    }
+
 
     /**
      * 更新设备Presence信息和局域网状态
