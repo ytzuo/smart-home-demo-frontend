@@ -36,12 +36,12 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(files("libs\\ZRDDSd.jar"))
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime)
     testImplementation(libs.junit)

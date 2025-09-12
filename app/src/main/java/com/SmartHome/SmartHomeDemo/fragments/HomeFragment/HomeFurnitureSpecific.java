@@ -27,11 +27,15 @@
     import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
     import com.google.android.material.button.MaterialButton;
 
+    import java.text.SimpleDateFormat;
     import java.time.LocalDateTime;
     import java.util.ArrayList;
+    import java.util.Date;
     import java.util.List;
+    import java.util.Locale;
     import java.util.Objects;
 
+    import idl.SmartDemo03.Command;
     import idl.SmartDemo03.Presence;
 
     public class HomeFurnitureSpecific extends Fragment {
@@ -575,6 +579,15 @@
                         // 显示解绑确认对话框
                         showUnbindDialog(null, getView());
                         return true;
+                    }
+
+                    if (item.getItemId() == R.id.action_get_energy_report) {
+                        // TODO: 完成根据设备id获取设备能耗报告图的逻辑
+                        Command command   = new Command();
+                        command.deviceId  = furnitureItem.getDeviceId();
+                        command.action    = "get_raw_energy_data_"+command.deviceId;
+                        command.value     = 0;
+                        command.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                     }
                     return false;
                 }

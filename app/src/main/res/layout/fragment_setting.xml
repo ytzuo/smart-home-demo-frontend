@@ -245,14 +245,14 @@
                 android:layout_height="wrap_content"
                 android:text="删除已保存的情景"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="10dp"/>
-            <Button
-                android:id="@+id/gen_report"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="生成我的智能生活报告"/>
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="10dp"/>-->
+<!--            <Button-->
+<!--                android:id="@+id/gen_report"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="生成我的智能生活报告"/>-->
 
         </LinearLayout>
     </ScrollView>

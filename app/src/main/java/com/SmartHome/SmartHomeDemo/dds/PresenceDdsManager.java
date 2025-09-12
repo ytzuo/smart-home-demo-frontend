@@ -244,11 +244,11 @@ public class PresenceDdsManager {
             }
 
             // 创建Presence对象
-            Presence presence = new Presence();
-            presence.inRange = inRange;
-            presence.deviceId = deviceId;
+            Presence presence   = new Presence();
+            presence.inRange    = inRange;
+            presence.deviceId   = deviceId;
             presence.deviceType = deviceType;
-            presence.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            presence.timeStamp  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
             // 转换为具体的PresenceDataWriter
             PresenceDataWriter presenceDataWriter = (PresenceDataWriter) dataWriter;

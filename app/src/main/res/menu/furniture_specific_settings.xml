@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/action_get_energy_report"
+        android:title="@string/gen_energy_report" />
+    <item
         android:id="@+id/action_unbind"
         android:title="@string/unbind_device" />
-    <item
-        android:id="@+id/action_view_device"
-        android:title="查看家具日志" />
 </menu>

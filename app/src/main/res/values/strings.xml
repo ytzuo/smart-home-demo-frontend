@@ -52,5 +52,5 @@
     <string name="log_message">日志信息</string>
     <string name="select_report">选择要生成的智能报告</string>
     <string name="gen_vehicle_report">汽车健康报告</string>
-    <string name="gen_energy_report">家庭能耗报告</string>
+    <string name="gen_energy_report">设备能耗报告</string>
 </resources>
