@@ -453,7 +453,7 @@ public class SmartHomeApplication extends Application {
 
     // 添加媒体接收监听器接口
     public interface OnMediaReceivedListener {
-        void onMediaReceived(int alertId, Bitmap bitmap);
+        void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType);
     }
 
     private OnMediaReceivedListener mediaReceivedListener;
@@ -465,12 +465,12 @@ public class SmartHomeApplication extends Application {
     private void setupMediaListener() {
         mediaDdsManager.setOnMediaReceivedListener(new MediaDdsManager.OnMediaReceivedListener() {
             @Override
-            public void onMediaReceived(int alertId, Bitmap bitmap) {
-                Log.d(TAG, "收到媒体数据: alertId=" + alertId);
+            public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+                Log.d(TAG, "收到媒体数据: alertId=" + alertId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
 
                 // 通知监听器
                 if (mediaReceivedListener != null) {
-                    mediaReceivedListener.onMediaReceived(alertId, bitmap);
+                    mediaReceivedListener.onMediaReceived(alertId, bitmap, deviceId, deviceType);
                 }
             }
         });

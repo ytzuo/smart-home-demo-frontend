@@ -358,7 +358,7 @@
                             @Override
                             public void onStopTrackingTouch(SeekBar seekBar) {
                                 sendRequestSeekbar(seekBar, seekBar.getProgress());
-                                Log.d(TAG,"Place3");
+                                //Log.d(TAG,"Place3");
                             }
                         });
                     }
@@ -408,7 +408,7 @@
                             @Override
                             public void onStopTrackingTouch(SeekBar seekBar) {
                                 sendRequestSeekbar(seekBar, seekBar.getProgress());
-                                Log.d(TAG,"Place4");
+                                //Log.d(TAG,"Place4");
                             }
                         });
                     }

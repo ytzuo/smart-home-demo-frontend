@@ -88,11 +88,19 @@ public class MainActivity extends AppCompatActivity {
     private static class PendingMediaData {
         int alertId;
         Bitmap bitmap;
+        Alert alert; // 添加alert字段以保存设备信息
         long timestamp;
 
         PendingMediaData(int alertId, Bitmap bitmap) {
             this.alertId = alertId;
             this.bitmap = bitmap;
+            this.timestamp = System.currentTimeMillis();
+        }
+
+        PendingMediaData(int alertId, Bitmap bitmap, Alert alert) {
+            this.alertId = alertId;
+            this.bitmap = bitmap;
+            this.alert = alert; // 保存alert对象
             this.timestamp = System.currentTimeMillis();
         }
     }
@@ -115,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         app.setOnAlertReceivedListener(new AlertDdsManager.OnAlertReceivedListener() {
             @Override
             public void onAlertReceived(Alert alert) {
+                Log.i("MainActivity", "收到警报：" + alert.deviceId + " " + alert.deviceType + " " + alert.description);
                 addAlertToLog(alert);
                 // 根据deviceType分发到不同的处理逻辑
                 handleAlertByType(alert);
@@ -152,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
         // 设置媒体接收监听器
         app.setOnMediaReceivedListener(new SmartHomeApplication.OnMediaReceivedListener() {
             @Override
-            public void onMediaReceived(int alertId, Bitmap bitmap) {
-                handleReceivedMedia(alertId, bitmap);
+            public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+                handleReceivedMedia(alertId, bitmap, deviceId, deviceType);
             }
         });
 
@@ -286,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
                 currentTime,                    // 当前时间
                 ""+alert.alert_id,                 // Alert ID
                 alert.description,              // Alert 描述
-                alert.deviceType
+                alert.deviceId
         );
         Log.i("MainActivity", alert.deviceId+" "+alert.deviceType+" "+alert.level+" "+alert.description);
 
@@ -627,17 +636,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private void handleReceivedMedia(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+        // 将媒体数据加入队列等待处理，同时保存设备信息
+        Alert dummyAlert = new Alert();
+        dummyAlert.alert_id = alertId;
+        dummyAlert.deviceId = deviceId;
+        dummyAlert.deviceType = deviceType;
+        pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap, dummyAlert));
+        // 尝试处理队列中的媒体数据
+        processPendingMediaData();
+
+        Log.i("MainActivity", "alertId: " + alertId + ", deviceId: " + deviceId + ", deviceType: " + deviceType);
+
+        if(deviceType.equals("light") || deviceType.equals("air_conditioner") || deviceType.equals("ac")) {
+            handleReceivedFurnitureMedia(alertId, bitmap);
+        }
+    }
     // 处理接收到的媒体数据
-    private void handleReceivedMedia(int alertId, Bitmap bitmap) {
-        Log.i("MainActivity", "已接受到图片并更新至家具警报窗口，alertId: " + alertId);
+    private void handleReceivedFurnitureMedia(int alertId, Bitmap bitmap) {
         // 将媒体数据加入队列等待处理
         pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
         // 尝试处理队列中的媒体数据
         processPendingMediaData();
         // 在后台线程等待currentFurnitureAlert创建完成
-        Log.i("MainActivity", "MainPlace0");
         new Thread(() -> {
-            Log.i("MainActivity", "MainPlace1");
             int attempts = 0;
             final int maxAttempts = 30; // 最多等待30秒
             while (currentFurnitureAlert == null && attempts < maxAttempts) {
@@ -650,7 +673,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
             }
-            Log.i("MainActivity", "MainPlace2");
             // 切换到主线程更新UI
             runOnUiThread(() -> {
                 if (bitmap != null) {
@@ -659,7 +681,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Log.i("MainActivity", "家具警报图片为空");
                 }
-                Log.i("MainActivity", "MainPlace3");
             });
 
         }).start();
@@ -758,17 +779,25 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 如果对应的alert已经插入数据库，或者等待时间超过5秒（可能是孤儿数据），则处理该媒体数据
-            if (isAlertInserted || (System.currentTimeMillis() - mediaData.timestamp) > 5000) {
+            if (isAlertInserted || (System.currentTimeMillis() - mediaData.timestamp) > 5000 || mediaData.alert != null) {
                 // 从队列中移除
                 pendingMediaQueue.poll();
 
                 // 如果alert已插入数据库，则更新图片路径
                 if (isAlertInserted) {
                     saveMediaAndLinkToLog(mediaData.alertId, mediaData.bitmap);
+                } else if (mediaData.alert != null) {
+                    // 如果有alert对象，即使未插入数据库也处理媒体数据
+                    addAlertToLog(mediaData.alert);
+                    saveMediaAndLinkToLog(mediaData.alertId, mediaData.bitmap);
+
+                    // 标记该alert已处理
+                    synchronized (insertedAlerts) {
+                        insertedAlerts.put(mediaData.alertId, true);
+                    }
                 }
             } else {
                 // 如果对应的alert还未插入数据库，则等待下次处理
-                Log.i("MainActivity", "对应的alert还未插入数据库");
                 break;
             }
         }

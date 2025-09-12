@@ -52,7 +52,7 @@ public class MediaDdsManager {
     private String savePath;
 
     public interface OnMediaReceivedListener {
-        void onMediaReceived(int alertId, Bitmap bitmap);
+        void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType);
     }
 
     private static final String TOPIC_NAME = "AlertMedia";
@@ -270,7 +270,7 @@ public class MediaDdsManager {
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            mediaListener.onMediaReceived(media.alert_id, finalBitmap);
+                            mediaListener.onMediaReceived(media.alert_id, finalBitmap, media.deviceId, media.deviceType);
                         }
                     });
                 }
