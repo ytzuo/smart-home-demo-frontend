@@ -331,12 +331,12 @@ public class HomeFragment extends Fragment {
                             newItem.setTime(homeStatus.timeStamp);
 
                             // 更新数据
-                            //Log.i("newItem", "开始读取JSON");
-//                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
-//                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
-//                            } else {
-//                                Log.i("newItem", "JSON转换失败/更新失败 " + homeStatus.deviceStatus.get_at(i));
-//                            }
+                            Log.i("newItem", "开始读取JSON");
+                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
+                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
+                            } else {
+                                Log.i("newItem", "JSON转换失败/更新失败 " + homeStatus.deviceStatus.get_at(i));
+                            }
 
                             // 更新映射中的项目
                             currentItemMap.put(deviceId, newItem);
