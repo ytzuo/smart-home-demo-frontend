@@ -34,6 +34,7 @@ import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +64,7 @@ public class SettingFragment extends Fragment {
     private Button sceneMode1Customize;
     private Button sceneMode2Customize;
     private Button sceneMode3Customize;
+    private Button genReport;
 
     // SharedPreferences的键名
     private static final String PREFS_NAME = "SceneModeNames";
@@ -110,6 +112,7 @@ public class SettingFragment extends Fragment {
         testSceneMode      = view.findViewById(R.id.test_del_scene);
         darkText           = view.findViewById(R.id.dark_mode_text);
         notificationText   = view.findViewById(R.id.notification_allow_text);
+        genReport          = view.findViewById(R.id.gen_report);
 
         if(darkModeSwitch != null) {
             // 设置开关的初始状态
@@ -165,6 +168,43 @@ public class SettingFragment extends Fragment {
                     clearSceneModeDevices(SCENE_MODE_1_DEVICES_KEY);
                     clearSceneModeDevices(SCENE_MODE_2_DEVICES_KEY);
                     clearSceneModeDevices(SCENE_MODE_3_DEVICES_KEY);
+                }
+            });
+        }
+
+        if(genReport != null) {
+            genReport.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // 加载对话框布局
+                    LayoutInflater inflater = LayoutInflater.from(requireContext());
+                    View dialogView = inflater.inflate(R.layout.window_select_report, null);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setView(dialogView);
+
+                    AlertDialog dialog = builder.create();
+
+                    // 为生成车辆报告按钮设置点击事件
+                    MaterialButton genVehicleReportBtn = dialogView.findViewById(R.id.gen_vehicle_report);
+                    if (genVehicleReportBtn != null) {
+                        genVehicleReportBtn.setOnClickListener(v -> {
+                            // TODO: 实现生成车辆报告的逻辑
+                            Command command = new Command();
+
+                        });
+                    }
+
+                    // 为生成能耗报告按钮设置点击事件
+                    MaterialButton genEnergyReportBtn = dialogView.findViewById(R.id.gen_energy_report);
+                    if (genEnergyReportBtn != null) {
+                        genEnergyReportBtn.setOnClickListener(v -> {
+                            // TODO: 实现生成能耗报告的逻辑
+                            Command command = new Command();
+                        });
+                    }
+
+                    dialog.show();
                 }
             });
         }

@@ -180,6 +180,11 @@ public class HomeFragment extends Fragment {
                         item.setImageResource(R.drawable.icon_air_conditioner);
                         break;
                 }
+                // 添加设备在线状态显示逻辑
+                SmartHomeApplication app = (SmartHomeApplication) getActivity().getApplication();
+                boolean isDeviceOnline = app.isDeviceInLan(item.getDeviceId());
+                // 可以通过设置item的属性来表示在线状态，供适配器使用
+                item.setOnlineStatus(isDeviceOnline);
                 String itemGroup = item.getDeviceGroup();
                 //Log.d("HomeFragment", "Processing item: " + item.getDeviceId() + " with group: " + itemGroup);
 
@@ -331,12 +336,12 @@ public class HomeFragment extends Fragment {
                             newItem.setTime(homeStatus.timeStamp);
 
                             // 更新数据
-                            //Log.i("newItem", "开始读取JSON");
-//                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
-//                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
-//                            } else {
-//                                Log.i("newItem", "JSON转换失败/更新失败 " + homeStatus.deviceStatus.get_at(i));
-//                            }
+                            Log.i("newItem", "开始读取JSON");
+                            if(newItem.receiveDataJson(homeStatus.deviceStatus.get_at(i))) {
+                                Log.i("newItem", newItem.getFurnitureDataPack().toString());
+                            } else {
+                                Log.i("newItem", "JSON转换失败/更新失败 " + homeStatus.deviceStatus.get_at(i));
+                            }
 
                             // 更新映射中的项目
                             currentItemMap.put(deviceId, newItem);

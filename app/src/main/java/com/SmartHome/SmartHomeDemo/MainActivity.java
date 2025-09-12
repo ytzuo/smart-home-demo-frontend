@@ -519,10 +519,13 @@ public class MainActivity extends AppCompatActivity {
 
     // 根据设备类型分发警报到相应处理逻辑
     private void handleAlertByType(Alert alert) {
+        Log.i("MainActivity", "handleAlertByType");
         if ("car".equals(alert.deviceType)) {
             // 在主线程中显示车辆警报弹窗
             runOnUiThread(() -> showCarAlert(alert));
-        } else if ("light".equals(alert.deviceType) || "air_conditioner".equals(alert.deviceType) || "ac".equals(alert.deviceType)) {
+        } else if ("light".equals(alert.deviceType)
+                || "air_conditioner".equals(alert.deviceType)
+                || "ac".equals(alert.deviceType)) {
             // 家具类设备（灯或空调）在主线程中显示家具警报弹窗
             runOnUiThread(() -> showFurnitureAlert(alert));
         }
