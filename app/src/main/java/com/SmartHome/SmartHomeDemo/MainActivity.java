@@ -655,6 +655,7 @@ public class MainActivity extends AppCompatActivity {
         if(deviceType.equals("light") || deviceType.equals("air_conditioner") || deviceType.equals("ac")) {
             handleReceivedFurnitureMedia(alertId, bitmap);
         }
+
     }
     // 处理接收到的媒体数据
     private void handleReceivedFurnitureMedia(int alertId, Bitmap bitmap) {
