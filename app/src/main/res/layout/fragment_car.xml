@@ -22,15 +22,13 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_car"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="270dp"
             android:layout_margin="10dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/ic_no_signal"
             android:contentDescription="汽车摄像头照片"
-            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
             app:layout_constraintTop_toBottomOf="@id/top_view"
-            app:layout_constraintDimensionRatio="16:9"
-            app:shapeAppearanceOverlay="@style/RoundedImage"
             tools:layout_editor_absoluteX="9dp" />
 
         <LinearLayout

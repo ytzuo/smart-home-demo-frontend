@@ -76,7 +76,8 @@ public class SmartHomeApplication extends Application {
     private HomeStatusDdsManager homeStatusDdsManager;
     private PresenceDdsManager presenceDdsManager;
     private VehicleStatusDdsManager vehicleStatusDdsManager;
-    private MediaDdsManager mediaDdsManager; // 添加这一行
+    private MediaDdsManager mediaDdsManager; // 用于处理AlertMedia主题
+    private MediaDdsManager vehicleMediaDdsManager; // 用于处理VehicleMedia主题
     private ReportMediaDdsManager reportMediaDdsManager;
     private EnergyRawDataDdsManager energyRawDataDdsManager;
 
@@ -184,6 +185,10 @@ public class SmartHomeApplication extends Application {
         }
         mediaDdsManager.initialize(baseDdsManager, savePath);
 
+        // 初始化车辆媒体管理器
+        vehicleMediaDdsManager = new MediaDdsManager("VehicleMedia");
+        vehicleMediaDdsManager.initialize(baseDdsManager, savePath);
+
         reportMediaDdsManager = new ReportMediaDdsManager();
         reportMediaDdsManager.initialize(baseDdsManager, "");
 
@@ -192,6 +197,7 @@ public class SmartHomeApplication extends Application {
 
         // 设置媒体接收监听器
         setupMediaListener();
+        setupVehicleMediaListener();
         setupReportMediaListener();
     }
 
@@ -470,10 +476,20 @@ public class SmartHomeApplication extends Application {
         void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType);
     }
 
+    // 添加VehicleMedia接收监听器接口
+    public interface OnVehicleMediaReceivedListener {
+        void onVehicleMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType);
+    }
+
     private OnMediaReceivedListener mediaReceivedListener;
+    private OnVehicleMediaReceivedListener vehicleMediaReceivedListener;
 
     public void setOnMediaReceivedListener(OnMediaReceivedListener listener) {
         this.mediaReceivedListener = listener;
+    }
+
+    public void setOnVehicleMediaReceivedListener(OnVehicleMediaReceivedListener listener) {
+        this.vehicleMediaReceivedListener = listener;
     }
 
     public interface OnReportMediaReceivedListener {
@@ -518,6 +534,25 @@ public class SmartHomeApplication extends Application {
                 // 通知监听器
                 if (mediaReceivedListener != null) {
                     mediaReceivedListener.onMediaReceived(alertId, bitmap, deviceId, deviceType);
+                }
+
+                // 如果是车辆相关的媒体数据，也通知VehicleMedia监听器
+                if ("car".equals(deviceType) && vehicleMediaReceivedListener != null) {
+                    vehicleMediaReceivedListener.onVehicleMediaReceived(alertId, bitmap, deviceId, deviceType);
+                }
+            }
+        });
+    }
+
+    private void setupVehicleMediaListener() {
+        vehicleMediaDdsManager.setOnMediaReceivedListener(new MediaDdsManager.OnMediaReceivedListener() {
+            @Override
+            public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+                Log.d(TAG, "收到VehicleMedia数据: alertId=" + alertId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
+
+                // 通知VehicleMedia监听器
+                if (vehicleMediaReceivedListener != null) {
+                    vehicleMediaReceivedListener.onVehicleMediaReceived(alertId, bitmap, deviceId, deviceType);
                 }
             }
         });
@@ -582,7 +617,7 @@ public class SmartHomeApplication extends Application {
                 // 如果距离上次收到presence消息超过30秒，则将局域网状态设为false
                 if (currentTime - presenceTime.getTime() > DEVICE_TIMEOUT) {
                     deviceLanStatusMap.put(deviceId, false);
-                    Log.d(TAG, "设备超时，局域网状态设为false: " + deviceId);
+                    //Log.d(TAG, "设备超时，局域网状态设为false: " + deviceId);
                 }
             } catch (java.text.ParseException e) {
                 Log.e(TAG, "解析时间戳失败: " + presenceTimeStr, e);

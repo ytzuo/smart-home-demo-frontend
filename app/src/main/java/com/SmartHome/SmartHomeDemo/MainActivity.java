@@ -1,7 +1,6 @@
 
 package com.SmartHome.SmartHomeDemo;
 
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -74,7 +73,6 @@ import idl.SmartDemo03.EnergyRawData;
 import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
 import idl.SmartDemo03.VehicleStatus;
-
 
 public class MainActivity extends AppCompatActivity {
     private static final String GROUP_PREFS_NAME = "GroupNames";
@@ -156,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 设置VehicleStatus监听器
-//        VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
+        //VehicleStatusDdsManager vehicleStatusDdsManager = app.getVehicleStatusDdsManager();
         // 设置VehicleStatus监听器
         app.setOnVehicleStatusReceivedListener(new SmartHomeApplication.OnVehicleStatusReceivedListener() {
             @Override
@@ -170,9 +168,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
                 Log.i("MainActivity", "媒体监听器被触发");
-                handleReceivedMedia(alertId, bitmap, deviceId, deviceType);
+                handleReceivedAlertMedia(alertId, bitmap, deviceId, deviceType);
             }
         });
+
+        // 设置VehicleMedia接收监听器
+        app.setOnVehicleMediaReceivedListener(new SmartHomeApplication.OnVehicleMediaReceivedListener() {
+            @Override
+            public void onVehicleMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+                handleReceivedVehicleMedia(alertId, bitmap, deviceId, deviceType);
+                Log.i("MainActivity", "收到VehicleMedia: alertId=" + alertId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
+            }
+        });
+
         // 设置ReportMedia接收监听器
         app.setOnReportMediaReceivedListener(new SmartHomeApplication.OnReportMediaReceivedListener() {
             @Override
@@ -237,6 +245,20 @@ public class MainActivity extends AppCompatActivity {
         // 启动处理警报的线程
         //startAlertHandlingThread();
     }
+
+    // 处理接收到的定时发送的 车辆媒体数据
+    private void handleReceivedVehicleMedia(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+        Log.i("MainActivity", "handleReceivedVehicleMedia");
+
+        // 更新车辆界面中的图片
+        if (currentCarFragment != null && bitmap != null) {
+            Log.i("MainActivity", "已更新车辆界面中的图片");
+            runOnUiThread(() -> {
+                currentCarFragment.updateCarImage(bitmap);
+            });
+        }
+    }
+
     /**
      * 刷新Fragment UI的方法
      * @param fragment 需要刷新的Fragment
@@ -667,7 +689,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void handleReceivedMedia(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
+    private void handleReceivedAlertMedia(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
         // 将媒体数据加入队列等待处理，同时保存设备信息
         Alert dummyAlert = new Alert();
         dummyAlert.alert_id = alertId;
@@ -680,14 +702,14 @@ public class MainActivity extends AppCompatActivity {
         //Log.i("MainActivity", "alertId: " + alertId + ", deviceId: " + deviceId + ", deviceType: " + deviceType);
 
         if(deviceType.equals("light") || deviceType.equals("air_conditioner") || deviceType.equals("ac")) {
-            handleReceivedFurnitureMedia(alertId, bitmap);
+            handleReceivedFurnitureAlertMedia(alertId, bitmap);
         } else if (deviceType.equals("car")) {
-            handleReceivedCarMedia(alertId, bitmap);
+            handleReceivedCarAlertMedia(alertId, bitmap);
         }
 
     }
     // 处理接收到的媒体数据
-    private void handleReceivedFurnitureMedia(int alertId, Bitmap bitmap) {
+    private void handleReceivedFurnitureAlertMedia(int alertId, Bitmap bitmap) {
         // 将媒体数据加入队列等待处理
         pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));
         // 尝试处理队列中的媒体数据
@@ -720,7 +742,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 处理接收到的车辆媒体数据
-    private void handleReceivedCarMedia(int alertId, Bitmap bitmap) {
+    private void handleReceivedCarAlertMedia(int alertId, Bitmap bitmap) {
         Log.i("MainActivity", "handleReceiveCarMedia");
         // 将媒体数据加入队列等待处理
         pendingMediaQueue.offer(new PendingMediaData(alertId, bitmap));

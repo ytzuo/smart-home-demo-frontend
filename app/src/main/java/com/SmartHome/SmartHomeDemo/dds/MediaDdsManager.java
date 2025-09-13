@@ -51,11 +51,22 @@ public class MediaDdsManager {
     // 应用内部存储路径
     private String savePath;
 
+    // 主题名称
+    private String topicName;
+
     public interface OnMediaReceivedListener {
         void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType);
     }
 
-    private static final String TOPIC_NAME = "AlertMedia";
+    private static final String DEFAULT_TOPIC_NAME = "AlertMedia";
+
+    public MediaDdsManager() {
+        this.topicName = DEFAULT_TOPIC_NAME;
+    }
+
+    public MediaDdsManager(String topicName) {
+        this.topicName = topicName;
+    }
 
     public void initialize(BaseDdsManager baseManager, String savePath) {
         this.savePath = savePath;
@@ -76,7 +87,7 @@ public class MediaDdsManager {
 
             // 创建主题
             topic = baseManager.getParticipant().create_topic(
-                    TOPIC_NAME,
+                    topicName,
                     AlertMediaTypeSupport.get_instance().get_type_name(),
                     DomainParticipant.TOPIC_QOS_DEFAULT,
                     null,
@@ -84,11 +95,11 @@ public class MediaDdsManager {
             );
 
             if (topic == null) {
-                Log.e(TAG, "创建AlertMedia主题失败");
+                Log.e(TAG, "创建" + topicName + "主题失败");
                 return;
             }
 
-            Log.i(TAG, "✓ AlertMedia主题创建成功: " + TOPIC_NAME);
+            Log.i(TAG, "✓ " + topicName + "主题创建成功: " + topicName);
 
             createSubscriber(baseManager);
 
