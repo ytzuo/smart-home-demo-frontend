@@ -34,6 +34,11 @@ import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -64,7 +69,7 @@ public class SettingFragment extends Fragment {
     private Button sceneMode1Customize;
     private Button sceneMode2Customize;
     private Button sceneMode3Customize;
-    //private Button genReport;
+    private Button testChart;
 
     // SharedPreferences的键名
     private static final String PREFS_NAME = "SceneModeNames";
@@ -112,7 +117,7 @@ public class SettingFragment extends Fragment {
         testSceneMode      = view.findViewById(R.id.test_del_scene);
         darkText           = view.findViewById(R.id.dark_mode_text);
         notificationText   = view.findViewById(R.id.notification_allow_text);
-        //genReport          = view.findViewById(R.id.gen_report);
+        testChart          = view.findViewById(R.id.test_chart);
 
         if(darkModeSwitch != null) {
             // 设置开关的初始状态
@@ -172,42 +177,75 @@ public class SettingFragment extends Fragment {
             });
         }
 
-//        if(genReport != null) {
-//            genReport.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    // 加载对话框布局
-//                    LayoutInflater inflater = LayoutInflater.from(requireContext());
-//                    View dialogView = inflater.inflate(R.layout.window_select_report, null);
-//
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-//                    builder.setView(dialogView);
-//
-//                    AlertDialog dialog = builder.create();
-//
-//                    // 为生成车辆报告按钮设置点击事件
-//                    MaterialButton genVehicleReportBtn = dialogView.findViewById(R.id.gen_vehicle_report);
-//                    if (genVehicleReportBtn != null) {
-//                        genVehicleReportBtn.setOnClickListener(v -> {
-//                            // TODO: 实现生成车辆报告的逻辑
-//                            Command command = new Command();
-//                        });
-//                    }
-//
-//                    // 为生成能耗报告按钮设置点击事件
-//                    MaterialButton genEnergyReportBtn = dialogView.findViewById(R.id.gen_energy_report);
-//                    if (genEnergyReportBtn != null) {
-//                        genEnergyReportBtn.setOnClickListener(v -> {
-//                            // TODO: 实现生成能耗报告的逻辑
-//                            Command command = new Command();
-//                        });
-//                    }
-//
-//                    dialog.show();
-//                }
-//            });
-//        }
+        if(testChart != null) {
+            testChart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ArrayList<Entry> entries = new ArrayList<>();
+                    // 使用日期时间戳作为X轴值
+                    long currentTime = System.currentTimeMillis();
+                    long oneDayMillis = 24 * 60 * 60 * 1000;
+
+                    entries.add(new Entry(currentTime - 6 * oneDayMillis, 20));
+                    entries.add(new Entry(currentTime - 5 * oneDayMillis, 40));
+                    entries.add(new Entry(currentTime - 4 * oneDayMillis, 30));
+                    entries.add(new Entry(currentTime - 3 * oneDayMillis, 60));
+                    entries.add(new Entry(currentTime - 2 * oneDayMillis, 50));
+                    entries.add(new Entry(currentTime - oneDayMillis, 44));
+                    entries.add(new Entry(currentTime, 32));
+                    showChart(entries);
+                }
+            });
+        }
     }
+    private void showChart(ArrayList<Entry> entries) {
+        // 加载window_energy_trend布局
+        View trendView = getLayoutInflater().inflate(R.layout.window_energy_trend, null);
+
+        // 获取图表实例
+        LineChart energyChart = trendView.findViewById(R.id.trend_chart);
+
+        // 创建示例数据集
+        LineDataSet dataSet = new LineDataSet(entries, "设备能耗");
+        dataSet.setColor(ColorTemplate.MATERIAL_COLORS[0]);
+        dataSet.setValueTextColor(ColorTemplate.MATERIAL_COLORS[1]);
+
+        // 设置线条加粗
+        dataSet.setLineWidth(3f); // 设置线条宽度为3像素
+
+        // 设置数据到图表
+        energyChart.setData(new LineData(dataSet));
+        // 设置X轴标签
+        energyChart.getXAxis().setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
+        energyChart.getXAxis().setGranularity(1f);
+        energyChart.getXAxis().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                // 将时间戳转换为日期格式
+                long millis = (long) value;
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MM-dd");
+                return sdf.format(new java.util.Date(millis));
+            }
+        });
+
+        // 设置Y轴标签
+        energyChart.getAxisLeft().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return value + "kWh";
+            }
+        });
+        energyChart.invalidate(); // 刷新图表
+
+        // 显示图表弹窗
+        new AlertDialog.Builder(requireContext())
+                .setView(trendView)
+                .setTitle("设备能耗趋势")
+                .setPositiveButton("关闭", null)
+                .show();
+    }
+
+
 
     // 在 Fragment 或 Activity 中添加以下代码
     private void setupDoubleClickToEdit(TextView textView, final String prefKey) {
