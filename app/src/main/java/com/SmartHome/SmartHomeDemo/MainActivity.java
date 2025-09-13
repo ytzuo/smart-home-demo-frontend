@@ -966,6 +966,8 @@ public class MainActivity extends AppCompatActivity {
         com.zrdds.infrastructure.FloatSeq currentPowerSeq = energyRawData.currentPowerSeq;
         com.zrdds.infrastructure.StringSeq timeSeq = energyRawData.timeSeq;
 
+        Log.d("ChartDebug", "接收到数据: 功率数据长度=" + currentPowerSeq.length() + ", 时间数据长度=" + timeSeq.length());
+
         // 检查数据是否有效
         if (currentPowerSeq.length() != timeSeq.length()) {
             Log.e("MainActivity", "数据长度不匹配: currentPowerSeq长度=" + currentPowerSeq.length() +
@@ -973,42 +975,65 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // 转换数据为图表可用格式
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        for (int i = 0; i < currentPowerSeq.length(); i++) {
-            try {
-                // 将时间字符串转换为时间戳
-                Date date = sdf.parse(timeSeq.get_at(i));
-                long timestamp = date.getTime();
+        // 如果数据为空，直接返回
+        if (currentPowerSeq.length() == 0) {
+            Log.w("MainActivity", "接收到空的能源数据");
+            // 显示一个提示对话框
+            new AlertDialog.Builder(this)
+                    .setTitle("无数据")
+                    .setMessage("当前设备没有能耗数据可供显示")
+                    .setPositiveButton("关闭", null)
+                    .show();
+            return;
+        }
 
-                // 添加数据点 (时间戳, 功率值)
-                entries.add(new Entry(timestamp, currentPowerSeq.get_at(i)));
-            } catch (Exception e) {
-                Log.e("MainActivity", "解析时间数据出错: " + timeSeq.get_at(i), e);
+        // 使用索引作为横坐标
+        for (int i = 0; i < currentPowerSeq.length(); i++) {
+            float powerValue = currentPowerSeq.get_at(i);
+            // 使用索引作为X轴值
+            entries.add(new Entry(i, powerValue));
+
+            // 打印前几个数据点用于调试
+            if (i < 5) {
+                Log.d("ChartDebug", "数据点[" + i + "] 功率: " + powerValue);
             }
         }
 
+        Log.d("ChartDebug", "总共添加了 " + entries.size() + " 个数据点");
+
+        // 检查是否有有效数据
+        if (entries.isEmpty()) {
+            Log.w("MainActivity", "没有有效的数据点可以显示");
+            new AlertDialog.Builder(this)
+                    .setTitle("无有效数据")
+                    .setMessage("无法处理接收到的能耗数据")
+                    .setPositiveButton("关闭", null)
+                    .show();
+            return;
+        }
+
         // 创建数据集
-        LineDataSet dataSet = new LineDataSet(entries, "实时功率 (" + energyRawData.deviceId + ")");
+        LineDataSet dataSet = new LineDataSet(entries, "能耗 (" + energyRawData.deviceId + ")");
         dataSet.setColor(ColorTemplate.MATERIAL_COLORS[0]);
         dataSet.setValueTextColor(ColorTemplate.MATERIAL_COLORS[1]);
         dataSet.setLineWidth(3f); // 设置线条宽度为3像素
         dataSet.setCircleRadius(4f); // 设置数据点圆圈半径
         dataSet.setDrawValues(true); // 显示数值
+        dataSet.setDrawCircles(true); // 确保绘制圆点
+        dataSet.setDrawFilled(true); // 绘制填充区域
 
         // 设置数据到图表
-        energyChart.setData(new LineData(dataSet));
+        LineData lineData = new LineData(dataSet);
+        energyChart.setData(lineData);
 
-        // 设置X轴标签
+        // 设置X轴标签（使用索引）
         energyChart.getXAxis().setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
-        energyChart.getXAxis().setGranularity(1f);
+        energyChart.getXAxis().setGranularity(1f); // 设置最小间隔为1
         energyChart.getXAxis().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                // 将时间戳转换为日期格式
-                long millis = (long) value;
-                SimpleDateFormat displayFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
-                return displayFormat.format(new Date(millis));
+                // 直接显示索引值
+                return String.valueOf((int) value);
             }
         });
 
@@ -1016,7 +1041,14 @@ public class MainActivity extends AppCompatActivity {
         energyChart.getAxisLeft().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return String.format("%.1f", value) + "W";
+                // 根据数值大小选择合适的格式
+                if (value < 1) {
+                    return String.format("%.2f", value) + "kWh";
+                } else if (value < 10) {
+                    return String.format("%.1f", value) + "kWh";
+                } else {
+                    return String.format("%.0f", value) + "kWh";
+                }
             }
         });
 
@@ -1031,8 +1063,13 @@ public class MainActivity extends AppCompatActivity {
         energyChart.setDragEnabled(true);
         energyChart.setScaleEnabled(true);
 
+        // 设置图例
+        energyChart.getLegend().setEnabled(true);
+
         // 刷新图表
         energyChart.invalidate();
+
+        Log.d("ChartDebug", "图表已刷新，数据集包含 " + dataSet.getEntryCount() + " 个条目");
 
         // 显示图表弹窗
         new AlertDialog.Builder(this)

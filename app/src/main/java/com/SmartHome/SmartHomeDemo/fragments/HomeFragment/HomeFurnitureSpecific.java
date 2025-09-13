@@ -585,8 +585,7 @@
                         // TODO: 完成根据设备id获取设备能耗报告图的逻辑
                         Command command   = new Command();
                         command.deviceId  = furnitureItem.getDeviceId();
-                        //command.action    = "get_raw_energy_data_"+command.deviceId;
-                        command.action    = "get_energy_data_" + command.deviceId;
+                        command.action    = "get_raw_energy_data_" + command.deviceId;
                         command.value     = 0;
                         command.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                         commandDdsManager.sendCommand(command);
