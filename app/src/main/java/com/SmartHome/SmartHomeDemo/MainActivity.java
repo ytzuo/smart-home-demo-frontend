@@ -48,6 +48,11 @@ import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogFragment;
 import com.SmartHome.SmartHomeDemo.fragments.LogFragment.LogItem;
 import com.SmartHome.SmartHomeDemo.fragments.SettingFragment.SettingFragment;
 import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
@@ -65,6 +70,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
 import idl.SmartDemo03.Alert;
+import idl.SmartDemo03.EnergyRawData;
 import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
 import idl.SmartDemo03.VehicleStatus;
@@ -173,6 +179,15 @@ public class MainActivity extends AppCompatActivity {
             public void onReportMediaReceived(String reportId, Bitmap bitmap, String deviceId, String deviceType) {
                 Log.i("MainActivity", "收到ReportMedia: reportId=" + reportId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
                 handleReceivedReportMedia(reportId, bitmap, deviceId, deviceType);
+            }
+        });
+
+        app.setOnEnergyRawDataReceivedListener(new SmartHomeApplication.OnEnergyRawDataReceivedListener() {
+            @Override
+            public void onEnergyRawDataReceived(EnergyRawData energyRawData) {
+                // TODO: 处理接收到的能源数据
+                Log.i("MainActivity", "收到EnergyRawData");
+                showChartWindow(energyRawData);
             }
         });
 
@@ -937,5 +952,93 @@ public class MainActivity extends AppCompatActivity {
         //}
     }
 
+    private void showChartWindow(EnergyRawData energyRawData) {
+        // 加载window_energy_trend布局
+        View trendView = getLayoutInflater().inflate(R.layout.window_energy_trend, null);
 
+        // 获取图表实例
+        LineChart energyChart = trendView.findViewById(R.id.trend_chart);
+
+        // 创建数据集
+        ArrayList<Entry> entries = new ArrayList<>();
+
+        // 从EnergyRawData中提取数据
+        com.zrdds.infrastructure.FloatSeq currentPowerSeq = energyRawData.currentPowerSeq;
+        com.zrdds.infrastructure.StringSeq timeSeq = energyRawData.timeSeq;
+
+        // 检查数据是否有效
+        if (currentPowerSeq.length() != timeSeq.length()) {
+            Log.e("MainActivity", "数据长度不匹配: currentPowerSeq长度=" + currentPowerSeq.length() +
+                    ", timeSeq长度=" + timeSeq.length());
+            return;
+        }
+
+        // 转换数据为图表可用格式
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        for (int i = 0; i < currentPowerSeq.length(); i++) {
+            try {
+                // 将时间字符串转换为时间戳
+                Date date = sdf.parse(timeSeq.get_at(i));
+                long timestamp = date.getTime();
+
+                // 添加数据点 (时间戳, 功率值)
+                entries.add(new Entry(timestamp, currentPowerSeq.get_at(i)));
+            } catch (Exception e) {
+                Log.e("MainActivity", "解析时间数据出错: " + timeSeq.get_at(i), e);
+            }
+        }
+
+        // 创建数据集
+        LineDataSet dataSet = new LineDataSet(entries, "实时功率 (" + energyRawData.deviceId + ")");
+        dataSet.setColor(ColorTemplate.MATERIAL_COLORS[0]);
+        dataSet.setValueTextColor(ColorTemplate.MATERIAL_COLORS[1]);
+        dataSet.setLineWidth(3f); // 设置线条宽度为3像素
+        dataSet.setCircleRadius(4f); // 设置数据点圆圈半径
+        dataSet.setDrawValues(true); // 显示数值
+
+        // 设置数据到图表
+        energyChart.setData(new LineData(dataSet));
+
+        // 设置X轴标签
+        energyChart.getXAxis().setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
+        energyChart.getXAxis().setGranularity(1f);
+        energyChart.getXAxis().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                // 将时间戳转换为日期格式
+                long millis = (long) value;
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.getDefault());
+                return displayFormat.format(new Date(millis));
+            }
+        });
+
+        // 设置Y轴标签
+        energyChart.getAxisLeft().setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("%.1f", value) + "W";
+            }
+        });
+
+        // 隐藏右边的Y轴
+        energyChart.getAxisRight().setEnabled(false);
+
+        // 设置图表描述
+        energyChart.getDescription().setEnabled(false);
+
+        // 启用触摸手势
+        energyChart.setTouchEnabled(true);
+        energyChart.setDragEnabled(true);
+        energyChart.setScaleEnabled(true);
+
+        // 刷新图表
+        energyChart.invalidate();
+
+        // 显示图表弹窗
+        new AlertDialog.Builder(this)
+                .setView(trendView)
+                .setTitle("设备能耗趋势 - " + energyRawData.deviceType)
+                .setPositiveButton("关闭", null)
+                .show();
+    }
 }

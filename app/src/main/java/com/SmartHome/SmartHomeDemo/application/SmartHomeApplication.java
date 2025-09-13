@@ -18,6 +18,7 @@ import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
+import com.SmartHome.SmartHomeDemo.dds.EnergyRawDataDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.MediaDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.PresenceDdsManager;
@@ -77,6 +78,7 @@ public class SmartHomeApplication extends Application {
     private VehicleStatusDdsManager vehicleStatusDdsManager;
     private MediaDdsManager mediaDdsManager; // 添加这一行
     private ReportMediaDdsManager reportMediaDdsManager;
+    private EnergyRawDataDdsManager energyRawDataDdsManager;
 
     private ConnectivityManager.NetworkCallback networkCallback;
     private String deviceId;
@@ -143,6 +145,9 @@ public class SmartHomeApplication extends Application {
         // 设置VehicleStatus消息监听器
         setupVehicleStatusListener();
 
+        // 设置EnergyRawData消息监听器
+        setupEnergyRawDataListener();
+
         // 从数据库初始化已配对设备
         initializePairedDevices();
 
@@ -181,6 +186,9 @@ public class SmartHomeApplication extends Application {
 
         reportMediaDdsManager = new ReportMediaDdsManager();
         reportMediaDdsManager.initialize(baseDdsManager, "");
+
+        energyRawDataDdsManager = new EnergyRawDataDdsManager();
+        energyRawDataDdsManager.initialize(baseDdsManager);
 
         // 设置媒体接收监听器
         setupMediaListener();
@@ -474,6 +482,31 @@ public class SmartHomeApplication extends Application {
     private OnReportMediaReceivedListener reportMediaReceivedListener;
     public void setOnReportMediaReceivedListener(OnReportMediaReceivedListener listener) {
         this.reportMediaReceivedListener = listener;
+    }
+
+    // 添加EnergyRawData监听器接口
+    public interface OnEnergyRawDataReceivedListener {
+        void onEnergyRawDataReceived(idl.SmartDemo03.EnergyRawData energyRawData);
+    }
+    private OnEnergyRawDataReceivedListener energyRawDataReceivedListener;
+    public void setOnEnergyRawDataReceivedListener(OnEnergyRawDataReceivedListener listener) {
+        this.energyRawDataReceivedListener = listener;
+    }
+
+    private void setupEnergyRawDataListener() {
+        energyRawDataDdsManager.setOnEnergyRawDataReceivedListener(new EnergyRawDataDdsManager.OnEnergyRawDataReceivedListener() {
+            @Override
+            public void onEnergyRawDataReceived(idl.SmartDemo03.EnergyRawData energyRawData) {
+                Log.d(TAG, "收到EnergyRawData消息");
+
+                // 通知监听器
+                if (energyRawDataReceivedListener != null) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        energyRawDataReceivedListener.onEnergyRawDataReceived(energyRawData);
+                    });
+                }
+            }
+        });
     }
 
     private void setupMediaListener() {
