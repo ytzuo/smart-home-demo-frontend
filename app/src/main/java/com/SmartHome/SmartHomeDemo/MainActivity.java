@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
                         item.setDeviceType(dev.getDeviceType());
                         item.setDeviceGroup(dev.getDeviceGroup()); // 设置设备分组
                         item.setWorkingStatus("未连接");
-                        item.setStatus("未连接");
+                        item.setStatus("00000000");
                         item.setTime("默认时间");
 
                         // 设置图片资源
@@ -887,7 +887,7 @@ public class MainActivity extends AppCompatActivity {
                     saveMediaAndLinkToLog(mediaData.alertId, mediaData.bitmap);
                 } else if (mediaData.alert != null) {
                     // 如果有alert对象，即使未插入数据库也处理媒体数据
-                    addAlertToLog(mediaData.alert);
+                    //addAlertToLog(mediaData.alert);
                     saveMediaAndLinkToLog(mediaData.alertId, mediaData.bitmap);
 
                     // 标记该alert已处理
@@ -1124,6 +1124,25 @@ public class MainActivity extends AppCompatActivity {
                 blacklistedDevice.setTimestamp(currentTime);
 
                 app.getDatabase().blacklistedDeviceDao().insert(blacklistedDevice);
+
+                // 在主线程中更新UI
+                runOnUiThread(() -> {
+                    ToastUtil.showToast(this, "设备已添加到黑名单: " + presence.deviceId, Toast.LENGTH_SHORT);
+
+                    // 从HomeFragment的家具列表中移除该设备
+                    if (currentHomeFragment != null && currentHomeFragment.getHomeViewModel() != null) {
+                        List<FurnitureItem> currentList = currentHomeFragment.getHomeViewModel().getFurnitureLiveData().getValue();
+                        if (currentList != null) {
+                            List<FurnitureItem> newList = new ArrayList<>();
+                            for (FurnitureItem item : currentList) {
+                                if (!item.getDeviceId().equals(presence.deviceId)) {
+                                    newList.add(item);
+                                }
+                            }
+                            currentHomeFragment.getHomeViewModel().updateFurnitureList(newList);
+                        }
+                    }
+                });
 
                 Log.i("MainActivity", "设备已添加到黑名单: " + presence.deviceId);
             } catch (Exception e) {

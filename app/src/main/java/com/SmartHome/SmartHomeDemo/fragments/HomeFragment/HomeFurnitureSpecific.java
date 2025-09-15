@@ -201,6 +201,17 @@
                 Switch mainSwitch = view.findViewById(R.id.switch_11);
                 mainSwitch.setChecked(true);
             }
+
+            // 检查furnitureItem和switchStatus是否为null
+            if (furnitureItem != null && furnitureItem.getSwitchStatus() != null &&
+                    furnitureItem.getSwitchStatus().length() > 0 &&
+                    furnitureItem.getSwitchStatus().charAt(0) == '1') {
+                Switch mainSwitch = view.findViewById(R.id.switch_11);
+                if (mainSwitch != null) {
+                    mainSwitch.setChecked(true);
+                }
+            }
+
         }
 
         // 根据FurnitureItem中的switchStatus更新开关状态
@@ -299,6 +310,7 @@
 
             TextView arg1TextView = view.findViewById(R.id.arg1_item);
             Switch switch11 = view.findViewById(R.id.switch_11);
+            Log.i(TAG, "refreshUI " + switch11.isChecked());
 
             // 根据FurnitureItem中的switchStatus更新开关状态
             updateUISwitchStatueFromObject(view);

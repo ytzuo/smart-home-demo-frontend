@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.SmartHome.SmartHomeDemo.MainActivity;
 import com.SmartHome.SmartHomeDemo.R;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +69,8 @@ public class FurnitureListFragment extends Fragment {
         adapter.setOnItemClickLitener(new FurniturePageAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(FurnitureItem item) {
-                Log.i("FurnitureListFragment", "onItemClick");
+                Log.i("FurnitureListFragment", item.getStatus());
+                ToastUtil.showToast(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT);
                 // 使用FragmentTransaction显示HomeFurnitureSpecific Fragment
                 HomeFurnitureSpecific fragment = new HomeFurnitureSpecific();
 

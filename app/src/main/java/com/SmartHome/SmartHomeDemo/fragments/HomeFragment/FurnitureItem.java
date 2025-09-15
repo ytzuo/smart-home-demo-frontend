@@ -17,9 +17,9 @@ public class FurnitureItem implements Serializable {
     private String status = "00000000";
     private String time;
     private int imageResource;
-    private float acTemp; //空调温度
-    private String switchStatus; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
-    private float lightPercent;
+    private float acTemp = 26.0f; //空调温度
+    private String switchStatus = "00000000"; //八位长的字符串, 类似00000000, 代表家具的功能开关状态
+    private float lightPercent = 80.0f;
     private String deviceGroup; // 新增设备组字段
     private boolean onLineStatus;
 
@@ -73,6 +73,7 @@ public class FurnitureItem implements Serializable {
         }
 
         List<Integer> receivedStatus = furnitureDataPack.getStatus();
+        Log.i("newItem", "receivedStatus: "+receivedStatus.toString());
         if (receivedStatus == null) {
             return false;
         }
@@ -96,16 +97,17 @@ public class FurnitureItem implements Serializable {
                 e.printStackTrace();
                 return false;
             }
-            return true;
+            //return true;
         }
 
         // 重新构建switchStatus而不是追加
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < receivedStatus.size(); i++){
-            sb.append(receivedStatus.get(i) == 1 ? "1" : "0");
+            sb.append(receivedStatus.get(i) != 0 ? "1" : "0");
         }
         switchStatus = sb.toString();
-        if(switchStatus.charAt(0) == '1') {
+        Log.i("newItem", switchStatus);
+        if(switchStatus.charAt(0) != '0') {
             workingStatus = "工作中";
         } else {
             workingStatus = "关机";
@@ -121,6 +123,13 @@ public class FurnitureItem implements Serializable {
         try {
             switch (deviceType){
                 case "air_conditioner":
+                    if (params.size() > 0) {
+                        acTemp = params.get(0);
+                        status = "温度 " + acTemp;
+                    }
+                    imageResource = R.drawable.icon_air_conditioner;
+                    break;
+                case "ac":
                     if (params.size() > 0) {
                         acTemp = params.get(0);
                         status = "温度 " + acTemp;

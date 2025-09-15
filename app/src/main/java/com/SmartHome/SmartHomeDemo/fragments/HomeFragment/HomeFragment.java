@@ -264,14 +264,22 @@ public class HomeFragment extends Fragment {
                 try {
                     // 从数据库获取现有设备列表（仅执行一次）
                     List<Device> devicesInDatabase = new ArrayList<>();
+                    List<com.SmartHome.SmartHomeDemo.database.BlacklistedDevice> blacklistedDevices = new ArrayList<>();
                     if (app != null && app.getDatabase() != null) {
                         devicesInDatabase = app.getDatabase().deviceDao().getAllDevices();
+                        blacklistedDevices = app.getDatabase().blacklistedDeviceDao().getAllBlacklistedDevices();
                     }
 
                     // 创建设备ID到设备的映射，提高查找效率
                     Map<String, Device> deviceMap = new HashMap<>();
                     for (Device device : devicesInDatabase) {
                         deviceMap.put(device.getDeviceId(), device);
+                    }
+
+                    // 创建黑名单设备ID的集合，提高查找效率
+                    Set<String> blacklistedDeviceIds = new HashSet<>();
+                    for (com.SmartHome.SmartHomeDemo.database.BlacklistedDevice blacklistedDevice : blacklistedDevices) {
+                        blacklistedDeviceIds.add(blacklistedDevice.getDeviceId());
                     }
 
                     // 获取当前家具列表的副本
@@ -291,6 +299,12 @@ public class HomeFragment extends Fragment {
                     for(int i = 0; i < len; i++) {
                         String deviceId = homeStatus.deviceIds.get_at(i);
 
+                        // 检查设备是否在黑名单中
+                        if (blacklistedDeviceIds.contains(deviceId)) {
+                            // 如果设备在黑名单中，则跳过处理
+                            continue;
+                        }
+
                         // 从映射中查找设备，时间复杂度O(1)
                         Device existingDevice = deviceMap.get(deviceId);
 
@@ -301,26 +315,42 @@ public class HomeFragment extends Fragment {
                             FurnitureItem newItem;
 
                             if (existingItem != null) {
-                                // 如果已存在，创建一个副本进行更新
-                                newItem = new FurnitureItem(
-                                        existingItem.getDeviceId(),
-                                        existingItem.getDeviceType(),
-                                        existingItem.getWorkingStatus(),
-                                        existingItem.getStatus(),
-                                        existingItem.getTime(),
-                                        existingItem.getImageResource(),
-                                        existingItem.getAcTemp(),
-                                        existingItem.getSwitchStatus(),
-                                        existingItem.getLightPercent()
-                                );
+                                // 如果已存在，基于现有项创建新项，但使用HomeStatus中的新数据进行更新
+                                newItem = new FurnitureItem();
+                                newItem.setDeviceId(existingItem.getDeviceId());
+                                newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
                                 newItem.setDeviceGroup(existingItem.getDeviceGroup());
-                                newItem.setFurnitureDataPack(existingItem.getFurnitureDataPack());
+                                newItem.setImageResource(existingItem.getImageResource());
+
+                                // 使用HomeStatus中的新数据更新时间戳
+                                newItem.setTime(homeStatus.timeStamp);
+
+                                // 解析HomeStatus中的JSON数据
+                                String jsonData = homeStatus.deviceStatus.get_at(i);
+                                if (newItem.receiveDataJson(jsonData)) {
+                                    Log.i("JSON", newItem.getFurnitureDataPack().toString());
+                                    // 成功解析JSON后更新数据
+                                    newItem.updateSelfFromDataPack();
+                                    Log.i("newItem",
+                                            "status: "+newItem.getStatus()+
+                                            " swtichStatus: "+newItem.getSwitchStatus());
+                                } else {
+                                    // 如果解析失败，保留现有项的部分数据
+                                    newItem.setWorkingStatus(existingItem.getWorkingStatus());
+                                    newItem.setStatus(existingItem.getStatus());
+                                    newItem.setSwitchStatus(existingItem.getSwitchStatus());
+                                    newItem.setAcTemp(existingItem.getAcTemp());
+                                    newItem.setLightPercent(existingItem.getLightPercent());
+                                    Log.i("newItem", "JSON转换失败/更新失败 " + jsonData);
+                                }
                             } else {
                                 // 如果不存在，创建新项目
                                 newItem = new FurnitureItem();
                                 newItem.setDeviceId(deviceId);
                                 newItem.setDeviceType(homeStatus.deviceTypes.get_at(i));
                                 newItem.setDeviceGroup(existingDevice.getDeviceGroup()); // 从数据库获取分组信息
+                                // 设置默认的switchStatus
+                                newItem.setSwitchStatus("00000000");
 
                                 switch(newItem.getDeviceType()) {
                                     case "light":
@@ -567,7 +597,7 @@ public class HomeFragment extends Fragment {
                                 item.setDeviceType(dev.getDeviceType());
                                 item.setDeviceGroup(dev.getDeviceGroup());
                                 item.setWorkingStatus("未连接");
-                                item.setStatus("未连接");
+                                item.setStatus("00000000");
                                 item.setTime("默认时间");
 
                                 // 设置图片资源
