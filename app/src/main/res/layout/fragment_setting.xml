@@ -257,7 +257,7 @@
                 style="@style/AppTheme.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="测试折线图"/>
+                android:text="管理设备黑名单"/>
 
         </LinearLayout>
     </ScrollView>

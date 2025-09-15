@@ -22,6 +22,7 @@
     import com.SmartHome.SmartHomeDemo.R;
     import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
     import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+    import com.SmartHome.SmartHomeDemo.database.BlacklistedDevice;
     import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
     import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
     import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
@@ -840,6 +841,7 @@
             // 更新对话框中的文本
             TextView deviceIdText = dialogView.findViewById(R.id.unbind_device_id);
             TextView deviceTypeText = dialogView.findViewById(R.id.unbind_device_type);
+            CheckBox addToBlacklistCheckBox = dialogView.findViewById(R.id.unbind_checkBox_add_to_blacklist);
 
             if (deviceIdText != null) {
                 deviceIdText.setText(getString(R.string.device_id) + ": " + furnitureItem.getDeviceId());
@@ -862,7 +864,13 @@
                     AppDatabase.databaseWriteExecutor.execute(() -> {
                         // 从数据库中删除设备
                         app.getDatabase().deviceDao().deleteByDeviceId(furnitureItem.getDeviceId());
+                        // 检查用户是否选择了添加到黑名单
+                        boolean addToBlacklist = addToBlacklistCheckBox.isChecked();
 
+                        // 如果用户选择了添加到黑名单，则将设备添加到黑名单数据库
+                        if (addToBlacklist) {
+                            addDeviceToBlacklist(furnitureItem.getDeviceType(), furnitureItem.getDeviceId());
+                        }
                         // 从UI中删除设备
                         if (getActivity() instanceof MainActivity) {
                             MainActivity mainActivity = (MainActivity) getActivity();
@@ -903,5 +911,27 @@
                 });
             }
             dialog.show();
+        }
+
+        private void addDeviceToBlacklist(String deviceType, String deviceId) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                try {
+                    // 创建黑名单设备实体并插入数据库
+                    BlacklistedDevice blacklistedDevice = new BlacklistedDevice();
+                    blacklistedDevice.setDeviceId(deviceId);
+                    blacklistedDevice.setDeviceType(deviceType);
+
+                    // 设置当前时间戳
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    String currentTime = sdf.format(new Date());
+                    blacklistedDevice.setTimestamp(currentTime);
+
+                    app.getDatabase().blacklistedDeviceDao().insert(blacklistedDevice);
+
+                    Log.i("MainActivity", "设备已添加到黑名单: " + deviceId);
+                } catch (Exception e) {
+                    Log.e("MainActivity", "添加设备到黑名单时出错: " + e.getMessage());
+                }
+            });
         }
     }

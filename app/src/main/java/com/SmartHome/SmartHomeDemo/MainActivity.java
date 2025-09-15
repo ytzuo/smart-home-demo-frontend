@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ import androidx.fragment.app.Fragment;
 
 import com.SmartHome.SmartHomeDemo.application.SmartHomeApplication;
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
+import com.SmartHome.SmartHomeDemo.database.BlacklistedDevice;
 import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.database.DeviceDao;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
@@ -384,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
         // 更新对话框中的文本
         TextView deviceIdText = dialogView.findViewById(R.id.match_device_id);
         TextView deviceTypeText = dialogView.findViewById(R.id.match_device_type);
+        CheckBox addToBlacklistCheckBox = dialogView.findViewById(R.id.checkBox_add_to_blacklist);
 
         if (deviceIdText != null) {
             deviceIdText.setText(getString(R.string.device_id) + ": " + presence.deviceId);
@@ -418,6 +421,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
+        // 设置对话框不可通过点击外部区域取消
+        dialog.setCanceledOnTouchOutside(false);
 
         // 设置按钮点击事件
         if (dialogView.findViewById(R.id.add_new_done) != null) {
@@ -438,6 +443,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (dialogView.findViewById(R.id.add_new_cancel) != null) {
             dialogView.findViewById(R.id.add_new_cancel).setOnClickListener(v -> {
+                if (addToBlacklistCheckBox.isChecked()) {
+                    // 用户选择将设备添加到黑名单
+                    addDeviceToBlacklist(presence);
+                }
                 // 用户点击取消
                 dialog.dismiss();
             });
@@ -1100,4 +1109,50 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("关闭", null)
                 .show();
     }
+
+    private void addDeviceToBlacklist(Presence presence) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                // 创建黑名单设备实体并插入数据库
+                BlacklistedDevice blacklistedDevice = new BlacklistedDevice();
+                blacklistedDevice.setDeviceId(presence.deviceId);
+                blacklistedDevice.setDeviceType(presence.deviceType);
+
+                // 设置当前时间戳
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                String currentTime = sdf.format(new Date());
+                blacklistedDevice.setTimestamp(currentTime);
+
+                app.getDatabase().blacklistedDeviceDao().insert(blacklistedDevice);
+
+                Log.i("MainActivity", "设备已添加到黑名单: " + presence.deviceId);
+            } catch (Exception e) {
+                Log.e("MainActivity", "添加设备到黑名单时出错: " + e.getMessage());
+            }
+        });
+    }
+    private boolean isDeviceBlacklisted(String deviceId) {
+        try {
+            BlacklistedDevice blacklistedDevice = app.getDatabase().blacklistedDeviceDao().getBlacklistedDeviceById(deviceId);
+            return blacklistedDevice != null;
+        } catch (Exception e) {
+            Log.e("MainActivity", "检查设备是否在黑名单时出错: " + e.getMessage());
+            return false;
+        }
+    }
+    private void handleNewDevice(Presence presence) {
+        // 检查设备是否在黑名单中
+        if (isDeviceBlacklisted(presence.deviceId)) {
+            Log.i("MainActivity", "设备在黑名单中，忽略: " + presence.deviceId);
+            return;
+        }
+
+        // 检查设备是否已经配对
+        Device existingDevice = database.deviceDao().getDeviceByDeviceId(presence.deviceId);
+        if (existingDevice == null) {
+            // 设备未配对，显示配对对话框
+            showNewDeviceDialog(presence);
+        }
+    }
+
 }

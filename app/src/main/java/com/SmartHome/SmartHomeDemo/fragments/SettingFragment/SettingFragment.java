@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ import com.SmartHome.SmartHomeDemo.fragments.CarFragment.CarAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureAlert;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureDataPack;
 import com.SmartHome.SmartHomeDemo.fragments.HomeFragment.FurnitureItem;
+import com.SmartHome.SmartHomeDemo.utils.ToastUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -181,19 +183,7 @@ public class SettingFragment extends Fragment {
             testChart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ArrayList<Entry> entries = new ArrayList<>();
-                    // 使用日期时间戳作为X轴值
-                    long currentTime = System.currentTimeMillis();
-                    long oneDayMillis = 24 * 60 * 60 * 1000;
-
-                    entries.add(new Entry(currentTime - 6 * oneDayMillis, 20));
-                    entries.add(new Entry(currentTime - 5 * oneDayMillis, 40));
-                    entries.add(new Entry(currentTime - 4 * oneDayMillis, 30));
-                    entries.add(new Entry(currentTime - 3 * oneDayMillis, 60));
-                    entries.add(new Entry(currentTime - 2 * oneDayMillis, 50));
-                    entries.add(new Entry(currentTime - oneDayMillis, 44));
-                    entries.add(new Entry(currentTime, 32));
-                    showChart(entries);
+                    showBlacklistManagementDialog();
                 }
             });
         }
@@ -687,4 +677,99 @@ public class SettingFragment extends Fragment {
             }
         }
     }
+
+    private void showBlacklistManagementDialog() {
+        // 创建自定义对话框
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.window_blacklist_manage, null);
+        builder.setView(dialogView);
+
+        // 设置标题
+        TextView titleText = dialogView.findViewById(R.id.blacklist_title);
+        titleText.setText("黑名单管理");
+
+        // 初始化设备列表
+        RecyclerView deviceRecyclerView = dialogView.findViewById(R.id.blacklist_device_recyclerView);
+        deviceRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        // 设置按钮点击事件
+        Button cancelButton = dialogView.findViewById(R.id.blacklist_cancel);
+        Button doneButton = dialogView.findViewById(R.id.blacklist_done);
+
+        AlertDialog dialog = builder.create();
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        // 先显示对话框
+        dialog.show();
+
+        // 显示加载进度指示
+        TextView loadingText = new TextView(requireContext());
+        loadingText.setText("正在加载黑名单设备列表...");
+        loadingText.setPadding(16, 16, 16, 16);
+        deviceRecyclerView.setAdapter(new RecyclerView.Adapter() {
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return new RecyclerView.ViewHolder(loadingText) {};
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                // 不需要实现
+            }
+
+            @Override
+            public int getItemCount() {
+                return 1;
+            }
+        });
+
+        // 在后台线程中获取黑名单设备列表
+        if (database != null) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                // 在后台线程中查询数据库
+                List<com.SmartHome.SmartHomeDemo.database.BlacklistedDevice> blacklistedDevices =
+                        database.blacklistedDeviceDao().getAllBlacklistedDevices();
+                Log.i(TAG, "黑名单设备数量: " + blacklistedDevices.size());
+
+                // 切换到主线程更新UI
+                requireActivity().runOnUiThread(() -> {
+                    BlacklistDeviceAdapter adapter = new BlacklistDeviceAdapter(requireContext(), blacklistedDevices);
+                    deviceRecyclerView.setAdapter(adapter);
+
+                    doneButton.setOnClickListener(v -> {
+                        // 从黑名单中移除选中的设备
+                        List<com.SmartHome.SmartHomeDemo.database.BlacklistedDevice> selectedDevices =
+                                adapter.getSelectedDevicesForRemoval();
+
+                        if (!selectedDevices.isEmpty()) {
+                            // 在后台线程中从数据库删除选中的设备
+                            AppDatabase.databaseWriteExecutor.execute(() -> {
+                                for (com.SmartHome.SmartHomeDemo.database.BlacklistedDevice device : selectedDevices) {
+                                    database.blacklistedDeviceDao().delete(device);
+                                    Log.i(TAG, "已从黑名单中移除设备: " + device.getDeviceId());
+                                }
+
+                                // 更新UI
+                                requireActivity().runOnUiThread(() -> {
+                                    adapter.removeSelectedDevices();
+                                    ToastUtil.showToast(requireContext(), "已从黑名单中移除 " + selectedDevices.size() + " 个设备",
+                                            Toast.LENGTH_SHORT);
+                                });
+                            });
+                        }
+
+                        dialog.dismiss();
+                    });
+                });
+            });
+        } else {
+            Log.e(TAG, "数据库不可用!");
+            ToastUtil.showToast(requireContext(), "数据库不可用", Toast.LENGTH_SHORT);
+            dialog.dismiss();
+        }
+    }
+
 }

@@ -37,6 +37,12 @@
         android:layout_height="wrap_content"
         android:text="@string/device_type"
         android:textSize="18sp" />
+    <CheckBox
+        android:id="@+id/unbind_checkBox_add_to_blacklist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="同时添加到黑名单"
+        android:textSize="18sp" />
     <View
         android:layout_width="match_parent"
         android:layout_height="15dp"/>

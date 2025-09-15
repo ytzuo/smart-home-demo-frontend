@@ -261,6 +261,15 @@ public class SmartHomeApplication extends Application {
             // 在后台线程中查询数据库，检查设备是否存在
             Executors.newSingleThreadExecutor().execute(() -> {
                 try {
+                    // 检查设备是否在黑名单中
+                    com.SmartHome.SmartHomeDemo.database.BlacklistedDevice blacklistedDevice =
+                            database.blacklistedDeviceDao().getBlacklistedDeviceById(presence.deviceId);
+
+                    // 如果设备在黑名单中，则忽略
+                    if (blacklistedDevice != null) {
+                        Log.i(TAG, "设备在黑名单中，忽略: " + presence.deviceId);
+                        return;
+                    }
                     // 这里需要根据您的实际数据库结构来查询设备
                     // 假设有一个deviceDao()方法和getDeviceById()方法
                      Device device = database.deviceDao().getDeviceByDeviceId(presence.deviceId);

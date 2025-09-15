@@ -9,7 +9,7 @@ import android.content.Context;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Device.class, Log.class}, version = 6, exportSchema = false)
+@Database(entities = {Device.class, Log.class, BlacklistedDevice.class}, version = 7, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     //
@@ -23,6 +23,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract DeviceDao deviceDao();
     public abstract LogDao logDao();
+    public abstract BlacklistedDeviceDao blacklistedDeviceDao();
 
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
