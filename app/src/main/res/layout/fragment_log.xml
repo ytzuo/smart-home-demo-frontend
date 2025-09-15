@@ -37,8 +37,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="750dp"
                     android:paddingStart="15dp"
-                    tools:layout_editor_absoluteX="0dp"
-                    tools:ignore="RtlSymmetry">
+                    tools:ignore="RtlSymmetry"
+                    tools:layout_editor_absoluteX="0dp">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
@@ -50,22 +50,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+        <View
+            android:layout_width="5dp"
+            android:layout_height="match_parent"></View>
 
         <Button
             android:id="@+id/log_btn_test_del_all"
+            style="@style/AppTheme.Button.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="删除所有数据"
             android:textSize="20sp" />
-
+        <View
+            android:layout_width="5dp"
+            android:layout_height="match_parent"></View>
         <Button
             android:id="@+id/log_btn_filter"
+            style="@style/AppTheme.Button.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="20sp"
             android:text="筛选" />
+        <View
+            android:layout_width="5dp"
+            android:layout_height="match_parent"></View>
 
     </LinearLayout>
 

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -67,6 +68,8 @@ public class LogFragment extends Fragment {
         // 设置适配器
         adapter = new LogAdapter(new ArrayList<LogItem>());
         recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_fall_down));
+        recyclerView.scheduleLayoutAnimation();
 
         //测试用按钮, 用于清空数据库
         test_btn = view.findViewById(R.id.log_btn_test_del_all);

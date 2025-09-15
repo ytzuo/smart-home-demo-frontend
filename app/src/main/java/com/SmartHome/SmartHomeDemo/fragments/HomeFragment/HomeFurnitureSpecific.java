@@ -582,7 +582,10 @@
                     }
 
                     if (item.getItemId() == R.id.action_get_energy_report) {
-                        // TODO: 完成根据设备id获取设备能耗报告图的逻辑
+                        if(!furnitureItem.isOnline()){
+                            ToastUtil.showToast(app, "设备不在线！", Toast.LENGTH_SHORT);
+                            return false;
+                        }
                         Command command   = new Command();
                         command.deviceId  = furnitureItem.getDeviceId();
                         command.action    = "get_raw_energy_data_" + command.deviceId;
@@ -590,6 +593,7 @@
                         command.timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                         commandDdsManager.sendCommand(command);
                         Log.i(TAG, "已发送获取能耗报告的命令");
+                        return true;
                     }
                     return false;
                 }

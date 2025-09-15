@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,6 +53,8 @@ public class FurnitureListFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutAnimation(AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_fall_down));
+        recyclerView.scheduleLayoutAnimation();
 
         // 检查是否有更新的数据
         if (getArguments() != null && getArguments().containsKey("updated_list")) {

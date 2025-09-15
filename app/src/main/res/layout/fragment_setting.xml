@@ -111,6 +111,7 @@
                         android:layout_height="match_parent"/>
                     <Button
                         android:id="@+id/scene_mode_1_customize"
+                        style="@style/AppTheme.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -168,6 +169,7 @@
                         android:layout_height="match_parent"/>
                     <Button
                         android:id="@+id/scene_mode_2_customize"
+                        style="@style/AppTheme.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -225,6 +227,7 @@
                         android:layout_height="match_parent"/>
                     <Button
                         android:id="@+id/scene_mode_3_customize"
+                        style="@style/AppTheme.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -241,6 +244,7 @@
                 android:layout_height="10dp"/>
             <Button
                 android:id="@+id/test_del_scene"
+                style="@style/AppTheme.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="删除已保存的情景"/>
@@ -250,6 +254,7 @@
                 android:layout_height="10dp"/>
             <Button
                 android:id="@+id/test_chart"
+                style="@style/AppTheme.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="测试折线图"/>
