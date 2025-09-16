@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         app.setOnMediaReceivedListener(new SmartHomeApplication.OnMediaReceivedListener() {
             @Override
             public void onMediaReceived(int alertId, Bitmap bitmap, String deviceId, String deviceType) {
-                Log.i("MainActivity", "媒体监听器被触发");
+                Log.i("MainActivity", "收到AlertMedia数据: alertId=" + alertId + ", deviceId=" + deviceId + ", deviceType=" + deviceType);
                 handleReceivedAlertMedia(alertId, bitmap, deviceId, deviceType);
             }
         });
