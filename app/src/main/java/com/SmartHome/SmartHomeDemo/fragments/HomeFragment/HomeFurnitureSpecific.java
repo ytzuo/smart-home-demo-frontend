@@ -642,7 +642,7 @@
             String seekBarName = getResources().getResourceEntryName(seekBar.getId());
             // 这里可以添加实际的设备控制逻辑
             if (isAdded()) {
-                ToastUtil.showToast(requireContext(), seekBarName + " 值: " + progress, Toast.LENGTH_SHORT);
+                //ToastUtil.showToast(requireContext(), seekBarName + " 值: " + progress, Toast.LENGTH_SHORT);
             }
         }
 

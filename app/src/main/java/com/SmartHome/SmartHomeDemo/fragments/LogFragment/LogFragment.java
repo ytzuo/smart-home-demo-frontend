@@ -124,7 +124,7 @@ public class LogFragment extends Fragment {
             @Override
             public void onItemClick(LogItem item, int position) {
                 //Log.i("LogFragment", "点击了: " + item.getLogID());
-                ToastUtil.showToast(getContext(), "点击了: " + item.getLogID(), Toast.LENGTH_SHORT);
+                //ToastUtil.showToast(getContext(), "点击了: " + item.getLogID(), Toast.LENGTH_SHORT);
                 showLogDetailDialog(item);
             }
         });

@@ -70,7 +70,7 @@ public class FurnitureListFragment extends Fragment {
             @Override
             public void onItemClick(FurnitureItem item) {
                 Log.i("FurnitureListFragment", item.getStatus());
-                ToastUtil.showToast(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT);
+                //ToastUtil.showToast(getContext(), "点击了: " + item.getDeviceId(), Toast.LENGTH_SHORT);
                 // 使用FragmentTransaction显示HomeFurnitureSpecific Fragment
                 HomeFurnitureSpecific fragment = new HomeFurnitureSpecific();
 
