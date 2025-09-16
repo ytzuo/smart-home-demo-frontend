@@ -15,6 +15,7 @@ import androidx.core.net.ParseException;
 
 import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.Device;
+import com.SmartHome.SmartHomeDemo.dds.AIVehicleHealthReportDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.BaseDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.CommandDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
@@ -80,6 +81,7 @@ public class SmartHomeApplication extends Application {
     private MediaDdsManager vehicleMediaDdsManager; // 用于处理VehicleMedia主题
     private ReportMediaDdsManager reportMediaDdsManager;
     private EnergyRawDataDdsManager energyRawDataDdsManager;
+    private AIVehicleHealthReportDdsManager aiReportDdsManager;
 
     private ConnectivityManager.NetworkCallback networkCallback;
     private String deviceId;
@@ -106,6 +108,13 @@ public class SmartHomeApplication extends Application {
     private AlertDdsManager.OnAlertReceivedListener alertReceivedListener;
     public void setOnAlertReceivedListener(AlertDdsManager.OnAlertReceivedListener listener) {
         this.alertDdsManager.setOnAlertReceivedListener(listener);
+    }
+    private AIVehicleHealthReportDdsManager.OnAIReportReceivedListener aiReportReceivedListener;
+    public void setOnAIReportReceivedListener(AIVehicleHealthReportDdsManager.OnAIReportReceivedListener aiReportReceivedListener) {
+        this.aiReportReceivedListener = aiReportReceivedListener;
+        if (this.aiReportDdsManager != null) {
+            this.aiReportDdsManager.setOnAIReportReceivedListener(aiReportReceivedListener);
+        }
     }
 
     private OnVehicleStatusReceivedListener vehicleStatusReceivedListener;
@@ -174,6 +183,9 @@ public class SmartHomeApplication extends Application {
 
         vehicleStatusDdsManager = new VehicleStatusDdsManager();
         vehicleStatusDdsManager.initialize(baseDdsManager);
+
+        aiReportDdsManager = new AIVehicleHealthReportDdsManager();
+        aiReportDdsManager.initialize(baseDdsManager);
 
         // 初始化媒体管理器
         mediaDdsManager = new MediaDdsManager();

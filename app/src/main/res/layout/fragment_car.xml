@@ -158,7 +158,12 @@
                         android:textColor="#FF9E9E9E"/>
                 </LinearLayout>
             </LinearLayout>
-
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/gen_ai_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="获取AI智能检测报告"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

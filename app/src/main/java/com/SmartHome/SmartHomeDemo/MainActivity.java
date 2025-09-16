@@ -1,6 +1,8 @@
 
 package com.SmartHome.SmartHomeDemo;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -37,6 +39,7 @@ import com.SmartHome.SmartHomeDemo.database.AppDatabase;
 import com.SmartHome.SmartHomeDemo.database.BlacklistedDevice;
 import com.SmartHome.SmartHomeDemo.database.Device;
 import com.SmartHome.SmartHomeDemo.database.DeviceDao;
+import com.SmartHome.SmartHomeDemo.dds.AIVehicleHealthReportDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.AlertDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.HomeStatusDdsManager;
 import com.SmartHome.SmartHomeDemo.dds.VehicleStatusDdsManager;
@@ -56,6 +59,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -70,11 +75,13 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 
+import idl.SmartDemo03.AIVehicleHealthReport;
 import idl.SmartDemo03.Alert;
 import idl.SmartDemo03.EnergyRawData;
 import idl.SmartDemo03.HomeStatus;
 import idl.SmartDemo03.Presence;
 import idl.SmartDemo03.VehicleStatus;
+import io.noties.markwon.Markwon;
 
 public class MainActivity extends AppCompatActivity {
     private static final String GROUP_PREFS_NAME = "GroupNames";
@@ -195,9 +202,17 @@ public class MainActivity extends AppCompatActivity {
         app.setOnEnergyRawDataReceivedListener(new SmartHomeApplication.OnEnergyRawDataReceivedListener() {
             @Override
             public void onEnergyRawDataReceived(EnergyRawData energyRawData) {
-                // TODO: 处理接收到的能源数据
                 Log.i("MainActivity", "收到EnergyRawData");
                 showChartWindow(energyRawData);
+            }
+        });
+
+        app.setOnAIReportReceivedListener(new AIVehicleHealthReportDdsManager.OnAIReportReceivedListener() {
+            @Override
+            public void onAIReportReceived(AIVehicleHealthReport aiReport) {
+                // TODO: 处理AI 报告的逻辑
+                Log.i("MainActivity", "收到AIVehicleHealthReport");
+                showAIReportWindow(aiReport);
             }
         });
 
@@ -246,6 +261,43 @@ public class MainActivity extends AppCompatActivity {
         });
         // 启动处理警报的线程
         //startAlertHandlingThread();
+    }
+
+    private void showAIReportWindow(AIVehicleHealthReport aiReport) {
+        View aiReportView = getLayoutInflater().inflate(R.layout.window_ai_report, null);
+        TextView carID         = aiReportView.findViewById(R.id.ai_report_car_id);
+        TextView reportID      = aiReportView.findViewById(R.id.ai_report_id);
+        TextView reportTime    = aiReportView.findViewById(R.id.ai_report_time);
+        TextView aiModel       = aiReportView.findViewById(R.id.ai_report_model);
+        TextView reportContent = aiReportView.findViewById(R.id.ai_report_content);
+
+        Button doneBtn = aiReportView.findViewById(R.id.ai_report_confirm);
+
+        // 使用Markwon渲染Markdown文本
+        Markwon markwon = Markwon.create(this);
+        markwon.setMarkdown(reportContent, aiReport.reportContent.substring(8));
+
+
+        carID.setText(aiReport.vehicleId);
+        reportID.setText(aiReport.reportId);
+        reportTime.setText(aiReport.timeStamp);
+        aiModel.setText(aiReport.generationModel);
+        //reportContent.setText(aiReport.reportContent);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(aiReportView);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        if(doneBtn != null) {
+            doneBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+        }
     }
 
     // 处理接收到的定时发送的 车辆媒体数据

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ public class CarFragment extends Fragment {
     private MaterialButton lockButton;
     private MaterialButton acButton;
     private ImageView carImageView;
+    private Button genAIReport;
 
     private SmartHomeApplication app;
     private CommandDdsManager commandDdsManager;
@@ -72,6 +74,7 @@ public class CarFragment extends Fragment {
         acButton         = view.findViewById(R.id.control_car_ac);
         ctrlText         = view.findViewById(R.id.control_car_text);
         carImageView     = view.findViewById(R.id.iv_car); // 获取汽车图像视图的引用
+        genAIReport      = view.findViewById(R.id.gen_ai_report);
 
         // 观察LiveData变化并更新UI
         LiveData<CarItem> carLiveData = carViewModel.getCarLiveData();
@@ -253,6 +256,20 @@ public class CarFragment extends Fragment {
                 Log.i(TAG, "发送命令" + command.action);
                 //Toast.makeText(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT).show();
                 ToastUtil.showToast(getContext(), "空调控制按钮被点击", Toast.LENGTH_SHORT);
+            }
+        });
+
+        genAIReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Command command = new Command();
+                command.action = "car";
+                command.deviceType = "car";
+                command.value = 0;
+                command.timeStamp =  String.valueOf(System.currentTimeMillis());
+                Log.i(TAG, "发送命令" + command.action);
+                commandDdsManager.sendCommand(command);
+                ToastUtil.showToast(getContext(),"正在生成AI智能检测报告！", Toast.LENGTH_SHORT);;
             }
         });
     }

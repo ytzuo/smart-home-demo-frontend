@@ -106,20 +106,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="10dp">
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
                     <Button
+                        style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/scene_mode_1_customize"
-                        style="@style/AppTheme.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="5dp"
+                        android:textSize="16sp"
                         android:text="编辑"/>
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -164,20 +159,15 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="10dp">
 
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
                     <Button
+                        style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/scene_mode_2_customize"
-                        style="@style/AppTheme.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="5dp"
+                        android:textSize="16sp"
                         android:text="编辑"/>
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -222,20 +212,15 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="10dp">
 
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
                     <Button
                         android:id="@+id/scene_mode_3_customize"
-                        style="@style/AppTheme.Button"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="5dp"
+                        android:textSize="16sp"
                         android:text="编辑"/>
-                    <View
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -244,9 +229,10 @@
                 android:layout_height="10dp"/>
             <Button
                 android:id="@+id/test_del_scene"
-                style="@style/AppTheme.Button"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:text="删除已保存的情景"/>
 
             <View
@@ -254,9 +240,10 @@
                 android:layout_height="10dp"/>
             <Button
                 android:id="@+id/test_chart"
-                style="@style/AppTheme.Button"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:text="管理设备黑名单"/>
 
         </LinearLayout>

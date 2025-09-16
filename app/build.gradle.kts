@@ -49,4 +49,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     annotationProcessor(libs.room.compiler)
     implementation(libs.gson)
+    implementation("io.noties.markwon:core:4.6.2")
 }

@@ -56,7 +56,7 @@
 
         <Button
             android:id="@+id/log_btn_test_del_all"
-            style="@style/AppTheme.Button.Small"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -67,7 +67,7 @@
             android:layout_height="match_parent"></View>
         <Button
             android:id="@+id/log_btn_filter"
-            style="@style/AppTheme.Button.Small"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
