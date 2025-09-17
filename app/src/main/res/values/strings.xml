@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartHomeDemo</string>
+    <string name="app_name">人车家</string>
     <string name="type">家具图片</string>
     <string name="furniture">设备名称</string>
     <string name="working">工作状态</string>
